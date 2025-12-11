@@ -41,7 +41,7 @@ export function HypothesisGeneration() {
 
   const handleStartInterview = () => {
     if (currentCase && hypotheses.length > 0) {
-      startCase(currentCase);
+      startCase(currentCase, true); // preserve hypotheses and planned questions
       navigate('/interview');
     }
   };

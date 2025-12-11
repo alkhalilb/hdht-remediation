@@ -30,7 +30,7 @@ interface AppState {
   // Current session
   currentSession: RemediationSession | null;
   currentCase: RemediationCase | null;
-  startCase: (caseData: RemediationCase) => void;
+  startCase: (caseData: RemediationCase, preserveHypotheses?: boolean) => void;
   endCase: (assessment: CaseAssessment) => void;
 
   // Interview state
@@ -151,15 +151,15 @@ export const useAppStore = create<AppState>()(
       // Session
       currentSession: null,
       currentCase: null,
-      startCase: (caseData) => {
-        const { student } = get();
+      startCase: (caseData, preserveHypotheses = false) => {
+        const { student, hypotheses: existingHypotheses, plannedQuestions: existingPlannedQuestions } = get();
         const session: RemediationSession = {
           sessionId: generateId(),
           studentId: student?.id || 'anonymous',
           caseId: caseData.id,
           startTime: new Date(),
           hypotheses: {
-            initial: [],
+            initial: preserveHypotheses ? existingHypotheses.map(h => h.name) : [],
           },
           questions: [],
           liveMetrics: {
@@ -175,11 +175,11 @@ export const useAppStore = create<AppState>()(
           currentSession: session,
           currentCase: caseData,
           messages: [],
-          hypotheses: [],
+          hypotheses: preserveHypotheses ? existingHypotheses : [],
           questions: [],
           scaffoldingEvents: [],
           liveMetrics: initialLiveMetrics,
-          plannedQuestions: [],
+          plannedQuestions: preserveHypotheses ? existingPlannedQuestions : [],
         });
       },
       endCase: (assessment) => {
