@@ -4,38 +4,11 @@ A hypothesis-driven history taking remediation application for medical students.
 
 ---
 
-## ⚠️ DEPLOYMENT PENDING - Complete These Steps
+## Deployed URLs
 
-### GitHub Repository
-https://github.com/alkhalilb/hdht-remediation
-
-### Step 1: Deploy Backend to Railway
-
-1. Go to **https://railway.app** and sign in
-2. Click **"New Project"** → **"Deploy from GitHub repo"**
-3. Select your `alkhalilb/hdht-remediation` repository
-4. **Important**: Set **Root Directory** to `server`
-5. Add environment variable:
-   - `ANTHROPIC_API_KEY` = your Anthropic API key (get from https://console.anthropic.com/settings/keys)
-6. Railway will auto-detect Node.js and deploy
-7. Once deployed, copy the public URL (e.g., `https://your-backend.up.railway.app`)
-
-### Step 2: Deploy Frontend to Vercel
-
-1. Go to **https://vercel.com** and sign in
-2. Click **"Add New..."** → **"Project"**
-3. Import your `alkhalilb/hdht-remediation` repository
-4. Set **Root Directory** to `app`
-5. Add environment variable:
-   - `VITE_API_URL` = your Railway backend URL from Step 1 (e.g., `https://hdht-server-production.up.railway.app`)
-6. Deploy
-
-### After Deployment - Update These URLs
-
-- **Backend URL**: [pending - update after Railway deploy]
-- **Frontend URL**: [pending - update after Vercel deploy]
-
-*Remove this section after deployment is complete.*
+- **Frontend**: https://hdht-remediation.vercel.app/
+- **Backend**: https://hdht-remediation-production.up.railway.app
+- **GitHub**: https://github.com/alkhalilb/hdht-remediation
 
 ---
 
