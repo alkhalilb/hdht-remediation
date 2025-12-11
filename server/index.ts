@@ -122,9 +122,10 @@ Respond as the patient would, in first person.`;
     const responseText = response.content[0].type === 'text' ? response.content[0].text : '';
 
     res.json({ response: responseText });
-  } catch (error) {
-    console.error('Virtual patient error:', error);
-    res.status(500).json({ error: 'Failed to generate response' });
+  } catch (error: any) {
+    console.error('Virtual patient error:', error?.message || error);
+    console.error('Full error:', JSON.stringify(error, null, 2));
+    res.status(500).json({ error: 'Failed to generate response', details: error?.message });
   }
 });
 
