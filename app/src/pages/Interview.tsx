@@ -63,8 +63,18 @@ export function Interview() {
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
   const removePlannedQuestion = useAppStore((state) => state.removePlannedQuestion);
 
+  // Get case from store (already set by HypothesisGeneration)
+  const storeCase = useAppStore((state) => state.currentCase);
+
   // Load the appropriate case based on phase
   useEffect(() => {
+    // If store already has the case loaded (from HypothesisGeneration), use it
+    if (storeCase) {
+      setCurrentCase(storeCase);
+      return;
+    }
+
+    // Otherwise, load the case (fallback for direct navigation)
     let caseToLoad: RemediationCase | null = null;
 
     if (phase === 'diagnostic') {
@@ -78,9 +88,8 @@ export function Interview() {
 
     if (caseToLoad && (!currentCase || currentCase.id !== caseToLoad.id)) {
       setCurrentCase(caseToLoad);
-      startCase(caseToLoad);
     }
-  }, [phase, assignedTrack, currentTrackCaseIndex, exitAttempts]);
+  }, [phase, assignedTrack, currentTrackCaseIndex, exitAttempts, storeCase]);
 
   // Update elapsed time
   useEffect(() => {
