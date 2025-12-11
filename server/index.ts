@@ -113,7 +113,7 @@ Respond as the patient would, in first person.`;
     messages.push({ role: 'user', content: question });
 
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
+      model: 'claude-opus-4-5',
       max_tokens: 300,
       system: systemPrompt,
       messages,
@@ -168,7 +168,7 @@ Respond in JSON format ONLY (no other text):
 }`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
+      model: 'claude-opus-4-5',
       max_tokens: 500,
       system: systemPrompt,
       messages: [{ role: 'user', content: 'Analyze the question and respond with JSON only.' }],
@@ -231,7 +231,7 @@ Evaluate the student's differential diagnosis and respond in JSON format ONLY:
 }`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
+      model: 'claude-opus-4-5',
       max_tokens: 500,
       system: systemPrompt,
       messages: [{ role: 'user', content: 'Evaluate the hypotheses and respond with JSON only.' }],
@@ -324,7 +324,7 @@ Assess the performance and respond in JSON format ONLY:
 }`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
+      model: 'claude-opus-4-5',
       max_tokens: 1000,
       system: systemPrompt,
       messages: [{ role: 'user', content: 'Assess the performance and respond with JSON only.' }],
