@@ -7,9 +7,10 @@ interface LayoutProps {
   children: ReactNode;
   showProgress?: boolean;
   showHeader?: boolean;
+  fullWidth?: boolean;
 }
 
-export function Layout({ children, showProgress = true, showHeader = true }: LayoutProps) {
+export function Layout({ children, showProgress = true, showHeader = true, fullWidth = false }: LayoutProps) {
   const { percentComplete, currentStep, totalSteps } = useProgress();
   const { phase } = useAppStore();
 
@@ -61,9 +62,13 @@ export function Layout({ children, showProgress = true, showHeader = true }: Lay
         </header>
       )}
       <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-4xl mx-auto">
-          {children}
-        </div>
+        {fullWidth ? (
+          children
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            {children}
+          </div>
+        )}
       </main>
     </div>
   );

@@ -334,7 +334,7 @@ export function Interview() {
   // Hypothesis entry gate
   if (!hypothesesEntered && hypotheses.length === 0) {
     return (
-      <Layout showProgress={true}>
+      <Layout showProgress={true} fullWidth>
         <PatientInfoBar
           name={currentCase.patient.name}
           age={currentCase.patient.age}
@@ -344,7 +344,7 @@ export function Interview() {
           elapsedTime="00:00"
         />
 
-        <div className="mt-8">
+        <div className="max-w-4xl mx-auto mt-8">
           <Card>
             <CardContent className="py-8">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -391,7 +391,7 @@ export function Interview() {
   }
 
   return (
-    <Layout showProgress={true}>
+    <Layout showProgress={true} fullWidth>
       <PatientInfoBar
         name={currentCase.patient.name}
         age={currentCase.patient.age}
@@ -402,7 +402,7 @@ export function Interview() {
         showTargetRange={scaffolding.showTargetRange ? currentCase.expertContent.expertQuestionCount : undefined}
       />
 
-      <div className="flex gap-6 mt-4">
+      <div className="max-w-6xl mx-auto flex gap-6 mt-4">
         {/* Main chat area */}
         <div className="flex-1 flex flex-col" style={{ minHeight: 'calc(100vh - 250px)' }}>
           {/* Alerts */}
