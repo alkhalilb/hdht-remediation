@@ -159,7 +159,7 @@ export const useAppStore = create<AppState>()(
           caseId: caseData.id,
           startTime: new Date(),
           hypotheses: {
-            initial: preserveHypotheses ? existingHypotheses.map(h => h.name) : [],
+            initial: preserveHypotheses ? existingHypotheses : [],
           },
           questions: [],
           liveMetrics: {
