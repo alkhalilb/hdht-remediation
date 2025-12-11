@@ -1,0 +1,9 @@
+# Force Railway to use Dockerfile
+[phases.setup]
+cmds = []
+
+[phases.build]
+cmds = ["echo 'Use Dockerfile'"]
+
+[start]
+cmd = "node dist/index.js"
