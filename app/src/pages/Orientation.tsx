@@ -205,7 +205,7 @@ export function Orientation() {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Progress indicator */}
         <div className="flex justify-center gap-2 mb-6">
           {orientationSlides.map((_, index) => (

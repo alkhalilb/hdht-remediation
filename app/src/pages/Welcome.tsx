@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Layout, Button, Card, CardContent } from '../components/common';
-import { Stethoscope, Target, BookOpen, ClipboardCheck, MessageSquare } from 'lucide-react';
+import { Stethoscope, Target, BookOpen, ClipboardCheck } from 'lucide-react';
 
 export function Welcome() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export function Welcome() {
 
   return (
     <Layout showProgress={false}>
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Stethoscope className="w-10 h-10 text-white" />
@@ -39,7 +39,7 @@ export function Welcome() {
             </p>
 
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              The program has 4 parts:
+              The program has 3 parts:
             </h2>
 
             <div className="space-y-4">
@@ -79,18 +79,7 @@ export function Welcome() {
                 </div>
               </div>
 
-              <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">4. Brief Survey (5 min)</h3>
-                  <p className="text-sm text-gray-600">
-                    Help us improve this program
-                  </p>
-                </div>
               </div>
-            </div>
 
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">

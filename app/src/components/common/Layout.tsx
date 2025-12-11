@@ -25,7 +25,6 @@ export function Layout({ children, showProgress = true, showHeader = true }: Lay
       case 'exit_intro': return 'Exit Assessment';
       case 'exit_case': return 'Exit Case';
       case 'exit_feedback': return 'Results';
-      case 'survey': return 'Feedback Survey';
       case 'completion': return 'Complete!';
       default: return '';
     }
@@ -35,7 +34,7 @@ export function Layout({ children, showProgress = true, showHeader = true }: Lay
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       {showHeader && (
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-          <div className="max-w-5xl mx-auto px-4 py-3">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -61,7 +60,7 @@ export function Layout({ children, showProgress = true, showHeader = true }: Lay
           </div>
         </header>
       )}
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
     </div>
@@ -122,7 +121,7 @@ export function PatientInfoBar({
 }: PatientInfoBarProps) {
   return (
     <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-16 z-40">
-      <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-gray-900">{name}</span>
