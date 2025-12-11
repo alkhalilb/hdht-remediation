@@ -61,11 +61,11 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
           </div>
         </header>
       )}
-      <main className={`w-full ${fullWidth ? '' : 'px-4 sm:px-6 lg:px-8 py-8'}`}>
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         {fullWidth ? (
           children
         ) : (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             {children}
           </div>
         )}
@@ -127,7 +127,7 @@ export function PatientInfoBar({
   showTargetRange,
 }: PatientInfoBarProps) {
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-16 z-40">
+    <div className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
