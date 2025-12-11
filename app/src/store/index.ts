@@ -459,7 +459,6 @@ export const useProgress = () => {
     case 'exit_feedback':
       currentStep = 6;
       break;
-    case 'survey':
     case 'completion':
       currentStep = 7;
       break;
