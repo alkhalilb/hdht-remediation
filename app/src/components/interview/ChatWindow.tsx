@@ -1,0 +1,87 @@
+import { useRef, useEffect } from 'react';
+import { Message } from '../../types';
+import { User, Bot } from 'lucide-react';
+
+interface ChatWindowProps {
+  messages: Message[];
+  isLoading?: boolean;
+}
+
+export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 rounded-lg">
+      {messages.length === 0 ? (
+        <div className="text-center py-12 text-gray-500">
+          <p className="text-lg font-medium">Start the Interview</p>
+          <p className="text-sm mt-1">Ask your first question to begin gathering the history.</p>
+        </div>
+      ) : (
+        messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex gap-3 ${
+              message.role === 'student' ? 'flex-row-reverse' : ''
+            }`}
+          >
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                message.role === 'student'
+                  ? 'bg-blue-600 text-white'
+                  : message.role === 'patient'
+                  ? 'bg-gray-300 text-gray-700'
+                  : 'bg-yellow-100 text-yellow-700'
+              }`}
+            >
+              {message.role === 'student' ? (
+                <User className="w-4 h-4" />
+              ) : (
+                <Bot className="w-4 h-4" />
+              )}
+            </div>
+            <div
+              className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                message.role === 'student'
+                  ? 'bg-blue-600 text-white'
+                  : message.role === 'patient'
+                  ? 'bg-white text-gray-900 border border-gray-200'
+                  : 'bg-yellow-50 text-yellow-900 border border-yellow-200'
+              }`}
+            >
+              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              {message.questionAnalysis && message.role === 'student' && (
+                <div className="mt-2 pt-2 border-t border-blue-500/30 text-xs opacity-90">
+                  <span className="bg-blue-500/30 px-2 py-0.5 rounded">
+                    {message.questionAnalysis.category.replace('_', ' ')}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ))
+      )}
+
+      {isLoading && (
+        <div className="flex gap-3">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-300 text-gray-700">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div className="bg-white text-gray-900 border border-gray-200 rounded-lg px-4 py-2">
+            <div className="flex gap-1">
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div ref={messagesEndRef} />
+    </div>
+  );
+}

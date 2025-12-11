@@ -1,0 +1,175 @@
+import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '../store';
+import { getTrackCases } from '../data/cases';
+import { Layout, Button, Card, CardContent } from '../components/common';
+import { getDeficitDisplayName, getScaffoldingExplanation } from '../services/scoring';
+import { BookOpen, ArrowRight, Info } from 'lucide-react';
+
+export function TrackIntro() {
+  const navigate = useNavigate();
+  const { assignedTrack, currentTrackCaseIndex, setPhase } = useAppStore();
+
+  if (!assignedTrack) {
+    navigate('/');
+    return null;
+  }
+
+  const trackCases = getTrackCases(assignedTrack);
+  const currentCase = trackCases[currentTrackCaseIndex];
+
+  if (!currentCase) {
+    // All track cases complete, go to exit
+    setPhase('exit_intro');
+    navigate('/exit-intro');
+    return null;
+  }
+
+  const handleStart = () => {
+    setPhase('track_case');
+    navigate('/interview');
+  };
+
+  const trackName = getDeficitDisplayName(assignedTrack);
+  const scaffoldingExplanation = getScaffoldingExplanation(
+    currentCase.scaffoldingLevel as 'high' | 'medium' | 'low',
+    assignedTrack
+  );
+
+  return (
+    <Layout>
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-8 h-8 text-blue-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {trackName} Track
+          </h1>
+          <p className="text-gray-600">
+            Practice Case {currentTrackCaseIndex + 1} of 3
+          </p>
+        </div>
+
+        {/* Progress indicator */}
+        <div className="flex justify-center gap-4 mb-8">
+          {[0, 1, 2].map((index) => (
+            <div key={index} className="flex items-center">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                  index < currentTrackCaseIndex
+                    ? 'bg-green-600 text-white'
+                    : index === currentTrackCaseIndex
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-500'
+                }`}
+              >
+                {index < currentTrackCaseIndex ? '✓' : index + 1}
+              </div>
+              {index < 2 && (
+                <div
+                  className={`w-12 h-1 mx-2 rounded ${
+                    index < currentTrackCaseIndex ? 'bg-green-600' : 'bg-gray-200'
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <Card className="mb-6">
+          <CardContent className="py-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              {currentCase.title}
+            </h2>
+
+            <div className="p-4 bg-gray-50 rounded-lg mb-4">
+              <h3 className="font-medium text-gray-900 mb-2">Patient Preview</h3>
+              <p className="text-gray-700">
+                {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
+              </p>
+              <p className="text-gray-700">
+                Chief Complaint: "{currentCase.chiefComplaint}"
+              </p>
+            </div>
+
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-blue-900 mb-1">
+                    Scaffolding Level: {currentCase.scaffoldingLevel?.charAt(0).toUpperCase()}{currentCase.scaffoldingLevel?.slice(1)}
+                  </h3>
+                  <p className="text-sm text-blue-800">
+                    {scaffoldingExplanation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardContent className="py-4">
+            <h3 className="font-semibold text-gray-900 mb-3">Remember Your Focus: {trackName}</h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              {getTrackReminders(assignedTrack).map((reminder, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium text-blue-600">
+                    {index + 1}
+                  </span>
+                  {reminder}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        <div className="text-center">
+          <Button size="lg" onClick={handleStart}>
+            Start Practice Case
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+
+function getTrackReminders(track: string): string[] {
+  switch (track) {
+    case 'organization':
+      return [
+        'Start with the HPI - explore the chief complaint thoroughly',
+        'Complete one topic before moving to the next',
+        'Follow the sequence: HPI → PMH → Meds → Family → Social → ROS',
+        'Avoid jumping back to topics you\'ve already covered',
+      ];
+
+    case 'completeness':
+      return [
+        'Cover all required domains - don\'t skip any major categories',
+        'Ask sufficient depth within each topic',
+        'Watch the checklist to track your coverage',
+        'Don\'t end the interview with important topics missing',
+      ];
+
+    case 'hypothesisAlignment':
+      return [
+        'For each question, know which hypothesis you\'re testing',
+        'Ask discriminating questions that distinguish between diagnoses',
+        'Update your differential as you learn new information',
+        'Connect your questions to your hypotheses',
+      ];
+
+    case 'efficiency':
+      return [
+        'Avoid asking the same question in different ways',
+        'Focus on discriminating questions, not "nice to know" info',
+        'Aim to complete the history in 15-25 questions',
+        'Each question should have a clear purpose',
+      ];
+
+    default:
+      return ['Focus on hypothesis-driven questioning'];
+  }
+}
