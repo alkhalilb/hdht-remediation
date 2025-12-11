@@ -9,7 +9,6 @@ import {
   TrackFeedback,
   ExitIntro,
   ExitFeedback,
-  Survey,
   Completion,
 } from './pages';
 
@@ -31,7 +30,6 @@ function AppRoutes() {
       case 'exit_intro': return '/exit-intro';
       case 'exit_case': return '/interview';
       case 'exit_feedback': return '/exit-feedback';
-      case 'survey': return '/survey';
       case 'completion': return '/completion';
       default: return '/';
     }
@@ -48,7 +46,6 @@ function AppRoutes() {
       <Route path="/track-feedback" element={<TrackFeedback />} />
       <Route path="/exit-intro" element={<ExitIntro />} />
       <Route path="/exit-feedback" element={<ExitFeedback />} />
-      <Route path="/survey" element={<Survey />} />
       <Route path="/completion" element={<Completion />} />
       <Route path="*" element={<Navigate to={getRedirectPath()} replace />} />
     </Routes>

@@ -32,8 +32,8 @@ export function ExitFeedback() {
 
   const handleContinue = () => {
     if (exitPassed) {
-      setPhase('survey');
-      navigate('/survey');
+      setPhase('completion');
+      navigate('/completion');
     } else if (exitAttempts >= 2) {
       // Flagged for review
       setPhase('completion');
@@ -241,8 +241,8 @@ export function ExitFeedback() {
             <h3 className="font-semibold text-gray-900 mb-3">What's Next?</h3>
             {exitPassed ? (
               <p className="text-gray-700">
-                Complete a brief survey to help us improve this program.
-                Your feedback is valuable!
+                You've successfully completed the remediation program.
+                Great work!
               </p>
             ) : exitAttempts >= 2 ? (
               <p className="text-gray-700">
@@ -261,7 +261,7 @@ export function ExitFeedback() {
         <div className="text-center">
           <Button size="lg" onClick={handleContinue}>
             {exitPassed
-              ? 'Complete Survey'
+              ? 'Complete'
               : exitAttempts >= 2
               ? 'Continue'
               : 'Retry Exit Case'}

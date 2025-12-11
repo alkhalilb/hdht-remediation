@@ -291,5 +291,4 @@ export type AppPhase =
   | 'exit_intro'
   | 'exit_case'
   | 'exit_feedback'
-  | 'survey'
   | 'completion';
