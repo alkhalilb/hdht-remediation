@@ -341,28 +341,32 @@ export function Orientation() {
         </Card>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8">
-          <Button
-            variant="outline"
-            onClick={handlePrev}
-            disabled={currentSlide === 0}
-            className="rounded-full px-6"
-          >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Previous
-          </Button>
+        <div className="flex items-center justify-between mt-12 pt-6 border-t border-gray-200">
+          <div className="w-40">
+            <Button
+              variant="outline"
+              onClick={handlePrev}
+              disabled={currentSlide === 0}
+              className="rounded-full px-6 w-full"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Previous
+            </Button>
+          </div>
 
           <span className="text-sm text-gray-500 font-medium">
             {currentSlide + 1} of {orientationSlides.length}
           </span>
 
-          <Button
-            onClick={handleNext}
-            className="rounded-full px-6"
-          >
-            {isLastSlide ? 'Start Diagnostic Case' : 'Next'}
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </Button>
+          <div className="w-40">
+            <Button
+              onClick={handleNext}
+              className="rounded-full px-6 w-full"
+            >
+              {isLastSlide ? 'Start' : 'Next'}
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </div>
     </Layout>
