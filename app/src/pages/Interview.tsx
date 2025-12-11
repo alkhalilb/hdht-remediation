@@ -15,7 +15,7 @@ import {
   EfficiencyAlert,
 } from '../components/scaffolding';
 import { RemediationCase, QuestionEntry, QuestionAnalysis, Message, HypothesisEntry } from '../types';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ListChecks, Send } from 'lucide-react';
 
 export function Interview() {
   const navigate = useNavigate();
@@ -58,7 +58,10 @@ export function Interview() {
     analysis: QuestionAnalysis;
   } | null>(null);
   const [alerts, setAlerts] = useState<{ type: string; id: string }[]>([]);
-  const [hypothesesEntered, setHypothesesEntered] = useState(false);
+
+  // Get planned questions from store
+  const plannedQuestions = useAppStore((state) => state.plannedQuestions);
+  const removePlannedQuestion = useAppStore((state) => state.removePlannedQuestion);
 
   // Load the appropriate case based on phase
   useEffect(() => {
@@ -319,7 +322,8 @@ export function Interview() {
     setAlerts(prev => prev.filter(a => a.id !== id));
   };
 
-  if (!currentCase) {
+  // Redirect to hypothesis generation if no hypotheses entered
+  if (!currentCase || hypotheses.length === 0) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
@@ -330,54 +334,6 @@ export function Interview() {
   }
 
   const scaffolding = currentCase.scaffolding;
-
-  // Hypothesis entry gate
-  if (!hypothesesEntered && hypotheses.length === 0) {
-    return (
-      <Layout showProgress={true}>
-        <Card>
-            <CardContent className="py-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Before You Begin
-              </h2>
-              <p className="text-gray-700 mb-6">
-                Based on the patient's chief complaint ("{currentCase.chiefComplaint}"),
-                enter your initial differential diagnosis. What conditions are you considering?
-              </p>
-
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-900 mb-2">Patient Information:</h3>
-                <p className="text-gray-700">
-                  {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
-                </p>
-                <p className="text-gray-700">
-                  Vitals: BP {currentCase.vitalSigns.bp}, HR {currentCase.vitalSigns.hr},
-                  RR {currentCase.vitalSigns.rr}, Temp {currentCase.vitalSigns.temp}°F,
-                  SpO2 {currentCase.vitalSigns.spo2}%
-                </p>
-              </div>
-
-              <HypothesisPanel
-                hypotheses={hypotheses}
-                onAdd={addHypothesis}
-                onUpdate={updateHypothesis}
-                onRemove={removeHypothesis}
-                showConfidence={true}
-              />
-
-              <div className="mt-6 flex justify-end">
-                <Button
-                  onClick={() => setHypothesesEntered(true)}
-                  disabled={hypotheses.length === 0}
-                >
-                  Start Interview
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-      </Layout>
-    );
-  }
 
   return (
     <Layout showProgress={true}>
@@ -462,6 +418,40 @@ export function Interview() {
               coveredTopics={liveMetrics.topicsCovered}
               showWarning={scaffolding.alertOnMissingTopics}
             />
+          )}
+
+          {/* Planned questions */}
+          {plannedQuestions.length > 0 && (
+            <Card>
+              <CardContent className="py-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <ListChecks className="w-4 h-4 text-blue-600" />
+                  <h3 className="font-medium text-gray-900 text-sm">Planned Questions</h3>
+                  <span className="text-xs text-gray-500">({plannedQuestions.length})</span>
+                </div>
+                <ul className="space-y-2">
+                  {plannedQuestions.map((q, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm group"
+                    >
+                      <span className="text-gray-700 flex-1 truncate">{q}</span>
+                      <button
+                        onClick={() => {
+                          handleAskQuestion(q);
+                          removePlannedQuestion(index);
+                        }}
+                        disabled={isLoading}
+                        className="ml-2 p-1 text-blue-600 hover:text-blue-800 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Ask this question"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

@@ -45,6 +45,12 @@ interface AppState {
   updateHypothesis: (id: string, updates: Partial<HypothesisEntry>) => void;
   removeHypothesis: (id: string) => void;
 
+  // Planned questions (pre-typed before interview)
+  plannedQuestions: string[];
+  setPlannedQuestions: (questions: string[]) => void;
+  addPlannedQuestion: (question: string) => void;
+  removePlannedQuestion: (index: number) => void;
+
   // Questions tracking
   questions: QuestionEntry[];
   addQuestion: (question: QuestionEntry) => void;
@@ -173,6 +179,7 @@ export const useAppStore = create<AppState>()(
           questions: [],
           scaffoldingEvents: [],
           liveMetrics: initialLiveMetrics,
+          plannedQuestions: [],
         });
       },
       endCase: (assessment) => {
@@ -265,6 +272,20 @@ export const useAppStore = create<AppState>()(
       removeHypothesis: (id) => {
         set((state) => ({
           hypotheses: state.hypotheses.filter((h) => h.id !== id),
+        }));
+      },
+
+      // Planned questions
+      plannedQuestions: [],
+      setPlannedQuestions: (questions) => set({ plannedQuestions: questions }),
+      addPlannedQuestion: (question) => {
+        set((state) => ({
+          plannedQuestions: [...state.plannedQuestions, question],
+        }));
+      },
+      removePlannedQuestion: (index) => {
+        set((state) => ({
+          plannedQuestions: state.plannedQuestions.filter((_, i) => i !== index),
         }));
       },
 

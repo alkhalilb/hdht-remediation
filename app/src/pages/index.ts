@@ -1,5 +1,6 @@
 export { Welcome } from './Welcome';
 export { Orientation } from './Orientation';
+export { HypothesisGeneration } from './HypothesisGeneration';
 export { Interview } from './Interview';
 export { DeficitReport } from './DeficitReport';
 export { TrackIntro } from './TrackIntro';

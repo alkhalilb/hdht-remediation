@@ -3,6 +3,7 @@ import { useAppStore } from './store';
 import {
   Welcome,
   Orientation,
+  HypothesisGeneration,
   Interview,
   DeficitReport,
   TrackIntro,
@@ -22,13 +23,13 @@ function AppRoutes() {
     switch (phase) {
       case 'welcome': return '/';
       case 'orientation': return '/orientation';
-      case 'diagnostic': return '/interview';
+      case 'diagnostic': return '/hypothesis-generation';
       case 'deficit_report': return '/deficit-report';
       case 'track_intro': return '/track-intro';
-      case 'track_case': return '/interview';
+      case 'track_case': return '/hypothesis-generation';
       case 'track_feedback': return '/track-feedback';
       case 'exit_intro': return '/exit-intro';
-      case 'exit_case': return '/interview';
+      case 'exit_case': return '/hypothesis-generation';
       case 'exit_feedback': return '/exit-feedback';
       case 'completion': return '/completion';
       default: return '/';
@@ -39,8 +40,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Welcome />} />
       <Route path="/orientation" element={<Orientation />} />
+      <Route path="/hypothesis-generation" element={<HypothesisGeneration />} />
       <Route path="/interview" element={<Interview />} />
-      <Route path="/diagnostic" element={<Navigate to="/interview" replace />} />
+      <Route path="/diagnostic" element={<Navigate to="/hypothesis-generation" replace />} />
       <Route path="/deficit-report" element={<DeficitReport />} />
       <Route path="/track-intro" element={<TrackIntro />} />
       <Route path="/track-feedback" element={<TrackFeedback />} />
