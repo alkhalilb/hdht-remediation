@@ -61,7 +61,7 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
           </div>
         </header>
       )}
-      <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
+      <main className={`w-full ${fullWidth ? '' : 'px-4 sm:px-6 lg:px-8 py-8'}`}>
         {fullWidth ? (
           children
         ) : (
