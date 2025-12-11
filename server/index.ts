@@ -6,7 +6,28 @@ import 'dotenv/config';
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(cors());
+// Configure CORS for production
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.some(allowed => origin.startsWith(allowed as string))) {
+      return callback(null, true);
+    }
+    // In production, be more permissive for Vercel preview URLs
+    if (origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 const anthropic = new Anthropic({
