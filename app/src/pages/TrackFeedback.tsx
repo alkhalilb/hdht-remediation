@@ -47,7 +47,7 @@ export function TrackFeedback() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
+      <div>
         <div className="text-center mb-8">
           <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
             passedMastery ? 'bg-green-100' : 'bg-blue-100'

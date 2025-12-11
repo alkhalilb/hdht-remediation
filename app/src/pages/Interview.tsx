@@ -344,7 +344,7 @@ export function Interview() {
           elapsedTime="00:00"
         />
 
-        <div className="max-w-4xl mx-auto mt-8">
+        <div className="mt-8">
           <Card>
             <CardContent className="py-8">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
