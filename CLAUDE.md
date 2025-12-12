@@ -167,3 +167,36 @@ Claude generates feedback but is constrained to reference computed metrics only.
 - **Transparency**: Scores come from deterministic algorithms, not LLM hallucination
 - **Reproducibility**: Same questions → same metrics every time
 - **Validity**: Grounded in educational research frameworks
+
+---
+
+## UI Components
+
+### MetricsDisplay (New)
+Located at `app/src/components/common/MetricsDisplay.tsx`:
+- **PhaseBadge**: Shows PCMC-1 phase prominently with color coding
+- **MetricsDisplay**: Shows all metrics grouped by category with progress bars, pass/warn/fail indicators, and target thresholds
+- **MetricsComparison**: For showing progress between assessments
+
+The UI now displays transparent, literature-grounded metrics instead of opaque 0-100 scores.
+
+---
+
+## Recent Changes (December 2025)
+
+### Assessment Pipeline Refactor
+- Replaced single-prompt scoring with 3-stage literature-grounded pipeline
+- Added loading indicator with progress steps during assessment
+- UI shows PCMC-1 Phase as primary output instead of arbitrary scores
+- Each metric shows actual value, target threshold, and pass/fail status
+
+### Interview Page Updates
+- Added back/forward navigation buttons
+- Fixed chat bubble sizing and spacing
+- Allow typing questions while waiting for patient response
+- Assessment loading overlay with progress animation
+
+### Files to Know
+- `server/assessment/` - The entire assessment pipeline
+- `app/src/components/common/MetricsDisplay.tsx` - New metrics display components
+- `literature_grounded_assessment_spec.md` - Full specification for the assessment approach
