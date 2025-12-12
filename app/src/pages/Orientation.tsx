@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Layout, Button, Card, CardContent } from '../components/common';
+import { setDebugMode, isDebugMode } from '../data/debugInterviews';
 import {
   ChevronRight,
   ChevronLeft,
@@ -12,7 +13,8 @@ import {
   XCircle,
   Shuffle,
   AlertTriangle,
-  Target
+  Target,
+  Bug
 } from 'lucide-react';
 
 const orientationSlides = [
@@ -282,10 +284,29 @@ export function Orientation() {
   const navigate = useNavigate();
   const { setPhase } = useAppStore();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [debugPassword, setDebugPassword] = useState('');
+  const [debugEnabled, setDebugEnabled] = useState(isDebugMode());
+  const [showDebugError, setShowDebugError] = useState(false);
 
   const isLastSlide = currentSlide === orientationSlides.length - 1;
   const slide = orientationSlides[currentSlide];
   const Icon = slide.icon;
+
+  const handleDebugLogin = () => {
+    if (debugPassword === 'debugFeinberg') {
+      setDebugMode(true);
+      setDebugEnabled(true);
+      setShowDebugError(false);
+      setDebugPassword('');
+    } else {
+      setShowDebugError(true);
+    }
+  };
+
+  const handleDebugLogout = () => {
+    setDebugMode(false);
+    setDebugEnabled(false);
+  };
 
   const handleNext = () => {
     if (isLastSlide) {
@@ -366,6 +387,47 @@ export function Orientation() {
               {isLastSlide ? 'Start' : 'Next'}
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
+          </div>
+        </div>
+
+        {/* Debug Mode Section */}
+        <div className="mt-12 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-center">
+            {debugEnabled ? (
+              <div className="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg">
+                <Bug className="w-4 h-4 text-orange-600" />
+                <span className="text-sm text-orange-800">Debug mode enabled</span>
+                <button
+                  onClick={handleDebugLogout}
+                  className="text-xs text-orange-600 hover:text-orange-800 underline"
+                >
+                  Disable
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Bug className="w-4 h-4 text-gray-400" />
+                <input
+                  type="password"
+                  value={debugPassword}
+                  onChange={(e) => {
+                    setDebugPassword(e.target.value);
+                    setShowDebugError(false);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleDebugLogin()}
+                  placeholder="Debug password"
+                  className={`px-3 py-1.5 text-sm border rounded-lg w-40 ${
+                    showDebugError ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  }`}
+                />
+                <button
+                  onClick={handleDebugLogin}
+                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
+                >
+                  Enable
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
