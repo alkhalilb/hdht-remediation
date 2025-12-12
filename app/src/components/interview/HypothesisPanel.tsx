@@ -20,7 +20,7 @@ export function HypothesisPanel({
   onRemove,
   disabled = false,
   showConfidence = true,
-  maxHypotheses = 5,
+  maxHypotheses = 7,
 }: HypothesisPanelProps) {
   const [newHypothesis, setNewHypothesis] = useState('');
   const [isExpanded, setIsExpanded] = useState(true);
@@ -138,7 +138,7 @@ export function HypothesisPanel({
           <p className="text-xs text-gray-500">
             {showConfidence
               ? 'Adjust confidence levels as you gather more information.'
-              : 'Add up to 5 differential diagnoses.'}
+              : `Add up to ${maxHypotheses} differential diagnoses.`}
           </p>
         </div>
       )}

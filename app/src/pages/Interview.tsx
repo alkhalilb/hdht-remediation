@@ -15,7 +15,7 @@ import {
   EfficiencyAlert,
 } from '../components/scaffolding';
 import { RemediationCase, QuestionEntry, QuestionAnalysis, Message, HypothesisEntry } from '../types';
-import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight } from 'lucide-react';
+import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 
 export function Interview() {
   const navigate = useNavigate();
@@ -60,6 +60,8 @@ export function Interview() {
   const [alerts, setAlerts] = useState<{ type: string; id: string }[]>([]);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [assessmentProgress, setAssessmentProgress] = useState<string | null>(null);
+  const [showRankingModal, setShowRankingModal] = useState(false);
+  const [rankedDifferential, setRankedDifferential] = useState<HypothesisEntry[]>([]);
 
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
@@ -261,6 +263,24 @@ export function Interview() {
   };
 
   const handleEndInterview = () => {
+    // Initialize ranked differential with current hypotheses order
+    setRankedDifferential([...hypotheses]);
+    setShowRankingModal(true);
+  };
+
+  const moveHypothesis = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= rankedDifferential.length) return;
+
+    const newRanked = [...rankedDifferential];
+    const temp = newRanked[index];
+    newRanked[index] = newRanked[newIndex];
+    newRanked[newIndex] = temp;
+    setRankedDifferential(newRanked);
+  };
+
+  const confirmRanking = () => {
+    setShowRankingModal(false);
     setShowEndConfirm(true);
   };
 
@@ -300,7 +320,7 @@ export function Interview() {
             isOpen: q.analysis?.isOpen || false,
           },
         })),
-        hypotheses: hypotheses.map(h => ({ name: h.name, confidence: h.confidence })),
+        hypotheses: rankedDifferential.map((h, idx) => ({ name: h.name, confidence: h.confidence, rank: idx + 1 })),
         expertContent: currentCase.expertContent,
         chiefComplaint: currentCase.chiefComplaint,
         patient: currentCase.patient,
@@ -528,6 +548,72 @@ export function Interview() {
         </div>
       </div>
 
+      {/* Differential Ranking Modal */}
+      {showRankingModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="max-w-lg mx-4 w-full">
+            <CardContent className="py-6">
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <ListChecks className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 text-lg mb-2">Rank Your Differential Diagnosis</h3>
+                <p className="text-sm text-gray-600">
+                  Before ending, order your differential from most likely (#1) to least likely.
+                  Use the arrows to reorder.
+                </p>
+              </div>
+
+              {rankedDifferential.length === 0 ? (
+                <div className="text-center py-6 text-gray-500">
+                  <p>No hypotheses to rank. Go back and add some diagnoses first.</p>
+                </div>
+              ) : (
+                <div className="space-y-2 mb-6">
+                  {rankedDifferential.map((hypothesis, index) => (
+                    <div
+                      key={hypothesis.id}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    >
+                      <div className="flex items-center gap-2 text-gray-400">
+                        <GripVertical className="w-4 h-4" />
+                        <span className="font-bold text-gray-600 w-6">#{index + 1}</span>
+                      </div>
+                      <span className="flex-1 font-medium text-gray-900">{hypothesis.name}</span>
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          onClick={() => moveHypothesis(index, 'up')}
+                          disabled={index === 0}
+                          className="p-1 hover:bg-gray-200 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => moveHypothesis(index, 'down')}
+                          disabled={index === rankedDifferential.length - 1}
+                          className="p-1 hover:bg-gray-200 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <Button variant="outline" onClick={() => setShowRankingModal(false)}>
+                  Go Back
+                </Button>
+                <Button onClick={confirmRanking} disabled={rankedDifferential.length === 0}>
+                  Confirm Ranking
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* End confirmation modal */}
       {showEndConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -538,17 +624,31 @@ export function Interview() {
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">End Interview?</h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <h3 className="font-semibold text-gray-900 mb-2">Ready to Submit?</h3>
+                  <p className="text-sm text-gray-600 mb-3">
                     You've asked {liveMetrics.questionCount} questions and covered{' '}
-                    {liveMetrics.topicsCovered.length} topics. Are you sure you want to end the interview?
+                    {liveMetrics.topicsCovered.length} topics.
                   </p>
+                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-gray-500 mb-2">Your final differential (ranked):</p>
+                    <ol className="text-sm space-y-1">
+                      {rankedDifferential.map((h, i) => (
+                        <li key={h.id} className="flex items-center gap-2">
+                          <span className="font-bold text-blue-600">{i + 1}.</span>
+                          <span className="text-gray-700">{h.name}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
                   <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setShowEndConfirm(false)}>
-                      Continue Interview
+                    <Button variant="outline" onClick={() => {
+                      setShowEndConfirm(false);
+                      setShowRankingModal(true);
+                    }}>
+                      Edit Ranking
                     </Button>
                     <Button onClick={confirmEndInterview} isLoading={isLoading}>
-                      End & Get Feedback
+                      Submit & Get Feedback
                     </Button>
                   </div>
                 </div>
