@@ -429,6 +429,7 @@ export function Interview() {
 
     try {
       const debugData = getDebugInterview(currentCase.id, quality);
+      const scaffolding = currentCase.scaffolding;
 
       // Add hypotheses if not already present (with confidence levels)
       for (const hyp of debugData.hypotheses) {
@@ -438,10 +439,25 @@ export function Interview() {
         }
       }
 
+      // Track question count for determining when mapping prompt would fire
+      let questionCount = liveMetrics.questionCount;
+
       // Simulate asking each question with delays
       for (const questionText of debugData.questions) {
-        // Add student message
-        addMessage({ role: 'student', content: questionText });
+        questionCount++;
+
+        // Determine if this question would trigger hypothesis mapping prompt
+        const wouldTriggerMapping = (
+          scaffolding.promptHypothesisMapping === 'after_each' ||
+          (scaffolding.promptHypothesisMapping === 'periodic' && questionCount % 5 === 0)
+        );
+
+        // Add student message with debug marker if applicable
+        addMessage({
+          role: 'student',
+          content: questionText,
+          debugMarker: wouldTriggerMapping ? 'would_trigger_mapping' : undefined,
+        });
 
         // Get patient response
         const patientResponse = await getPatientResponse({
@@ -469,7 +485,7 @@ export function Interview() {
 
         // Update metrics
         updateLiveMetrics({
-          questionCount: liveMetrics.questionCount + 1,
+          questionCount: questionCount,
         });
 
         // Small delay between questions for visual feedback
@@ -650,6 +666,12 @@ export function Interview() {
                 <div className="flex items-center gap-2 mb-3">
                   <Bug className="w-4 h-4 text-orange-600" />
                   <h3 className="font-medium text-orange-900 text-sm">Debug Mode</h3>
+                </div>
+                {/* Show scaffolding info */}
+                <div className="text-xs text-orange-700 mb-3 space-y-1 bg-orange-100 rounded p-2">
+                  <p><strong>Scaffolding:</strong> {currentCase.scaffoldingLevel}</p>
+                  <p><strong>Mapping prompts:</strong> {scaffolding.promptHypothesisMapping}</p>
+                  <p><strong>Alignment feedback:</strong> {scaffolding.showAlignmentFeedback}</p>
                 </div>
                 {debugComplete ? (
                   <div className="text-center py-3">

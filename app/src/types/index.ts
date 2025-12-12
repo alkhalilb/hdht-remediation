@@ -347,6 +347,7 @@ export interface Message {
   content: string;
   timestamp: Date;
   questionAnalysis?: QuestionAnalysis;
+  debugMarker?: 'would_trigger_mapping'; // Debug mode: indicates where hypothesis mapping prompt would fire
 }
 
 // App state types

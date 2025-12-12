@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { Message } from '../../types';
-import { User, Bot } from 'lucide-react';
+import { User, Bot, MessageSquareWarning } from 'lucide-react';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -59,6 +59,12 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
                   <span className="bg-blue-500/30 px-2 py-0.5 rounded">
                     {message.questionAnalysis.category.replace('_', ' ')}
                   </span>
+                </div>
+              )}
+              {message.debugMarker === 'would_trigger_mapping' && message.role === 'student' && (
+                <div className="mt-2 pt-2 border-t border-orange-400/50 text-xs flex items-center gap-1.5">
+                  <MessageSquareWarning className="w-3.5 h-3.5 text-orange-300" />
+                  <span className="text-orange-200">Hypothesis mapping prompt would fire here</span>
                 </div>
               )}
             </div>
