@@ -77,14 +77,14 @@ Classify this question. Respond with JSON only:
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
-      return validateClassification(parsed);
+      return validateClassification(parsed, questionText);
     }
 
     // Fallback if parsing fails
-    return getDefaultClassification();
+    return getDefaultClassification(questionText);
   } catch (error) {
     console.error('Question classification error:', error);
-    return getDefaultClassification();
+    return getDefaultClassification(questionText);
   }
 }
 
@@ -113,7 +113,7 @@ export async function classifyAllQuestions(
   return classifications;
 }
 
-function validateClassification(parsed: any): QuestionClassification {
+function validateClassification(parsed: any, questionText: string): QuestionClassification {
   // Ensure all fields exist with valid values
   const validCategories: HistoryCategory[] = [
     'HPI', 'PMH', 'PSH', 'Medications', 'Allergies', 'FamilyHistory', 'SocialHistory',
@@ -124,6 +124,7 @@ function validateClassification(parsed: any): QuestionClassification {
   const category = validCategories.includes(parsed.category) ? parsed.category : 'HPI';
 
   return {
+    questionText,
     category,
     informationGathering: {
       isChiefComplaintExploration: Boolean(parsed.informationGathering?.isChiefComplaintExploration),
@@ -144,8 +145,9 @@ function validateClassification(parsed: any): QuestionClassification {
   };
 }
 
-function getDefaultClassification(): QuestionClassification {
+function getDefaultClassification(questionText: string = ''): QuestionClassification {
   return {
+    questionText,
     category: 'HPI',
     informationGathering: {
       isChiefComplaintExploration: false,

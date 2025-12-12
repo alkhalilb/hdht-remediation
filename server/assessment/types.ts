@@ -23,6 +23,7 @@ export type HistoryCategory =
 
 // Stage 1: Question Classification (Claude output)
 export interface QuestionClassification {
+  questionText: string; // Original question text for topic detection
   category: HistoryCategory;
   informationGathering: {
     isChiefComplaintExploration: boolean;
@@ -67,6 +68,8 @@ export interface HypothesisDrivenMetrics {
     questionCount: number;
     hasDiscriminatingQuestion: boolean;
   }[];
+  // Track which must-consider diagnoses the student missed
+  missedMustConsider: string[];
 }
 
 // 2C: Completeness Metrics
@@ -129,6 +132,8 @@ export interface ExpertContent {
     offBase?: string[];
   };
   requiredTopics: string[];
+  // Topic descriptions - explains what specific topics mean (e.g., GI alarm symptoms)
+  topicDescriptions?: Record<string, string[]>;
   discriminatingQuestionsByHypothesis?: Record<string, {
     mustAsk: string[];
     shouldAsk: string[];

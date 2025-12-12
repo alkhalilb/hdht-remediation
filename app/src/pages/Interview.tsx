@@ -15,7 +15,8 @@ import {
   EfficiencyAlert,
 } from '../components/scaffolding';
 import { RemediationCase, QuestionEntry, QuestionAnalysis, Message, HypothesisEntry } from '../types';
-import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight, GripVertical, ChevronUp, ChevronDown, Bug } from 'lucide-react';
+import { isDebugMode, getDebugInterview, DebugQuality } from '../data/debugInterviews';
 
 export function Interview() {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ export function Interview() {
   const [showRankingModal, setShowRankingModal] = useState(false);
   const [rankedDifferential, setRankedDifferential] = useState<HypothesisEntry[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [debugFilling, setDebugFilling] = useState(false);
 
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
@@ -279,8 +281,9 @@ export function Interview() {
   };
 
   const handleEndInterview = () => {
-    // Initialize ranked differential with current hypotheses order
-    setRankedDifferential([...hypotheses]);
+    // Initialize ranked differential sorted by confidence (highest first)
+    const sortedByConfidence = [...hypotheses].sort((a, b) => b.confidence - a.confidence);
+    setRankedDifferential(sortedByConfidence);
     setShowRankingModal(true);
   };
 
@@ -425,6 +428,71 @@ export function Interview() {
   const confirmGoBack = () => {
     setShowBackConfirm(false);
     navigate('/hypothesis-generation');
+  };
+
+  // Debug mode: auto-fill interview with predefined questions
+  const handleDebugFill = async (quality: DebugQuality) => {
+    if (!currentCase || debugFilling) return;
+
+    setDebugFilling(true);
+    setIsLoading(true);
+
+    try {
+      const debugData = getDebugInterview(currentCase.id, quality);
+
+      // Add hypotheses if not already present
+      for (const hyp of debugData.hypotheses) {
+        const exists = hypotheses.some(h => h.name.toLowerCase() === hyp.toLowerCase());
+        if (!exists) {
+          addHypothesis({ name: hyp, confidence: 3 });
+        }
+      }
+
+      // Simulate asking each question with delays
+      for (const questionText of debugData.questions) {
+        // Add student message
+        addMessage({ role: 'student', content: questionText });
+
+        // Get patient response
+        const patientResponse = await getPatientResponse({
+          question: questionText,
+          patient: currentCase.patient,
+          chiefComplaint: currentCase.chiefComplaint,
+          illnessScript: currentCase.illnessScript,
+          conversationHistory: messages.map(m => ({
+            role: m.role === 'student' ? 'student' : 'patient',
+            content: m.content,
+          })),
+        });
+
+        // Add question entry
+        const questionEntry: QuestionEntry = {
+          id: `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          text: questionText,
+          response: patientResponse,
+          timestamp: new Date(),
+        };
+        addQuestion(questionEntry);
+
+        // Add patient response
+        addMessage({ role: 'patient', content: patientResponse });
+
+        // Update metrics
+        updateLiveMetrics({
+          questionCount: liveMetrics.questionCount + 1,
+        });
+
+        // Small delay between questions for visual feedback
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+    } catch (error) {
+      console.error('Debug fill error:', error);
+      setError('Failed to fill debug interview');
+    } finally {
+      setDebugFilling(false);
+      setIsLoading(false);
+    }
   };
 
   // Redirect to hypothesis generation if no hypotheses entered
@@ -578,6 +646,44 @@ export function Interview() {
                     </li>
                   ))}
                 </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Debug Panel - only visible in debug mode */}
+          {isDebugMode() && (
+            <Card className="border-orange-300 bg-orange-50">
+              <CardContent className="py-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bug className="w-4 h-4 text-orange-600" />
+                  <h3 className="font-medium text-orange-900 text-sm">Debug Mode</h3>
+                </div>
+                <p className="text-xs text-orange-700 mb-3">
+                  Auto-fill interview with predefined quality levels for testing.
+                </p>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => handleDebugFill('poor')}
+                    disabled={debugFilling || isLoading}
+                    className="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-800 rounded-lg disabled:opacity-50 transition-colors"
+                  >
+                    {debugFilling ? 'Filling...' : 'Poor Interview'}
+                  </button>
+                  <button
+                    onClick={() => handleDebugFill('medium')}
+                    disabled={debugFilling || isLoading}
+                    className="w-full px-3 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg disabled:opacity-50 transition-colors"
+                  >
+                    {debugFilling ? 'Filling...' : 'Medium Interview'}
+                  </button>
+                  <button
+                    onClick={() => handleDebugFill('good')}
+                    disabled={debugFilling || isLoading}
+                    className="w-full px-3 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-800 rounded-lg disabled:opacity-50 transition-colors"
+                  >
+                    {debugFilling ? 'Filling...' : 'Good Interview'}
+                  </button>
+                </div>
               </CardContent>
             </Card>
           )}

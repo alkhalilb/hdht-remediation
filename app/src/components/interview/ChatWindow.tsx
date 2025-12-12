@@ -45,7 +45,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
               )}
             </div>
             <div
-              className={`max-w-[80%] rounded-2xl px-5 py-3 ${
+              className={`max-w-[80%] rounded-2xl px-6 py-4 ${
                 message.role === 'student'
                   ? 'bg-blue-600 text-white'
                   : message.role === 'patient'
@@ -71,7 +71,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
           <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-300 text-gray-700">
             <Bot className="w-5 h-5" />
           </div>
-          <div className="bg-white text-gray-900 border border-gray-200 rounded-2xl px-5 py-3">
+          <div className="bg-white text-gray-900 border border-gray-200 rounded-2xl px-6 py-4">
             <div className="flex gap-1.5">
               <span className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
               <span className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />

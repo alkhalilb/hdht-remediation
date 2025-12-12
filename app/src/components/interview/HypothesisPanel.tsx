@@ -31,13 +31,25 @@ export function HypothesisPanel({
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Filter diseases based on input
+  // Filter diseases based on input - prioritize matches that start with query
   useEffect(() => {
     if (newHypothesis.trim().length >= 2) {
       const query = newHypothesis.toLowerCase();
-      const filtered = diseases
-        .filter(d => d.toLowerCase().includes(query))
-        .slice(0, 8); // Limit to 8 suggestions
+      // Separate into "starts with" and "contains" matches
+      const startsWithMatches: string[] = [];
+      const containsMatches: string[] = [];
+
+      for (const d of diseases) {
+        const lower = d.toLowerCase();
+        if (lower.startsWith(query)) {
+          startsWithMatches.push(d);
+        } else if (lower.includes(query)) {
+          containsMatches.push(d);
+        }
+      }
+
+      // Combine: prioritize "starts with", then "contains"
+      const filtered = [...startsWithMatches, ...containsMatches].slice(0, 8);
       setSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
       setSelectedIndex(-1);

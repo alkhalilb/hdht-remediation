@@ -137,6 +137,8 @@ export function computeHypothesisDrivenMetrics(
   studentHypotheses: string[],
   expertContent: ExpertContent
 ): HypothesisDrivenMetrics {
+  const mustConsider = expertContent.expectedHypotheses.mustConsider;
+
   if (classifiedQuestions.length === 0 || studentHypotheses.length === 0) {
     return {
       hypothesisCoverage: 0,
@@ -146,13 +148,16 @@ export function computeHypothesisDrivenMetrics(
       discriminatingRatio: 0,
       hypothesisClusteringScore: 0,
       hypothesisCoverageDetail: [],
+      missedMustConsider: mustConsider, // All are missed if no hypotheses
     };
   }
 
   // 1. Hypothesis Coverage (compare to expert must-consider list)
-  const mustConsider = expertContent.expectedHypotheses.mustConsider;
   const matchedMustConsider = mustConsider.filter(expert =>
     studentHypotheses.some(student => hypothesesMatch(student, expert))
+  );
+  const missedMustConsider = mustConsider.filter(expert =>
+    !studentHypotheses.some(student => hypothesesMatch(student, expert))
   );
   const hypothesisCoverage = mustConsider.length > 0
     ? matchedMustConsider.length / mustConsider.length
@@ -206,6 +211,7 @@ export function computeHypothesisDrivenMetrics(
     discriminatingRatio,
     hypothesisClusteringScore,
     hypothesisCoverageDetail,
+    missedMustConsider,
   };
 }
 
@@ -354,6 +360,31 @@ function questionCoversRequiredTopic(
   // Check if any HPI question was asked (covers basic chief complaint exploration)
   if (topicLower.includes('chief complaint') || topicLower.includes('pain characteristics')) {
     return categories.has('HPI');
+  }
+
+  // Topic-specific keyword detection in question text
+  // This handles case-specific topics like nsaid_use, diet, gi_alarm_symptoms
+  const topicKeywordMappings: Record<string, string[]> = {
+    'nsaid_use': ['nsaid', 'ibuprofen', 'advil', 'motrin', 'aleve', 'naproxen', 'aspirin', 'anti-inflammatory', 'pain killer', 'painkiller', 'pain medication'],
+    'diet': ['diet', 'eat', 'food', 'meal', 'breakfast', 'lunch', 'dinner', 'spicy', 'fatty', 'coffee', 'caffeine'],
+    'gi_alarm_symptoms': ['weight loss', 'blood in stool', 'black stool', 'melena', 'vomiting blood', 'hematemesis', 'difficulty swallowing', 'dysphagia', 'anemia', 'night sweats', 'fever'],
+    'red_flags': ['weight loss', 'fever', 'night sweats', 'weakness', 'numbness', 'bowel', 'bladder', 'incontinence'],
+    'exercise_tolerance': ['exercise', 'walk', 'stairs', 'exertion', 'activity', 'physical activity', 'blocks', 'flight'],
+    'orthopnea': ['pillow', 'lie flat', 'lying down', 'sleep', 'propped up'],
+    'pnd': ['wake up', 'short of breath', 'night', 'breathless'],
+    'edema': ['swelling', 'ankle', 'leg swell', 'feet swell', 'edema'],
+  };
+
+  // Check if topic matches one of our keyword mappings
+  if (topicKeywordMappings[topicLower]) {
+    const keywords = topicKeywordMappings[topicLower];
+    // Check if any question text contains any of the keywords
+    for (const q of questions) {
+      const questionTextLower = q.questionText.toLowerCase();
+      if (keywords.some(kw => questionTextLower.includes(kw))) {
+        return true;
+      }
+    }
   }
 
   return false;

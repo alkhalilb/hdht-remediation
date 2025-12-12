@@ -104,6 +104,7 @@ HYPOTHESIS-DRIVEN INQUIRY METRICS (Daniel et al. 2019)
 ═══════════════════════════════════════════════════════════════════
 
 Hypothesis coverage: ${(hd.hypothesisCoverage * 100).toFixed(0)}% of must-consider diagnoses included (target: ≥70%)
+${hd.missedMustConsider && hd.missedMustConsider.length > 0 ? `Missed diagnoses: ${hd.missedMustConsider.join(', ')}` : 'All must-consider diagnoses included ✓'}
 Question-hypothesis alignment: ${(hd.alignmentRatio * 100).toFixed(0)}% of questions tested hypotheses (target: ≥50%)
 Discriminating questions: ${(hd.discriminatingRatio * 100).toFixed(0)}% could differentiate diagnoses (target: ≥30%)
 Hypothesis clustering: ${(hd.hypothesisClusteringScore * 100).toFixed(0)}% (target: ≥60%)
@@ -213,11 +214,14 @@ function getDefaultFeedback(
   if (hd.alignmentRatio < 0.5) {
     improvements.push(`Connect questions to hypotheses - only ${(hd.alignmentRatio * 100).toFixed(0)}% of questions tested your differential`);
   }
+  if (hd.missedMustConsider && hd.missedMustConsider.length > 0) {
+    improvements.push(`Expand your differential diagnosis - you missed these important diagnoses: ${hd.missedMustConsider.join(', ')}`);
+  }
   if (ig.redundantQuestionCount > 0) {
     improvements.push(`Reduce redundancy - ${ig.redundantQuestionCount} questions asked about previously covered information`);
   }
   if (completeness.requiredTopicsMissed.length > 0) {
-    improvements.push(`Cover missing topics: ${completeness.requiredTopicsMissed.slice(0, 2).join(', ')}`);
+    improvements.push(`Cover missing topics: ${completeness.requiredTopicsMissed.slice(0, 3).join(', ')}`);
   }
 
   return {

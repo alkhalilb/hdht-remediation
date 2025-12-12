@@ -134,6 +134,27 @@ const topicLabels: Record<string, string> = {
   mood: 'Mood Assessment',
 };
 
+// Topic descriptions - explains what certain topics include
+const topicDescriptions: Record<string, string[]> = {
+  gi_alarm_symptoms: [
+    'Unintentional weight loss',
+    'Difficulty swallowing (dysphagia)',
+    'Blood in stool or black tarry stool (melena)',
+    'Vomiting blood (hematemesis)',
+    'Anemia symptoms',
+    'Persistent vomiting',
+    'Family history of GI malignancy',
+  ],
+  red_flags: [
+    'Fever',
+    'Night sweats',
+    'Unintentional weight loss',
+    'Progressive neurological symptoms',
+    'Bowel/bladder incontinence',
+    'Saddle anesthesia',
+  ],
+};
+
 // Convert topic code to readable label
 function getTopicLabel(topic: string): string {
   return topicLabels[topic] || topic.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
@@ -346,9 +367,18 @@ export function MetricsDisplay({
         {completeness.requiredTopicsMissed.length > 0 && (
           <div className="mt-3 p-4 bg-yellow-50 rounded-lg">
             <p className="text-sm font-medium text-yellow-800 mb-2">Topics Missed:</p>
-            <ul className="text-sm text-yellow-700">
+            <ul className="text-sm text-yellow-700 space-y-2">
               {completeness.requiredTopicsMissed.slice(0, 5).map((topic, i) => (
-                <li key={i}>• {getTopicLabel(topic)}</li>
+                <li key={i}>
+                  <span className="font-medium">• {getTopicLabel(topic)}</span>
+                  {topicDescriptions[topic] && (
+                    <ul className="ml-4 mt-1 text-xs text-yellow-600">
+                      {topicDescriptions[topic].map((desc, j) => (
+                        <li key={j}>- {desc}</li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
               ))}
               {completeness.requiredTopicsMissed.length > 5 && (
                 <li className="text-yellow-600">... and {completeness.requiredTopicsMissed.length - 5} more</li>
