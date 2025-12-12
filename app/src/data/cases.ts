@@ -632,7 +632,7 @@ export const exitCase1: RemediationCase = {
       { name: 'Metformin', dose: '1000mg', frequency: 'twice daily' },
       { name: 'Atorvastatin', dose: '40mg', frequency: 'at bedtime' },
     ],
-    allergies: ['Penicillin - rash'],
+    allergies: [{ allergen: 'Penicillin', reaction: 'rash' }],
     familyHistory: [
       { relation: 'Father', condition: 'Heart attack at age 58, died' },
       { relation: 'Mother', condition: 'Stroke at age 72' },
