@@ -101,7 +101,7 @@ export function HypothesisGeneration() {
                   {currentCase.patient.occupation}
                 </p>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg" style={{ padding: '16px' }}>
                   <p className="font-medium text-yellow-800 mb-1">Chief Complaint:</p>
                   <p className="text-yellow-900 text-lg">"{currentCase.chiefComplaint}"</p>
                 </div>

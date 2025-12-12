@@ -81,7 +81,7 @@ export function Welcome() {
 
               </div>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-6 bg-gray-50 rounded-lg" style={{ padding: '16px' }}>
               <p className="text-sm text-gray-600">
                 You can complete this in one sitting or across multiple sessions.
                 Your progress is saved automatically.

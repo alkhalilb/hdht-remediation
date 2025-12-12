@@ -1,6 +1,8 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import { Message } from '../../types';
-import { User, Bot, MessageSquareWarning, Volume2 } from 'lucide-react';
+import { User, Bot, MessageSquareWarning, Volume2, Loader2 } from 'lucide-react';
+
+const API_URL = '/api';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -11,23 +13,87 @@ interface ChatWindowProps {
 export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastSpokenMessageId = useRef<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [loadingTTS, setLoadingTTS] = useState<string | null>(null);
 
-  // Speak text using Web Speech API
-  const speakText = useCallback((text: string) => {
+  // Speak text using ElevenLabs API
+  const speakText = useCallback(async (text: string, messageId?: string) => {
+    // Stop any currently playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setPlayingMessageId(null);
+
+    if (messageId) {
+      setLoadingTTS(messageId);
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/tts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        console.error('TTS request failed:', response.status);
+        // Fall back to browser TTS
+        fallbackBrowserTTS(text);
+        return;
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      if (messageId) {
+        setPlayingMessageId(messageId);
+      }
+
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        setPlayingMessageId(null);
+        audioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        console.error('Audio playback error');
+        URL.revokeObjectURL(audioUrl);
+        setPlayingMessageId(null);
+        audioRef.current = null;
+        // Fall back to browser TTS
+        fallbackBrowserTTS(text);
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('TTS error:', error);
+      // Fall back to browser TTS
+      fallbackBrowserTTS(text);
+    } finally {
+      setLoadingTTS(null);
+    }
+  }, []);
+
+  // Fallback to browser TTS if ElevenLabs fails
+  const fallbackBrowserTTS = useCallback((text: string) => {
     if (!('speechSynthesis' in window)) return;
 
-    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
-
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
-    // Try to use a natural-sounding voice
     const voices = window.speechSynthesis.getVoices();
     const preferredVoice = voices.find(v =>
-      v.name.includes('Samantha') || // macOS
+      v.name.includes('Samantha') ||
       v.name.includes('Google') ||
       v.name.includes('Microsoft') ||
       v.lang.startsWith('en')
@@ -40,9 +106,19 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
   }, []);
 
   // Manual play button handler
-  const handlePlayMessage = useCallback((text: string) => {
-    speakText(text);
+  const handlePlayMessage = useCallback((text: string, messageId: string) => {
+    speakText(text, messageId);
   }, [speakText]);
+
+  // Stop playback
+  const handleStopPlayback = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    setPlayingMessageId(null);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -54,11 +130,21 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
         lastMessage.role === 'patient' &&
         lastMessage.id !== lastSpokenMessageId.current
       ) {
-        speakText(lastMessage.content);
+        speakText(lastMessage.content, lastMessage.id);
         lastSpokenMessageId.current = lastMessage.id;
       }
     }
   }, [messages, ttsEnabled, speakText]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-gray-50 rounded-lg" style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '300px' }}>
@@ -104,11 +190,28 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
                 <p className="text-base whitespace-pre-wrap leading-relaxed break-words flex-1">{message.content}</p>
                 {message.role === 'patient' && (
                   <button
-                    onClick={() => handlePlayMessage(message.content)}
-                    className="flex-shrink-0 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Read aloud"
+                    onClick={() =>
+                      playingMessageId === message.id
+                        ? handleStopPlayback()
+                        : handlePlayMessage(message.content, message.id)
+                    }
+                    disabled={loadingTTS === message.id}
+                    className={`flex-shrink-0 p-1.5 rounded-full transition-all ${
+                      playingMessageId === message.id
+                        ? 'bg-blue-100 text-blue-600'
+                        : loadingTTS === message.id
+                        ? 'bg-gray-100 text-gray-400'
+                        : 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100'
+                    }`}
+                    title={playingMessageId === message.id ? 'Stop' : 'Read aloud'}
                   >
-                    <Volume2 className="w-4 h-4" />
+                    {loadingTTS === message.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : playingMessageId === message.id ? (
+                      <Volume2 className="w-4 h-4 animate-pulse" />
+                    ) : (
+                      <Volume2 className="w-4 h-4" />
+                    )}
                   </button>
                 )}
               </div>

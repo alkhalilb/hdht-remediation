@@ -47,7 +47,7 @@ export function AlertBanner({ type, title, message, onDismiss }: AlertBannerProp
   const Icon = style.icon;
 
   return (
-    <div className={`${style.bg} ${style.border} border rounded-lg p-4 mb-4`}>
+    <div className={`${style.bg} ${style.border} border rounded-lg mb-4`} style={{ padding: '16px' }}>
       <div className="flex items-start gap-3">
         <Icon className={`w-5 h-5 ${style.iconColor} flex-shrink-0 mt-0.5`} />
         <div className="flex-1">

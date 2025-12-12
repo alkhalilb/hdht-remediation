@@ -154,7 +154,7 @@ export const QuestionInput = forwardRef<QuestionInputRef, QuestionInputProps>(
         </div>
 
         {showHint && (
-          <div className="flex items-start gap-2 mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-2 mb-3 bg-blue-50 border border-blue-200 rounded-lg" style={{ padding: '12px' }}>
             <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-blue-800">{showHint}</p>
           </div>

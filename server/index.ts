@@ -327,6 +327,71 @@ app.post('/api/assess-performance', async (req, res) => {
   }
 });
 
+// Text-to-Speech endpoint using ElevenLabs
+app.post('/api/tts', async (req, res) => {
+  try {
+    const { text, voiceId } = req.body as {
+      text: string;
+      voiceId?: string;
+    };
+
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    if (!apiKey) {
+      console.error('ELEVENLABS_API_KEY not configured');
+      return res.status(500).json({ error: 'TTS service not configured' });
+    }
+
+    // Default to "Rachel" voice - natural conversational female voice
+    // Other good options: "Domi" (young female), "Bella" (warm female), "Antoni" (warm male)
+    const selectedVoiceId = voiceId || '21m00Tcm4TlvDq8ikWAM'; // Rachel
+
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_turbo_v2_5', // Fast, high quality
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+            style: 0.0,
+            use_speaker_boost: true,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('ElevenLabs API error:', response.status, errorText);
+      return res.status(response.status).json({ error: 'TTS generation failed' });
+    }
+
+    // Stream the audio back to the client
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Cache-Control': 'no-cache',
+    });
+
+    const arrayBuffer = await response.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+
+  } catch (error: any) {
+    console.error('TTS error:', error?.message || error);
+    res.status(500).json({ error: 'Failed to generate speech' });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

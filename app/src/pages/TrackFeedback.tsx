@@ -188,7 +188,7 @@ export function TrackFeedback() {
                 </div>
               )}
 
-              <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="bg-blue-50 rounded-lg" style={{ padding: '16px' }}>
                 <h3 className="font-medium text-blue-900 mb-1">{trackName} Focus</h3>
                 <p className="text-sm text-blue-800">{assessment.feedback.deficitSpecific}</p>
               </div>
@@ -234,7 +234,7 @@ interface MetricBoxProps {
 
 function MetricBox({ label, value }: MetricBoxProps) {
   return (
-    <div className="p-4 rounded-lg bg-gray-50">
+    <div className="rounded-lg bg-gray-50" style={{ padding: '16px' }}>
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className="text-lg font-bold text-gray-900">{value}</p>
     </div>
