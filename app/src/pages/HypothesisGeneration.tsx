@@ -5,7 +5,8 @@ import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
 import { Layout, Button, Card, CardContent } from '../components/common';
 import { HypothesisPanel } from '../components/interview';
 import { RemediationCase } from '../types';
-import { Brain, Stethoscope, ClipboardList, ArrowRight } from 'lucide-react';
+import { isDebugMode, getDebugInterview, DebugQuality } from '../data/debugInterviews';
+import { Brain, Stethoscope, ClipboardList, ArrowRight, Bug, Check } from 'lucide-react';
 
 export function HypothesisGeneration() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export function HypothesisGeneration() {
   } = useAppStore();
 
   const [showTips, setShowTips] = useState(true);
+  const [debugFilled, setDebugFilled] = useState<DebugQuality | null>(null);
 
   // Get the current case based on phase
   let currentCase: RemediationCase | null = null;
@@ -39,6 +41,24 @@ export function HypothesisGeneration() {
       startCase(currentCase, true); // preserve hypotheses and planned questions
       navigate('/interview');
     }
+  };
+
+  // Debug: fill hypotheses with predefined quality level
+  const handleDebugFillHypotheses = (quality: DebugQuality) => {
+    if (!currentCase) return;
+
+    // Clear existing hypotheses first
+    hypotheses.forEach(h => removeHypothesis(h.id));
+
+    // Get debug data for this case
+    const debugData = getDebugInterview(currentCase.id, quality);
+
+    // Add hypotheses with confidence levels
+    debugData.hypotheses.forEach(hyp => {
+      addHypothesis({ name: hyp.name, confidence: hyp.confidence });
+    });
+
+    setDebugFilled(quality);
   };
 
   if (!currentCase) {
@@ -187,6 +207,58 @@ export function HypothesisGeneration() {
             Each question you ask should help confirm or rule out one of your diagnoses.
           </p>
         </div>
+
+        {/* Debug Panel */}
+        {isDebugMode() && (
+          <Card className="mt-6 border-orange-300 bg-orange-50">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Bug className="w-4 h-4 text-orange-600" />
+                <h3 className="font-medium text-orange-900 text-sm">Debug Mode - Auto-fill Hypotheses</h3>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleDebugFillHypotheses('poor')}
+                  className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    debugFilled === 'poor'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-red-100 hover:bg-red-200 text-red-800'
+                  }`}
+                >
+                  {debugFilled === 'poor' && <Check className="w-4 h-4" />}
+                  Poor
+                </button>
+                <button
+                  onClick={() => handleDebugFillHypotheses('medium')}
+                  className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    debugFilled === 'medium'
+                      ? 'bg-yellow-600 text-white'
+                      : 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
+                  }`}
+                >
+                  {debugFilled === 'medium' && <Check className="w-4 h-4" />}
+                  Medium
+                </button>
+                <button
+                  onClick={() => handleDebugFillHypotheses('good')}
+                  className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    debugFilled === 'good'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-100 hover:bg-green-200 text-green-800'
+                  }`}
+                >
+                  {debugFilled === 'good' && <Check className="w-4 h-4" />}
+                  Good
+                </button>
+              </div>
+              {debugFilled && (
+                <p className="mt-2 text-xs text-orange-700 text-center">
+                  Filled with {debugFilled} quality hypotheses
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </Layout>
   );

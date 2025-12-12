@@ -3,16 +3,24 @@
 
 export type DebugQuality = 'poor' | 'medium' | 'good';
 
+export interface DebugHypothesis {
+  name: string;
+  confidence: number; // 1-5
+}
+
 export interface DebugInterview {
-  hypotheses: string[];
+  hypotheses: DebugHypothesis[];
   questions: string[];
 }
 
 // Generic question sets that work across different cases
-const genericQuestions = {
+const genericQuestions: Record<DebugQuality, DebugInterview> = {
   // Poor: Disorganized, jumping around, missing key topics, not hypothesis-driven
   poor: {
-    hypotheses: ['Stomach bug', 'Food poisoning'],
+    hypotheses: [
+      { name: 'Stomach bug', confidence: 3 },
+      { name: 'Food poisoning', confidence: 3 },
+    ],
     questions: [
       'Do you have any allergies?',
       'What do you do for work?',
@@ -29,7 +37,11 @@ const genericQuestions = {
 
   // Medium: Reasonable organization, covers basics, but not discriminating
   medium: {
-    hypotheses: ['GERD', 'Peptic ulcer disease', 'Gastritis'],
+    hypotheses: [
+      { name: 'GERD', confidence: 4 },
+      { name: 'Peptic ulcer disease', confidence: 3 },
+      { name: 'Gastritis', confidence: 3 },
+    ],
     questions: [
       'What brings you in today?',
       'When did it start?',
@@ -50,7 +62,13 @@ const genericQuestions = {
 
   // Good: Organized, hypothesis-driven, discriminating questions
   good: {
-    hypotheses: ['Peptic ulcer disease', 'GERD', 'Gastritis', 'Pancreatitis', 'Biliary colic'],
+    hypotheses: [
+      { name: 'Peptic ulcer disease', confidence: 4 },
+      { name: 'GERD', confidence: 3 },
+      { name: 'Gastritis', confidence: 3 },
+      { name: 'Pancreatitis', confidence: 2 },
+      { name: 'Biliary colic', confidence: 2 },
+    ],
     questions: [
       'What brings you in today?',
       'When did this first start?',
@@ -88,7 +106,10 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
   // DIAGNOSTIC CASE: Chest pain (diag-chest-pain-001)
   'diag-chest-pain-001': {
     poor: {
-      hypotheses: ['Heart attack', 'Anxiety'],
+      hypotheses: [
+        { name: 'Heart attack', confidence: 4 },
+        { name: 'Anxiety', confidence: 3 },
+      ],
       questions: [
         'Any allergies?',
         'What do you do for work?',
@@ -100,7 +121,11 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     medium: {
-      hypotheses: ['Angina', 'GERD', 'Musculoskeletal pain'],
+      hypotheses: [
+        { name: 'Angina', confidence: 4 },
+        { name: 'GERD', confidence: 3 },
+        { name: 'Musculoskeletal pain', confidence: 2 },
+      ],
       questions: [
         'What brings you in?',
         'When did it start?',
@@ -117,7 +142,13 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     good: {
-      hypotheses: ['Unstable angina', 'Stable angina', 'GERD', 'Musculoskeletal', 'Pericarditis'],
+      hypotheses: [
+        { name: 'Unstable angina', confidence: 4 },
+        { name: 'Stable angina', confidence: 4 },
+        { name: 'GERD', confidence: 2 },
+        { name: 'Musculoskeletal', confidence: 2 },
+        { name: 'Pericarditis', confidence: 2 },
+      ],
       questions: [
         'What brings you in today?',
         'When did this start?',
@@ -150,7 +181,10 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
   // TRACK CASE 1: Abdominal pain (PUD) - matches *-case-1 IDs
   'abdominal-pain': {
     poor: {
-      hypotheses: ['Stomach bug', 'Food poisoning'],
+      hypotheses: [
+        { name: 'Stomach bug', confidence: 3 },
+        { name: 'Food poisoning', confidence: 3 },
+      ],
       questions: [
         'Do you have allergies?',
         'What do you do for work?',
@@ -164,7 +198,11 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     medium: {
-      hypotheses: ['GERD', 'Peptic ulcer', 'Gastritis'],
+      hypotheses: [
+        { name: 'GERD', confidence: 4 },
+        { name: 'Peptic ulcer', confidence: 3 },
+        { name: 'Gastritis', confidence: 3 },
+      ],
       questions: [
         'What brings you in today?',
         'When did this start?',
@@ -182,7 +220,13 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     good: {
-      hypotheses: ['Peptic ulcer disease', 'GERD', 'Gastritis', 'Gastric cancer', 'Pancreatitis'],
+      hypotheses: [
+        { name: 'Peptic ulcer disease', confidence: 4 },
+        { name: 'GERD', confidence: 3 },
+        { name: 'Gastritis', confidence: 3 },
+        { name: 'Gastric cancer', confidence: 2 },
+        { name: 'Pancreatitis', confidence: 2 },
+      ],
       questions: [
         'What brings you in today?',
         'When did this start?',
@@ -219,7 +263,10 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
   // TRACK CASE 2: Shortness of breath / Heart failure - matches *-case-2 IDs
   'shortness-of-breath': {
     poor: {
-      hypotheses: ['Pneumonia', 'Asthma'],
+      hypotheses: [
+        { name: 'Pneumonia', confidence: 3 },
+        { name: 'Asthma', confidence: 3 },
+      ],
       questions: [
         'Any allergies?',
         'Do you smoke?',
@@ -230,7 +277,11 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     medium: {
-      hypotheses: ['Heart failure', 'COPD', 'Pneumonia'],
+      hypotheses: [
+        { name: 'Heart failure', confidence: 4 },
+        { name: 'COPD', confidence: 3 },
+        { name: 'Pneumonia', confidence: 3 },
+      ],
       questions: [
         'What brings you in?',
         'When did it start?',
@@ -245,7 +296,13 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     good: {
-      hypotheses: ['Heart failure', 'COPD exacerbation', 'Pneumonia', 'Pulmonary embolism', 'Anemia'],
+      hypotheses: [
+        { name: 'Heart failure', confidence: 5 },
+        { name: 'COPD exacerbation', confidence: 3 },
+        { name: 'Pneumonia', confidence: 2 },
+        { name: 'Pulmonary embolism', confidence: 2 },
+        { name: 'Anemia', confidence: 1 },
+      ],
       questions: [
         'What brings you in today?',
         'When did the shortness of breath start?',
@@ -279,7 +336,10 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
   // TRACK CASE 3: Headache - matches *-case-3 IDs
   'headache': {
     poor: {
-      hypotheses: ['Migraine', 'Stress'],
+      hypotheses: [
+        { name: 'Migraine', confidence: 4 },
+        { name: 'Stress', confidence: 3 },
+      ],
       questions: [
         'Any allergies?',
         'What do you do for work?',
@@ -290,7 +350,11 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     medium: {
-      hypotheses: ['Tension headache', 'Migraine', 'Medication overuse headache'],
+      hypotheses: [
+        { name: 'Tension headache', confidence: 4 },
+        { name: 'Migraine', confidence: 3 },
+        { name: 'Medication overuse headache', confidence: 2 },
+      ],
       questions: [
         'What brings you in?',
         'When did it start?',
@@ -307,7 +371,13 @@ const caseSpecificQuestions: Record<string, Record<DebugQuality, DebugInterview>
       ],
     },
     good: {
-      hypotheses: ['Tension-type headache', 'Migraine without aura', 'Medication overuse headache', 'Cervicogenic headache', 'Secondary headache'],
+      hypotheses: [
+        { name: 'Tension-type headache', confidence: 5 },
+        { name: 'Migraine without aura', confidence: 3 },
+        { name: 'Medication overuse headache', confidence: 3 },
+        { name: 'Cervicogenic headache', confidence: 2 },
+        { name: 'Secondary headache', confidence: 1 },
+      ],
       questions: [
         'What brings you in today?',
         'When did these headaches start?',

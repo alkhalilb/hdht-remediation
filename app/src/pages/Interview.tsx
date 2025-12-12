@@ -15,7 +15,7 @@ import {
   EfficiencyAlert,
 } from '../components/scaffolding';
 import { RemediationCase, QuestionEntry, QuestionAnalysis, Message, HypothesisEntry } from '../types';
-import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight, GripVertical, ChevronUp, ChevronDown, Bug } from 'lucide-react';
+import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight, GripVertical, ChevronUp, ChevronDown, Bug, Check } from 'lucide-react';
 import { isDebugMode, getDebugInterview, DebugQuality } from '../data/debugInterviews';
 
 export function Interview() {
@@ -65,6 +65,7 @@ export function Interview() {
   const [rankedDifferential, setRankedDifferential] = useState<HypothesisEntry[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [debugFilling, setDebugFilling] = useState(false);
+  const [debugComplete, setDebugComplete] = useState<DebugQuality | null>(null);
 
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
@@ -429,11 +430,11 @@ export function Interview() {
     try {
       const debugData = getDebugInterview(currentCase.id, quality);
 
-      // Add hypotheses if not already present
+      // Add hypotheses if not already present (with confidence levels)
       for (const hyp of debugData.hypotheses) {
-        const exists = hypotheses.some(h => h.name.toLowerCase() === hyp.toLowerCase());
+        const exists = hypotheses.some(h => h.name.toLowerCase() === hyp.name.toLowerCase());
         if (!exists) {
-          addHypothesis({ name: hyp, confidence: 3 });
+          addHypothesis({ name: hyp.name, confidence: hyp.confidence });
         }
       }
 
@@ -474,6 +475,9 @@ export function Interview() {
         // Small delay between questions for visual feedback
         await new Promise(resolve => setTimeout(resolve, 100));
       }
+
+      // Mark as complete
+      setDebugComplete(quality);
 
     } catch (error) {
       console.error('Debug fill error:', error);
@@ -647,32 +651,48 @@ export function Interview() {
                   <Bug className="w-4 h-4 text-orange-600" />
                   <h3 className="font-medium text-orange-900 text-sm">Debug Mode</h3>
                 </div>
-                <p className="text-xs text-orange-700 mb-3">
-                  Auto-fill interview with predefined quality levels for testing.
-                </p>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => handleDebugFill('poor')}
-                    disabled={debugFilling || isLoading}
-                    className="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-800 rounded-lg disabled:opacity-50 transition-colors"
-                  >
-                    {debugFilling ? 'Filling...' : 'Poor Interview'}
-                  </button>
-                  <button
-                    onClick={() => handleDebugFill('medium')}
-                    disabled={debugFilling || isLoading}
-                    className="w-full px-3 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg disabled:opacity-50 transition-colors"
-                  >
-                    {debugFilling ? 'Filling...' : 'Medium Interview'}
-                  </button>
-                  <button
-                    onClick={() => handleDebugFill('good')}
-                    disabled={debugFilling || isLoading}
-                    className="w-full px-3 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-800 rounded-lg disabled:opacity-50 transition-colors"
-                  >
-                    {debugFilling ? 'Filling...' : 'Good Interview'}
-                  </button>
-                </div>
+                {debugComplete ? (
+                  <div className="text-center py-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Check className="w-5 h-5 text-green-600" />
+                    </div>
+                    <p className="text-sm text-green-800 font-medium">
+                      {debugComplete.charAt(0).toUpperCase() + debugComplete.slice(1)} interview complete!
+                    </p>
+                    <p className="text-xs text-green-700 mt-1">
+                      {questions.length} questions asked
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-xs text-orange-700 mb-3">
+                      Auto-fill interview with predefined quality levels for testing.
+                    </p>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleDebugFill('poor')}
+                        disabled={debugFilling || isLoading}
+                        className="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-800 rounded-lg disabled:opacity-50 transition-colors"
+                      >
+                        {debugFilling ? 'Filling...' : 'Poor Interview'}
+                      </button>
+                      <button
+                        onClick={() => handleDebugFill('medium')}
+                        disabled={debugFilling || isLoading}
+                        className="w-full px-3 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg disabled:opacity-50 transition-colors"
+                      >
+                        {debugFilling ? 'Filling...' : 'Medium Interview'}
+                      </button>
+                      <button
+                        onClick={() => handleDebugFill('good')}
+                        disabled={debugFilling || isLoading}
+                        className="w-full px-3 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-800 rounded-lg disabled:opacity-50 transition-colors"
+                      >
+                        {debugFilling ? 'Filling...' : 'Good Interview'}
+                      </button>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           )}
