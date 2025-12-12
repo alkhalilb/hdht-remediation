@@ -45,15 +45,15 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
               )}
             </div>
             <div
-              className={`max-w-[90%] rounded-2xl px-6 py-3 ${
+              className={`flex-1 rounded-2xl px-5 py-3 ${
                 message.role === 'student'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600 text-white ml-12'
                   : message.role === 'patient'
-                  ? 'bg-white text-gray-900 border border-gray-200'
-                  : 'bg-yellow-50 text-yellow-900 border border-yellow-200'
+                  ? 'bg-white text-gray-900 border border-gray-200 mr-12'
+                  : 'bg-yellow-50 text-yellow-900 border border-yellow-200 mr-12'
               }`}
             >
-              <p className="text-base whitespace-pre-wrap leading-relaxed">{message.content}</p>
+              <p className="text-base whitespace-pre-wrap leading-relaxed break-words">{message.content}</p>
               {message.questionAnalysis && message.role === 'student' && (
                 <div className="mt-2 pt-2 border-t border-blue-500/30 text-xs opacity-90">
                   <span className="bg-blue-500/30 px-2 py-0.5 rounded">

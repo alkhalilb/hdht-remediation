@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay, PhaseBadge } from '../components/common';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName, getTrackDescription } from '../services/scoring';
 import { Target, ArrowRight, BookOpen, AlertCircle } from 'lucide-react';
 import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
@@ -25,7 +25,6 @@ export function DeficitReport() {
   // Get the assessment from the session
   const assessment = currentSession?.assessment;
   const phase = assessment?.phase || 'APPROACHING';
-  const phaseRationale = assessment?.phaseRationale || [];
   const metrics = assessment?.metrics;
 
   // Map the deficit type to the remediation track type
@@ -48,20 +47,6 @@ export function DeficitReport() {
             Based on your performance, we've identified your primary area for improvement.
           </p>
         </div>
-
-        {/* Phase Badge - Primary Result */}
-        <Card className="mb-6">
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-gray-900">Performance Level</h2>
-          </CardHeader>
-          <CardContent>
-            <PhaseBadge 
-              phase={phase as PCMC1Phase} 
-              rationale={phaseRationale}
-              size="lg"
-            />
-          </CardContent>
-        </Card>
 
         {/* Metrics Display - Detailed Breakdown */}
         {metrics ? (

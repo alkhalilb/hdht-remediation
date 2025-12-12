@@ -1,4 +1,4 @@
-import { CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react';
+import { AlertTriangle, XCircle, Info } from 'lucide-react';
 
 // Types from the assessment system
 interface InformationGatheringMetrics {
@@ -87,62 +87,79 @@ const phaseConfig: Record<PCMC1Phase, { color: string; bgColor: string; descript
   },
 };
 
-type MetricStatus = 'pass' | 'warn' | 'fail';
+// Topic code to human-readable label mapping
+const topicLabels: Record<string, string> = {
+  onset: 'Onset/Timing',
+  location: 'Location',
+  character: 'Character/Quality',
+  severity: 'Severity',
+  duration: 'Duration',
+  aggravating: 'Aggravating Factors',
+  relieving: 'Relieving Factors',
+  timing: 'Timing/Frequency',
+  associated_symptoms: 'Associated Symptoms',
+  pmh: 'Past Medical History',
+  pmh_cardiac: 'Cardiac History',
+  psh: 'Past Surgical History',
+  medications: 'Medications',
+  nsaid_use: 'NSAID Use',
+  allergies: 'Allergies',
+  family_history: 'Family History',
+  family_history_cardiac: 'Cardiac Family History',
+  smoking: 'Smoking History',
+  alcohol: 'Alcohol Use',
+  diet: 'Diet',
+  exercise: 'Exercise/Activity',
+  exercise_tolerance: 'Exercise Tolerance',
+  occupation: 'Occupation',
+  gi_alarm_symptoms: 'GI Alarm Symptoms',
+  red_flags: 'Red Flag Symptoms',
+  orthopnea: 'Orthopnea',
+  pnd: 'Paroxysmal Nocturnal Dyspnea',
+  edema: 'Edema',
+  cardiac_history: 'Cardiac History',
+  frequency: 'Frequency',
+  medication_use: 'Medication Use',
+  caffeine: 'Caffeine Intake',
+  sleep: 'Sleep Quality',
+  mechanism: 'Mechanism of Injury',
+  radiation: 'Radiation',
+  neurological_symptoms: 'Neurological Symptoms',
+  bowel_bladder: 'Bowel/Bladder Function',
+  prior_episodes: 'Prior Episodes',
+  temperature_tolerance: 'Temperature Tolerance',
+  weight_changes: 'Weight Changes',
+  bowel_habits: 'Bowel Habits',
+  menstrual_history: 'Menstrual History',
+  mood: 'Mood Assessment',
+};
 
-interface MetricRowProps {
+// Convert topic code to readable label
+function getTopicLabel(topic: string): string {
+  return topicLabels[topic] || topic.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+interface SimpleMetricRowProps {
   label: string;
   value: string | number;
-  target: string;
-  status: MetricStatus;
   tooltip?: string;
 }
 
-function MetricRow({ label, value, target, status, tooltip }: MetricRowProps) {
-  const statusIcons = {
-    pass: <CheckCircle className="w-4 h-4 text-green-600" />,
-    warn: <AlertTriangle className="w-4 h-4 text-yellow-600" />,
-    fail: <XCircle className="w-4 h-4 text-red-600" />,
-  };
-
-  const statusColors = {
-    pass: 'bg-green-500',
-    warn: 'bg-yellow-500',
-    fail: 'bg-red-500',
-  };
-
-  // Calculate progress percentage (capped at 100%)
-  const numericValue = typeof value === 'string' ? parseFloat(value) : value;
-  const targetNum = parseFloat(target.replace(/[≥≤%]/g, ''));
-  const progress = Math.min((numericValue / targetNum) * 100, 100);
-
+function SimpleMetricRow({ label, value, tooltip }: SimpleMetricRowProps) {
   return (
-    <div className="flex items-center gap-3 py-2">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-medium text-gray-700">{label}</span>
-          {tooltip && (
-            <div className="group relative">
-              <Info className="w-3 h-3 text-gray-400" />
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                {tooltip}
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${statusColors[status]}`}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <span className="text-sm font-semibold text-gray-900 w-12 text-right">{value}</span>
-        </div>
-      </div>
+    <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2">
-        {statusIcons[status]}
-        <span className="text-xs text-gray-500 w-16">{target}</span>
+        <span className="text-sm text-gray-700">{label}</span>
+        {tooltip && (
+          <div className="group relative">
+            <Info className="w-3 h-3 text-gray-400" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+              {tooltip}
+            </div>
+          </div>
+        )}
       </div>
+      <span className="text-sm font-semibold text-gray-900">{value}</span>
     </div>
   );
 }
@@ -235,19 +252,6 @@ export function MetricsDisplay({
 }: MetricsDisplayProps) {
   const { ig, hd, completeness, efficiency, pc } = metrics;
 
-  // Helper to determine status
-  const getStatus = (value: number, target: number, higherIsBetter = true): MetricStatus => {
-    if (higherIsBetter) {
-      if (value >= target) return 'pass';
-      if (value >= target * 0.7) return 'warn';
-      return 'fail';
-    } else {
-      if (value <= target) return 'pass';
-      if (value <= target * 1.5) return 'warn';
-      return 'fail';
-    }
-  };
-
   return (
     <div className="metrics-display">
       {showPhase && <PhaseBadge phase={phase} rationale={phaseRationale} />}
@@ -257,41 +261,31 @@ export function MetricsDisplay({
         title="Information Gathering"
         highlight={highlightCategory === 'Organization'}
       >
-        <MetricRow
+        <SimpleMetricRow
           label="Early HPI Focus"
           value={`${(ig.earlyHPIFocus * 100).toFixed(0)}%`}
-          target="≥60%"
-          status={getStatus(ig.earlyHPIFocus, 0.6)}
           tooltip="Percentage of first 5 questions exploring chief complaint"
         />
-        <MetricRow
+        <SimpleMetricRow
           label="Line of Reasoning"
           value={ig.lineOfReasoningScore.toFixed(1)}
-          target="≥2.5"
-          status={getStatus(ig.lineOfReasoningScore, 2.5)}
           tooltip="Average consecutive questions on same topic"
         />
-        <MetricRow
+        <SimpleMetricRow
           label="Clarifying Questions"
           value={ig.clarifyingQuestionCount}
-          target="≥2"
-          status={getStatus(ig.clarifyingQuestionCount, 2)}
           tooltip="Questions asking patient to elaborate"
         />
         {!compact && (
           <>
-            <MetricRow
+            <SimpleMetricRow
               label="Summarizing Statements"
               value={ig.summarizingCount}
-              target="≥1"
-              status={getStatus(ig.summarizingCount, 1)}
               tooltip="Restating information to confirm understanding"
             />
-            <MetricRow
+            <SimpleMetricRow
               label="Redundant Questions"
               value={ig.redundantQuestionCount}
-              target="0"
-              status={getStatus(ig.redundantQuestionCount, 0, false)}
               tooltip="Questions asking about already-covered information"
             />
           </>
@@ -309,33 +303,25 @@ export function MetricsDisplay({
         title="Hypothesis-Driven Inquiry"
         highlight={highlightCategory === 'HypothesisAlignment'}
       >
-        <MetricRow
+        <SimpleMetricRow
           label="Hypothesis Coverage"
           value={`${(hd.hypothesisCoverage * 100).toFixed(0)}%`}
-          target="≥70%"
-          status={getStatus(hd.hypothesisCoverage, 0.7)}
           tooltip="How many must-consider diagnoses were in your differential"
         />
-        <MetricRow
+        <SimpleMetricRow
           label="Question-Hypothesis Alignment"
           value={`${(hd.alignmentRatio * 100).toFixed(0)}%`}
-          target="≥50%"
-          status={getStatus(hd.alignmentRatio, 0.5)}
           tooltip="Percentage of questions that test your stated hypotheses"
         />
-        <MetricRow
+        <SimpleMetricRow
           label="Discriminating Questions"
           value={`${(hd.discriminatingRatio * 100).toFixed(0)}%`}
-          target="≥30%"
-          status={getStatus(hd.discriminatingRatio, 0.3)}
           tooltip="Questions that help differentiate between diagnoses"
         />
         {!compact && (
-          <MetricRow
+          <SimpleMetricRow
             label="Hypothesis Clustering"
             value={`${(hd.hypothesisClusteringScore * 100).toFixed(0)}%`}
-            target="≥60%"
-            status={getStatus(hd.hypothesisClusteringScore, 0.6)}
             tooltip="Are questions for the same hypothesis grouped together?"
           />
         )}
@@ -352,22 +338,20 @@ export function MetricsDisplay({
         title="Completeness"
         highlight={highlightCategory === 'Completeness'}
       >
-        <MetricRow
+        <SimpleMetricRow
           label="Required Topics Covered"
           value={`${(completeness.completenessRatio * 100).toFixed(0)}%`}
-          target="≥70%"
-          status={getStatus(completeness.completenessRatio, 0.7)}
           tooltip="Percentage of required history topics addressed"
         />
         {completeness.requiredTopicsMissed.length > 0 && (
           <div className="mt-2 p-2 bg-yellow-50 rounded">
             <p className="text-sm font-medium text-yellow-800 mb-1">Topics Missed:</p>
             <ul className="text-sm text-yellow-700">
-              {completeness.requiredTopicsMissed.slice(0, 3).map((topic, i) => (
-                <li key={i}>• {topic}</li>
+              {completeness.requiredTopicsMissed.slice(0, 5).map((topic, i) => (
+                <li key={i}>• {getTopicLabel(topic)}</li>
               ))}
-              {completeness.requiredTopicsMissed.length > 3 && (
-                <li className="text-yellow-600">... and {completeness.requiredTopicsMissed.length - 3} more</li>
+              {completeness.requiredTopicsMissed.length > 5 && (
+                <li className="text-yellow-600">... and {completeness.requiredTopicsMissed.length - 5} more</li>
               )}
             </ul>
           </div>

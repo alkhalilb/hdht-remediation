@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay, PhaseBadge } from '../components/common';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName } from '../services/scoring';
 import { CheckCircle, ArrowRight, TrendingUp, Target, AlertTriangle } from 'lucide-react';
 import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
@@ -77,19 +77,6 @@ export function TrackFeedback() {
           </p>
         </div>
 
-        {/* Phase Result - Primary */}
-        <Card className="mb-6">
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-gray-900">Performance Level</h2>
-          </CardHeader>
-          <CardContent>
-            <PhaseBadge 
-              phase={phase as PCMC1Phase} 
-              size="lg"
-            />
-          </CardContent>
-        </Card>
-
         {/* Progress indicator - show improvement in key metric */}
         <Card className="mb-6">
           <CardHeader>
@@ -101,31 +88,23 @@ export function TrackFeedback() {
           <CardContent>
             {metrics ? (
               <div className="space-y-4">
-                {/* Key metrics comparison */}
+                {/* Key metrics display */}
                 <div className="grid grid-cols-2 gap-4">
-                  <MetricComparisonBox
+                  <MetricBox
                     label="Early HPI Focus"
-                    current={`${(metrics.ig.earlyHPIFocus * 100).toFixed(0)}%`}
-                    target="≥60%"
-                    isMet={metrics.ig.earlyHPIFocus >= 0.6}
+                    value={`${(metrics.ig.earlyHPIFocus * 100).toFixed(0)}%`}
                   />
-                  <MetricComparisonBox
+                  <MetricBox
                     label="Question Alignment"
-                    current={`${(metrics.hd.alignmentRatio * 100).toFixed(0)}%`}
-                    target="≥50%"
-                    isMet={metrics.hd.alignmentRatio >= 0.5}
+                    value={`${(metrics.hd.alignmentRatio * 100).toFixed(0)}%`}
                   />
-                  <MetricComparisonBox
+                  <MetricBox
                     label="Completeness"
-                    current={`${(metrics.completeness.completenessRatio * 100).toFixed(0)}%`}
-                    target="≥70%"
-                    isMet={metrics.completeness.completenessRatio >= 0.7}
+                    value={`${(metrics.completeness.completenessRatio * 100).toFixed(0)}%`}
                   />
-                  <MetricComparisonBox
+                  <MetricBox
                     label="Discriminating Qs"
-                    current={`${(metrics.hd.discriminatingRatio * 100).toFixed(0)}%`}
-                    target="≥30%"
-                    isMet={metrics.hd.discriminatingRatio >= 0.3}
+                    value={`${(metrics.hd.discriminatingRatio * 100).toFixed(0)}%`}
                   />
                 </div>
               </div>
@@ -247,29 +226,17 @@ export function TrackFeedback() {
   );
 }
 
-// Helper component for metric comparison boxes
-interface MetricComparisonBoxProps {
+// Helper component for metric display boxes
+interface MetricBoxProps {
   label: string;
-  current: string;
-  target: string;
-  isMet: boolean;
+  value: string;
 }
 
-function MetricComparisonBox({ label, current, target, isMet }: MetricComparisonBoxProps) {
+function MetricBox({ label, value }: MetricBoxProps) {
   return (
-    <div className={`p-3 rounded-lg ${isMet ? 'bg-green-50' : 'bg-yellow-50'}`}>
+    <div className="p-3 rounded-lg bg-gray-50">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <div className="flex items-center justify-between">
-        <p className={`text-lg font-bold ${isMet ? 'text-green-700' : 'text-yellow-700'}`}>
-          {current}
-        </p>
-        <span className="text-xs text-gray-500">{target}</span>
-      </div>
-      {isMet ? (
-        <CheckCircle className="w-4 h-4 text-green-600 mt-1" />
-      ) : (
-        <AlertTriangle className="w-4 h-4 text-yellow-600 mt-1" />
-      )}
+      <p className="text-lg font-bold text-gray-900">{value}</p>
     </div>
   );
 }
