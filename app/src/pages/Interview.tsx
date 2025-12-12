@@ -187,11 +187,18 @@ export function Interview() {
       });
 
       // Check for hypothesis mapping prompt
-      // Skip for OLDCARTS-style questions (HPI questions: Onset, Location, Duration, Character,
-      // Aggravating/Alleviating, Radiation, Timing, Severity) - these are standard history-taking
-      // questions where the intent is obvious
+      // Only prompt for discriminating questions - incisive, hypothesis-driven questions
+      // that test specific diagnoses (e.g., "Do you take NSAIDs?" for PUD case)
+      // Skip for:
+      // - OLDCARTS questions (standard HPI: onset, location, duration, character, etc.)
+      // - Routine history sections (PMH, FHx, social, meds, allergies) that every student asks
       const isOLDCARTSQuestion = analysis.category.startsWith('hpi_');
-      const shouldPromptMapping = !isOLDCARTSQuestion && (
+      const isRoutineHistorySection = ['pmh', 'psh', 'medications', 'allergies', 'family_history',
+        'social_substances', 'social_occupation', 'social_living'].includes(analysis.category);
+      const isDiscriminatingQuestion = analysis.isDiscriminating;
+
+      // Only prompt when it's a discriminating question that could reveal hypothesis-driven thinking
+      const shouldPromptMapping = isDiscriminatingQuestion && !isOLDCARTSQuestion && !isRoutineHistorySection && (
         scaffolding.promptHypothesisMapping === 'after_each' ||
         (scaffolding.promptHypothesisMapping === 'periodic' && (liveMetrics.questionCount + 1) % 5 === 0)
       );
