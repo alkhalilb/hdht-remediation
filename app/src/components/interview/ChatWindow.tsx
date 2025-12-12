@@ -45,7 +45,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
               )}
             </div>
             <div
-              className={`max-w-[85%] rounded-2xl px-5 py-3 ${
+              className={`max-w-[90%] rounded-2xl px-6 py-3 ${
                 message.role === 'student'
                   ? 'bg-blue-600 text-white'
                   : message.role === 'patient'
