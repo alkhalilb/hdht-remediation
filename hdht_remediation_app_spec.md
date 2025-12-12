@@ -925,7 +925,27 @@ Respond in JSON:
 
 ### 8.3 Scoring Algorithms
 
-*[Include scoring functions from original document for each dimension]*
+**IMPORTANT**: The scoring system has been refactored to use a literature-grounded assessment pipeline.
+See `literature_grounded_assessment_spec.md` and `server/assessment/` for the current implementation.
+
+The new 3-stage pipeline:
+1. **Stage 1**: Question classification (Claude - reliable for classification)
+2. **Stage 2**: Metric computation (deterministic algorithms - no LLM)
+3. **Stage 3**: Phase determination (rules) + Feedback generation (Claude grounded in metrics)
+
+Key metrics computed:
+- **Information Gathering** (Hasnain et al.): earlyHPIFocus, lineOfReasoningScore, clarifyingQuestionCount, prematureROSDetected
+- **Hypothesis-Driven** (Daniel et al.): hypothesisCoverage, alignmentRatio, discriminatingRatio, hypothesisClusteringScore
+- **Completeness**: requiredTopicsCovered, completenessRatio
+- **Efficiency**: totalQuestions, redundancyPenalty, informationYield
+- **Patient-Centeredness**: openQuestionRatio, leadingQuestionCount
+
+Phase determination follows PCMC-1 rubric:
+- DEVELOPING → Fails basic organization OR completeness
+- APPROACHING → Organized but not hypothesis-driven
+- MEETING → Hypothesis-driven + mostly complete
+- EXCEEDING → Meeting + efficient + discriminating
+- EXEMPLARY → Exceeding + complex case handling
 
 ### 8.4 Deficit Classification Algorithm
 

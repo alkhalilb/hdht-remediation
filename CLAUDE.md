@@ -40,8 +40,16 @@ HBHx/
 │   └── ...
 ├── server/                 # Backend API server
 │   ├── index.ts            # Express server with Claude API integration
+│   ├── assessment/         # Literature-grounded assessment pipeline
+│   │   ├── types.ts        # TypeScript interfaces for assessment
+│   │   ├── questionClassifier.ts  # Stage 1: Question classification
+│   │   ├── metricComputer.ts      # Stage 2: Deterministic metrics
+│   │   ├── phaseAssessor.ts       # Stage 3A: Phase determination
+│   │   ├── feedbackGenerator.ts   # Stage 3B: Grounded feedback
+│   │   └── index.ts        # Pipeline orchestration
 │   └── ...
-└── hdht_remediation_app_spec.md  # Full specification document
+├── hdht_remediation_app_spec.md  # Full specification document
+└── literature_grounded_assessment_spec.md  # Assessment pipeline specification
 ```
 
 ## How to Run
@@ -112,3 +120,50 @@ PORT=3001
 - Efficiency (0-100)
 - Patient-Centeredness (0-100)
 - Overall (weighted average)
+
+---
+
+## Assessment Pipeline (Literature-Grounded)
+
+The assessment system uses a 3-stage pipeline based on Daniel et al. (2019) and Hasnain et al. (2001):
+
+### Stage 1: Question Classification (Claude)
+Each question is classified by Claude (reliable for classification tasks):
+- Category (HPI, PMH, medications, etc.)
+- Whether it tests hypotheses
+- Whether it's discriminating
+- Whether it's redundant
+
+### Stage 2: Metric Computation (Deterministic)
+Pure algorithmic computation with NO LLM involvement:
+
+**Information Gathering Metrics (Hasnain et al.):**
+- `earlyHPIFocus` - % of first 5 questions on chief complaint (target: ≥60%)
+- `lineOfReasoningScore` - Average consecutive questions per topic (target: ≥2.5)
+- `clarifyingQuestionCount` - Number of clarifying questions (target: ≥2)
+- `prematureROSDetected` - Whether ROS started before HPI complete
+
+**Hypothesis-Driven Metrics (Daniel et al.):**
+- `hypothesisCoverage` - % of must-consider diagnoses included (target: ≥70%)
+- `alignmentRatio` - % of questions testing hypotheses (target: ≥50%)
+- `discriminatingRatio` - % of discriminating questions (target: ≥30%)
+- `hypothesisClusteringScore` - Grouping of related questions
+
+### Stage 3: Phase Determination + Feedback
+**3A: Rule-Based Phase Assignment:**
+```
+DEVELOPING  → Fails basic organization OR completeness
+APPROACHING → Organized but not hypothesis-driven
+MEETING     → Hypothesis-driven + mostly complete
+EXCEEDING   → Meeting + efficient + discriminating
+EXEMPLARY   → Exceeding + complex case handling
+```
+
+**3B: Grounded Feedback Generation:**
+Claude generates feedback but is constrained to reference computed metrics only.
+
+### Why This Approach?
+- **Reliability**: LLMs are good at classification but unreliable for direct scoring
+- **Transparency**: Scores come from deterministic algorithms, not LLM hallucination
+- **Reproducibility**: Same questions → same metrics every time
+- **Validity**: Grounded in educational research frameworks
