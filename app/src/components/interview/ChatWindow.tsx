@@ -45,12 +45,12 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
               )}
             </div>
             <div
-              className={`flex-1 rounded-2xl px-5 py-3 ${
+              className={`max-w-[80%] rounded-2xl px-5 py-3 ${
                 message.role === 'student'
-                  ? 'bg-blue-600 text-white ml-12'
+                  ? 'bg-blue-600 text-white'
                   : message.role === 'patient'
-                  ? 'bg-white text-gray-900 border border-gray-200 mr-12'
-                  : 'bg-yellow-50 text-yellow-900 border border-yellow-200 mr-12'
+                  ? 'bg-white text-gray-900 border border-gray-200'
+                  : 'bg-yellow-50 text-yellow-900 border border-yellow-200'
               }`}
             >
               <p className="text-base whitespace-pre-wrap leading-relaxed break-words">{message.content}</p>
