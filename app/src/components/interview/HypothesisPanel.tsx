@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { HypothesisEntry } from '../../types';
 import { Button } from '../common';
+import diseases from '../../data/diseases.json';
 
 interface HypothesisPanelProps {
   hypotheses: HypothesisEntry[];
@@ -24,16 +25,76 @@ export function HypothesisPanel({
 }: HypothesisPanelProps) {
   const [newHypothesis, setNewHypothesis] = useState('');
   const [isExpanded, setIsExpanded] = useState(true);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  const handleAdd = () => {
-    if (newHypothesis.trim() && hypotheses.length < maxHypotheses) {
-      onAdd({ name: newHypothesis.trim(), confidence: 3 });
+  // Filter diseases based on input
+  useEffect(() => {
+    if (newHypothesis.trim().length >= 2) {
+      const query = newHypothesis.toLowerCase();
+      const filtered = diseases
+        .filter(d => d.toLowerCase().includes(query))
+        .slice(0, 8); // Limit to 8 suggestions
+      setSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+      setSelectedIndex(-1);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [newHypothesis]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleAdd = (name?: string) => {
+    const hypothesis = name || newHypothesis.trim();
+    if (hypothesis && hypotheses.length < maxHypotheses) {
+      onAdd({ name: hypothesis, confidence: 3 });
       setNewHypothesis('');
+      setSuggestions([]);
+      setShowSuggestions(false);
     }
   };
 
+  const selectSuggestion = (suggestion: string) => {
+    handleAdd(suggestion);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (showSuggestions && suggestions.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+      } else if (e.key === 'Enter' && selectedIndex >= 0) {
+        e.preventDefault();
+        selectSuggestion(suggestions[selectedIndex]);
+      } else if (e.key === 'Escape') {
+        setShowSuggestions(false);
+      } else if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleAdd();
+      }
+    } else if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleAdd();
     }
@@ -117,17 +178,41 @@ export function HypothesisPanel({
 
           {hypotheses.length < maxHypotheses && !disabled && (
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={newHypothesis}
-                onChange={(e) => setNewHypothesis(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Add diagnosis (e.g., 'ACS', 'GERD')..."
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={newHypothesis}
+                  onChange={(e) => setNewHypothesis(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                  placeholder="Add diagnosis (e.g., 'chest pain', 'pneumonia')..."
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div
+                    ref={suggestionsRef}
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    {suggestions.map((suggestion, index) => (
+                      <button
+                        key={suggestion}
+                        onClick={() => selectSuggestion(suggestion)}
+                        className={`w-full px-3 py-2 text-left text-sm hover:bg-blue-50 ${
+                          index === selectedIndex ? 'bg-blue-100' : ''
+                        } ${index === 0 ? 'rounded-t-lg' : ''} ${
+                          index === suggestions.length - 1 ? 'rounded-b-lg' : ''
+                        }`}
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <Button
                 size="sm"
-                onClick={handleAdd}
+                onClick={() => handleAdd()}
                 disabled={!newHypothesis.trim()}
               >
                 <Plus className="w-4 h-4" />

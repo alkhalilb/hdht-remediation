@@ -56,7 +56,7 @@ interface AllMetrics {
 }
 
 type PCMC1Phase = 'DEVELOPING' | 'APPROACHING' | 'MEETING' | 'EXCEEDING' | 'EXEMPLARY';
-type RemediationTrack = 'Organization' | 'HypothesisAlignment' | 'Completeness' | 'Efficiency';
+type RemediationTrack = 'Organization' | 'HypothesisAlignment' | 'Completeness';
 
 // Phase display configuration
 const phaseConfig: Record<PCMC1Phase, { color: string; bgColor: string; description: string }> = {
@@ -374,38 +374,19 @@ export function MetricsDisplay({
         )}
       </MetricSection>
 
-      {/* Efficiency Section */}
-      <MetricSection
-        title="Efficiency"
-        highlight={highlightCategory === 'Efficiency'}
-      >
-        <MetricRow
-          label="Question Count"
-          value={efficiency.totalQuestions}
-          target={`${efficiency.expertQuestionRange.min}-${efficiency.expertQuestionRange.max}`}
-          status={efficiency.isWithinExpertRange ? 'pass' : 
-                  efficiency.totalQuestions < efficiency.expertQuestionRange.min ? 'warn' : 'fail'}
-          tooltip="Number of questions asked vs expert range"
-        />
-        {!compact && (
-          <>
-            <MetricRow
-              label="Information Yield"
-              value={`${(efficiency.informationYield * 100).toFixed(0)}%`}
-              target="≥50%"
-              status={getStatus(efficiency.informationYield, 0.5)}
-              tooltip="Unique topics covered per question"
-            />
-            <MetricRow
-              label="Open-Ended Questions"
-              value={`${(pc.openQuestionRatio * 100).toFixed(0)}%`}
-              target="≥30%"
-              status={getStatus(pc.openQuestionRatio, 0.3)}
-              tooltip="Open questions vs closed/yes-no questions"
-            />
-          </>
-        )}
-      </MetricSection>
+      {/* Question Summary - show question count without making it a deficit dimension */}
+      {!compact && (
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">Total Questions Asked:</span>
+            <span className="font-semibold text-gray-900">{efficiency.totalQuestions}</span>
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-sm text-gray-600">Open-Ended Questions:</span>
+            <span className="font-semibold text-gray-900">{(pc.openQuestionRatio * 100).toFixed(0)}%</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

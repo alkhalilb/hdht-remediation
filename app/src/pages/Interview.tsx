@@ -62,6 +62,7 @@ export function Interview() {
   const [assessmentProgress, setAssessmentProgress] = useState<string | null>(null);
   const [showRankingModal, setShowRankingModal] = useState(false);
   const [rankedDifferential, setRankedDifferential] = useState<HypothesisEntry[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
@@ -277,6 +278,26 @@ export function Interview() {
     newRanked[index] = newRanked[newIndex];
     newRanked[newIndex] = temp;
     setRankedDifferential(newRanked);
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newRanked = [...rankedDifferential];
+    const draggedItem = newRanked[draggedIndex];
+    newRanked.splice(draggedIndex, 1);
+    newRanked.splice(index, 0, draggedItem);
+    setRankedDifferential(newRanked);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   const confirmRanking = () => {
@@ -560,7 +581,7 @@ export function Interview() {
                 <h3 className="font-semibold text-gray-900 text-lg mb-2">Rank Your Differential Diagnosis</h3>
                 <p className="text-sm text-gray-600">
                   Before ending, order your differential from most likely (#1) to least likely.
-                  Use the arrows to reorder.
+                  Drag to reorder or use the arrows.
                 </p>
               </div>
 
@@ -573,7 +594,13 @@ export function Interview() {
                   {rankedDifferential.map((hypothesis, index) => (
                     <div
                       key={hypothesis.id}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-grab active:cursor-grabbing ${
+                        draggedIndex === index ? 'opacity-50 border-blue-400' : ''
+                      }`}
                     >
                       <div className="flex items-center gap-2 text-gray-400">
                         <GripVertical className="w-4 h-4" />

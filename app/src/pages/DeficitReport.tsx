@@ -195,7 +195,13 @@ function getDeficitExplanation(deficit: string, metrics?: AllMetrics): string {
       return `You covered ${(metrics.completeness.completenessRatio * 100).toFixed(0)}% of required topics (target: ≥70%). ${metrics.completeness.requiredTopicsMissed.length > 0 ? `Missing topics include: ${metrics.completeness.requiredTopicsMissed.slice(0, 3).join(', ')}.` : ''} Practice using a mental checklist to ensure you cover all relevant domains before concluding.`;
     
     case 'hypothesisAlignment':
-      return `Only ${(metrics.hd.alignmentRatio * 100).toFixed(0)}% of your questions clearly tested your stated hypotheses (target: ≥50%), and ${(metrics.hd.discriminatingRatio * 100).toFixed(0)}% were discriminating questions that help differentiate between diagnoses (target: ≥30%). Practice asking yourself before each question: "Which of my differential diagnoses will this help me rule in or out?"`;
+      const alignPct = (metrics.hd.alignmentRatio * 100).toFixed(0);
+      const discrimPct = (metrics.hd.discriminatingRatio * 100).toFixed(0);
+      // Only show deficit-style message if actually below threshold
+      if (metrics.hd.alignmentRatio >= 0.5 && metrics.hd.discriminatingRatio >= 0.3) {
+        return `You achieved ${alignPct}% hypothesis alignment and ${discrimPct}% discriminating questions. While these exceed targets, this was identified as your area with most room for improvement. Continue connecting each question to your differential diagnoses.`;
+      }
+      return `${alignPct}% of your questions tested your stated hypotheses (target: ≥50%), and ${discrimPct}% were discriminating questions (target: ≥30%). Practice asking yourself before each question: "Which of my differential diagnoses will this help me rule in or out?"`;
     
     case 'efficiency':
       return `You asked ${metrics.efficiency.totalQuestions} questions ${metrics.efficiency.isWithinExpertRange ? 'within' : 'outside'} the expert range of ${metrics.efficiency.expertQuestionRange.min}-${metrics.efficiency.expertQuestionRange.max}. ${metrics.ig.redundantQuestionCount > 0 ? `${metrics.ig.redundantQuestionCount} questions were redundant.` : ''} Practice asking discriminating questions that efficiently narrow your differential.`;

@@ -15,7 +15,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-gray-50 rounded-lg">
+    <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-gray-50 rounded-lg" style={{ maxHeight: 'calc(100vh - 350px)', minHeight: '300px' }}>
       {messages.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <p className="text-lg font-medium">Start the Interview</p>
@@ -45,7 +45,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
               )}
             </div>
             <div
-              className={`max-w-[75%] rounded-2xl px-5 py-3 ${
+              className={`max-w-[85%] rounded-2xl px-5 py-3 ${
                 message.role === 'student'
                   ? 'bg-blue-600 text-white'
                   : message.role === 'patient'

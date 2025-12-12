@@ -7,7 +7,7 @@ import { BookOpen, ArrowRight, Info } from 'lucide-react';
 
 export function TrackIntro() {
   const navigate = useNavigate();
-  const { assignedTrack, currentTrackCaseIndex, setPhase } = useAppStore();
+  const { assignedTrack, currentTrackCaseIndex, setPhase, clearMessages, setHypotheses, setPlannedQuestions } = useAppStore();
 
   if (!assignedTrack) {
     navigate('/');
@@ -25,8 +25,12 @@ export function TrackIntro() {
   }
 
   const handleStart = () => {
+    // Clear previous case state before starting new case
+    clearMessages();
+    setHypotheses([]);
+    setPlannedQuestions([]);
     setPhase('track_case');
-    navigate('/interview');
+    navigate('/hypothesis-generation');
   };
 
   const trackName = getDeficitDisplayName(assignedTrack);

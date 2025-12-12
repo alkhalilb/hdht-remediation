@@ -113,6 +113,8 @@ CRITICAL INSTRUCTIONS - This is a history-taking exercise. The student must ASK 
 
 8. Keep responses to 1-2 sentences maximum unless they ask a very specific compound question.
 
+9. **NO EMOTING OR ACTION DESCRIPTIONS**: Never include action descriptions like *shakes head*, *sighs*, *nods*, *pauses*, etc. Just provide the verbal response directly without any asterisk-wrapped descriptions.
+
 Respond as the patient would, in first person.`;
 
     const messages: { role: 'user' | 'assistant'; content: string }[] = conversationHistory.map(
