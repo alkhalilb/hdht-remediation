@@ -184,9 +184,8 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
                   ? 'bg-white text-gray-900 border border-gray-200 group'
                   : 'bg-yellow-50 text-yellow-900 border border-yellow-200'
               }`}
-              style={{ padding: '16px 24px' }}
             >
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-2" style={{ padding: '14px 20px' }}>
                 <p className="text-base whitespace-pre-wrap leading-relaxed break-words flex-1">{message.content}</p>
                 {message.role === 'patient' && (
                   <button

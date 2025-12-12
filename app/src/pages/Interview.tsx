@@ -450,19 +450,32 @@ export function Interview() {
       const debugData = getDebugInterview(currentCase.id, quality);
       const scaffolding = currentCase.scaffolding;
 
-      // Add hypotheses if not already present (with confidence levels)
+      // Add hypotheses starting at confidence 3 (neutral)
+      // Store final target confidences to gradually adjust towards
+      const hypothesisTargets: { name: string; targetConfidence: number; id?: string }[] = [];
       for (const hyp of debugData.hypotheses) {
         const exists = hypotheses.some(h => h.name.toLowerCase() === hyp.name.toLowerCase());
         if (!exists) {
-          addHypothesis({ name: hyp.name, confidence: hyp.confidence });
+          addHypothesis({ name: hyp.name, confidence: 3 }); // Start at 3
         }
+        hypothesisTargets.push({ name: hyp.name, targetConfidence: hyp.confidence });
       }
 
       // Track question count for determining when mapping prompt would fire
       let questionCount = liveMetrics.questionCount;
+      const totalQuestions = debugData.questions.length;
+
+      // Calculate confidence adjustment milestones (adjust at 25%, 50%, 75%, 100%)
+      const adjustmentPoints = [
+        Math.floor(totalQuestions * 0.25),
+        Math.floor(totalQuestions * 0.5),
+        Math.floor(totalQuestions * 0.75),
+        totalQuestions,
+      ];
 
       // Simulate asking each question with delays
-      for (const questionText of debugData.questions) {
+      for (let i = 0; i < debugData.questions.length; i++) {
+        const questionText = debugData.questions[i];
         questionCount++;
 
         // Determine if this question would trigger hypothesis mapping prompt
@@ -506,6 +519,29 @@ export function Interview() {
         updateLiveMetrics({
           questionCount: questionCount,
         });
+
+        // Gradually adjust confidence at milestone points
+        const questionNum = i + 1;
+        if (adjustmentPoints.includes(questionNum)) {
+          // Calculate progress (0.25, 0.5, 0.75, 1.0)
+          const progress = adjustmentPoints.indexOf(questionNum) + 1;
+          const progressRatio = progress / 4;
+
+          // Get current hypotheses and update their confidence towards target
+          const currentHypotheses = useAppStore.getState().hypotheses;
+          for (const target of hypothesisTargets) {
+            const hyp = currentHypotheses.find(h => h.name.toLowerCase() === target.name.toLowerCase());
+            if (hyp) {
+              // Interpolate from 3 towards target confidence
+              const newConfidence = Math.round(3 + (target.targetConfidence - 3) * progressRatio);
+              // Clamp between 1 and 5
+              const clampedConfidence = Math.max(1, Math.min(5, newConfidence));
+              if (hyp.confidence !== clampedConfidence) {
+                updateHypothesis(hyp.id, { confidence: clampedConfidence });
+              }
+            }
+          }
+        }
 
         // Small delay between questions for visual feedback
         await new Promise(resolve => setTimeout(resolve, 100));
