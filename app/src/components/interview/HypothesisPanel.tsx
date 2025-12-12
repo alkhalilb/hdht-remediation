@@ -129,7 +129,7 @@ export function HypothesisPanel({
               {hypotheses.map((hypothesis) => (
                 <div
                   key={hypothesis.id}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
                   <span className="text-sm font-medium text-gray-900">{hypothesis.name}</span>
                   <div className="flex items-center gap-2">

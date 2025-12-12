@@ -234,7 +234,7 @@ interface MetricBoxProps {
 
 function MetricBox({ label, value }: MetricBoxProps) {
   return (
-    <div className="p-3 rounded-lg bg-gray-50">
+    <div className="p-4 rounded-lg bg-gray-50">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className="text-lg font-bold text-gray-900">{value}</p>
     </div>
