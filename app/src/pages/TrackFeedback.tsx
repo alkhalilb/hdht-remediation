@@ -31,11 +31,10 @@ export function TrackFeedback() {
   const metrics = assessment?.metrics;
 
   // Map the deficit type to the remediation track type
-  const highlightCategory: RemediationTrackType = 
+  const highlightCategory: RemediationTrackType =
     assignedTrack === 'organization' ? 'Organization' :
     assignedTrack === 'hypothesisAlignment' ? 'HypothesisAlignment' :
-    assignedTrack === 'completeness' ? 'Completeness' :
-    'Efficiency';
+    'Completeness';
 
   // Get legacy focus dimension score for backward compatibility
   const focusKey = assignedTrack === 'hypothesisAlignment' ? 'hypothesisAlignment' : assignedTrack;

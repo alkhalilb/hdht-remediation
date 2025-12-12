@@ -29,11 +29,10 @@ export function DeficitReport() {
   const metrics = assessment?.metrics;
 
   // Map the deficit type to the remediation track type
-  const highlightCategory: RemediationTrackType = 
+  const highlightCategory: RemediationTrackType =
     assignedDeficit === 'organization' ? 'Organization' :
     assignedDeficit === 'hypothesisAlignment' ? 'HypothesisAlignment' :
-    assignedDeficit === 'completeness' ? 'Completeness' :
-    'Efficiency';
+    'Completeness';
 
   return (
     <Layout>

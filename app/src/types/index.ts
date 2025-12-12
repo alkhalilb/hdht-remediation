@@ -180,7 +180,7 @@ export interface ScaffoldingEvent {
 
 // Literature-grounded metrics types
 export type PCMC1Phase = 'DEVELOPING' | 'APPROACHING' | 'MEETING' | 'EXCEEDING' | 'EXEMPLARY';
-export type RemediationTrackType = 'Organization' | 'HypothesisAlignment' | 'Completeness' | 'Efficiency';
+export type RemediationTrackType = 'Organization' | 'HypothesisAlignment' | 'Completeness';
 
 export interface InformationGatheringMetrics {
   earlyHPIFocus: number;
