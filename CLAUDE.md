@@ -200,3 +200,14 @@ The UI now displays transparent, literature-grounded metrics instead of opaque 0
 - `server/assessment/` - The entire assessment pipeline
 - `app/src/components/common/MetricsDisplay.tsx` - New metrics display components
 - `literature_grounded_assessment_spec.md` - Full specification for the assessment approach
+
+### Build Fix (December 2025)
+- Server uses `moduleResolution: "NodeNext"` which requires `.js` extensions on all relative imports
+- If adding new files to `server/assessment/`, use `.js` extensions in imports (e.g., `import { foo } from './bar.js'`)
+
+---
+
+## Potential Future Work
+- Update `ExitFeedback.tsx` to use MetricsDisplay (currently not updated)
+- Persist phase/metrics in Zustand store for retrieval across pages
+- Add more cases for each remediation track
