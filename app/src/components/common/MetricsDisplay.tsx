@@ -256,7 +256,6 @@ export function MetricsDisplay({
       <MetricSection
         title="Information Gathering"
         highlight={highlightCategory === 'Organization'}
-        description="Based on Hasnain et al. (2001) - behaviors associated with diagnostic competence"
       >
         <MetricRow
           label="Early HPI Focus"
@@ -309,7 +308,6 @@ export function MetricsDisplay({
       <MetricSection
         title="Hypothesis-Driven Inquiry"
         highlight={highlightCategory === 'HypothesisAlignment'}
-        description="Based on Daniel et al. (2019) - clinical reasoning framework"
       >
         <MetricRow
           label="Hypothesis Coverage"

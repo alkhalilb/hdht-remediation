@@ -230,9 +230,9 @@ export function getScoreBgColor(score: number): string {
 // Get deficit type display name
 export function getDeficitDisplayName(deficit: DeficitType): string {
   const names: Record<DeficitType, string> = {
-    organization: 'Organization',
+    organization: 'Information Gathering',
     completeness: 'Completeness',
-    hypothesisAlignment: 'Hypothesis Alignment',
+    hypothesisAlignment: 'Hypothesis-Driven Inquiry',
     efficiency: 'Efficiency',
   };
   return names[deficit];

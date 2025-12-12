@@ -69,9 +69,6 @@ export function DeficitReport() {
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-lg font-semibold text-gray-900">Detailed Metrics</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Based on Hasnain et al. (2001) and Daniel et al. (2019) clinical reasoning frameworks
-              </p>
             </CardHeader>
             <CardContent>
               <MetricsDisplay

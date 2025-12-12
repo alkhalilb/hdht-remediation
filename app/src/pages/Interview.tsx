@@ -618,10 +618,6 @@ export function Interview() {
                     }}
                   ></div>
                 </div>
-
-                <p className="text-xs text-gray-500 mt-4">
-                  Using literature-grounded assessment framework
-                </p>
               </div>
             </CardContent>
           </Card>
