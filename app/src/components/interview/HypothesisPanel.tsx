@@ -186,7 +186,7 @@ export function HypothesisPanel({
                   onChange={(e) => setNewHypothesis(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                  placeholder="Add diagnosis (e.g., 'chest pain', 'pneumonia')..."
+                  placeholder="Add diagnosis..."
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {showSuggestions && suggestions.length > 0 && (
