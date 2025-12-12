@@ -7,7 +7,7 @@ import {
   PCMC1Phase,
   RemediationTrack,
   QuestionClassification,
-} from './types';
+} from './types.js';
 
 const FEEDBACK_SYSTEM_PROMPT = `You are a medical education feedback system providing specific, actionable feedback on hypothesis-driven history taking.
 

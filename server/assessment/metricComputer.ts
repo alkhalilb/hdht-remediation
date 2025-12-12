@@ -10,7 +10,7 @@ import {
   PatientCenterednessMetrics,
   AllMetrics,
   ExpertContent,
-} from './types';
+} from './types.js';
 
 // ============================================================================
 // 2A: Information Gathering Metrics (Hasnain et al. 2001)

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
-import { assessPerformanceLegacyFormat } from './assessment';
+import { assessPerformanceLegacyFormat } from './assessment/index.js';
 
 const app = express();
 const port = process.env.PORT || 3001;

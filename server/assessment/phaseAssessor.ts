@@ -12,7 +12,7 @@ import {
   PhaseResult,
   DeficitClassification,
   AllMetrics,
-} from './types';
+} from './types.js';
 
 // ============================================================================
 // Phase Thresholds (based on literature)

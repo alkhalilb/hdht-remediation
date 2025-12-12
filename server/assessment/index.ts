@@ -2,19 +2,19 @@
 // Replaces the old single-prompt scoring approach
 
 import Anthropic from '@anthropic-ai/sdk';
-import { classifyAllQuestions } from './questionClassifier';
-import { computeAllMetrics } from './metricComputer';
-import { determinePCMC1Phase, classifyDeficit, convertToLegacyScores } from './phaseAssessor';
-import { generateFeedback } from './feedbackGenerator';
+import { classifyAllQuestions } from './questionClassifier.js';
+import { computeAllMetrics } from './metricComputer.js';
+import { determinePCMC1Phase, classifyDeficit, convertToLegacyScores } from './phaseAssessor.js';
+import { generateFeedback } from './feedbackGenerator.js';
 import {
   LiteratureGroundedAssessment,
   ExpertContent,
   RemediationTrack,
   PCMC1Phase,
-} from './types';
+} from './types.js';
 
 // Re-export types
-export * from './types';
+export * from './types.js';
 
 interface AssessmentInput {
   questions: { text: string }[];

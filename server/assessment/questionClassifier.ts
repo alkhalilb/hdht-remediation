@@ -2,7 +2,7 @@
 // Uses Claude for CLASSIFICATION (reliable) not SCORING (unreliable)
 
 import Anthropic from '@anthropic-ai/sdk';
-import { QuestionClassification, HistoryCategory } from './types';
+import { QuestionClassification, HistoryCategory } from './types.js';
 
 const QUESTION_CLASSIFICATION_SYSTEM_PROMPT = `You are a medical education assessment system classifying student questions during history-taking.
 
