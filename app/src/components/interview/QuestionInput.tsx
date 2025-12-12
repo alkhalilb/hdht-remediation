@@ -55,10 +55,9 @@ export const QuestionInput = forwardRef<QuestionInputRef, QuestionInputProps>(
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={disabled}
-              placeholder={placeholder || 'Type your question...'}
+              placeholder={disabled ? 'Type your next question while waiting...' : (placeholder || 'Type your question...')}
               rows={2}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="flex flex-col gap-2">

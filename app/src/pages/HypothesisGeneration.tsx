@@ -5,7 +5,7 @@ import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
 import { Layout, Button, Card, CardContent } from '../components/common';
 import { HypothesisPanel } from '../components/interview';
 import { RemediationCase } from '../types';
-import { Brain, Stethoscope, ClipboardList, ArrowRight, MessageSquarePlus, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Brain, Stethoscope, ClipboardList, ArrowRight } from 'lucide-react';
 
 export function HypothesisGeneration() {
   const navigate = useNavigate();
@@ -15,9 +15,6 @@ export function HypothesisGeneration() {
     addHypothesis,
     updateHypothesis,
     removeHypothesis,
-    plannedQuestions,
-    addPlannedQuestion,
-    removePlannedQuestion,
     assignedTrack,
     currentTrackCaseIndex,
     exitAttempts,
@@ -25,8 +22,6 @@ export function HypothesisGeneration() {
   } = useAppStore();
 
   const [showTips, setShowTips] = useState(true);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [showQuestionPlanning, setShowQuestionPlanning] = useState(false);
 
   // Get the current case based on phase
   let currentCase: RemediationCase | null = null;
@@ -167,104 +162,6 @@ export function HypothesisGeneration() {
                 <p className="text-gray-500">
                   Add at least one diagnosis to continue
                 </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Question Planning (Collapsible) */}
-        <Card className="mb-6">
-          <CardContent className="py-4">
-            <button
-              onClick={() => setShowQuestionPlanning(!showQuestionPlanning)}
-              className="w-full flex items-center justify-between text-left"
-            >
-              <div className="flex items-center gap-3">
-                <MessageSquarePlus className="w-5 h-5 text-gray-600" />
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Plan Your Questions
-                    <span className="ml-2 text-sm font-normal text-gray-500">(Optional)</span>
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Pre-type questions to ask during the interview
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {plannedQuestions.length > 0 && (
-                  <span className="text-sm text-blue-600 font-medium">
-                    {plannedQuestions.length} planned
-                  </span>
-                )}
-                {showQuestionPlanning ? (
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                )}
-              </div>
-            </button>
-
-            {showQuestionPlanning && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <p className="text-sm text-gray-600 mb-3">
-                  Think about what questions would help you test each hypothesis.
-                  These will appear as suggestions during your interview.
-                </p>
-
-                {/* Add question input */}
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={newQuestion}
-                    onChange={(e) => setNewQuestion(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newQuestion.trim()) {
-                        addPlannedQuestion(newQuestion.trim());
-                        setNewQuestion('');
-                      }
-                    }}
-                    placeholder="Type a question to ask..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                  />
-                  <Button
-                    onClick={() => {
-                      if (newQuestion.trim()) {
-                        addPlannedQuestion(newQuestion.trim());
-                        setNewQuestion('');
-                      }
-                    }}
-                    disabled={!newQuestion.trim()}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Add
-                  </Button>
-                </div>
-
-                {/* List of planned questions */}
-                {plannedQuestions.length > 0 ? (
-                  <ul className="space-y-2">
-                    {plannedQuestions.map((q, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm"
-                      >
-                        <span className="text-gray-700">{q}</span>
-                        <button
-                          onClick={() => removePlannedQuestion(index)}
-                          className="text-gray-400 hover:text-red-500 p-1"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-center text-sm text-gray-400 py-4">
-                    No questions planned yet
-                  </p>
-                )}
               </div>
             )}
           </CardContent>

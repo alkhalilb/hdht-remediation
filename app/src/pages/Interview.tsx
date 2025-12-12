@@ -15,7 +15,7 @@ import {
   EfficiencyAlert,
 } from '../components/scaffolding';
 import { RemediationCase, QuestionEntry, QuestionAnalysis, Message, HypothesisEntry } from '../types';
-import { AlertTriangle, ListChecks, Send } from 'lucide-react';
+import { AlertTriangle, ListChecks, Send, ArrowLeft, ArrowRight } from 'lucide-react';
 
 export function Interview() {
   const navigate = useNavigate();
@@ -58,6 +58,8 @@ export function Interview() {
     analysis: QuestionAnalysis;
   } | null>(null);
   const [alerts, setAlerts] = useState<{ type: string; id: string }[]>([]);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+  const [assessmentProgress, setAssessmentProgress] = useState<string | null>(null);
 
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
@@ -267,8 +269,26 @@ export function Interview() {
 
     setShowEndConfirm(false);
     setIsLoading(true);
+    setAssessmentProgress('Analyzing your questions...');
 
     try {
+      // Simulate progress updates
+      const progressSteps = [
+        'Classifying question types...',
+        'Computing information gathering metrics...',
+        'Evaluating hypothesis alignment...',
+        'Determining performance phase...',
+        'Generating feedback...',
+      ];
+
+      let stepIndex = 0;
+      const progressInterval = setInterval(() => {
+        if (stepIndex < progressSteps.length) {
+          setAssessmentProgress(progressSteps[stepIndex]);
+          stepIndex++;
+        }
+      }, 1500);
+
       // Get full assessment
       const assessment = await assessPerformance({
         questions: questions.map(q => ({
@@ -286,6 +306,9 @@ export function Interview() {
         patient: currentCase.patient,
         assignedTrack: assignedTrack || undefined,
       });
+
+      clearInterval(progressInterval);
+      setAssessmentProgress('Finalizing results...');
 
       // Determine mastery based on track
       const masteryThreshold = 60;
@@ -324,11 +347,25 @@ export function Interview() {
       setError('Failed to assess performance. Please try again.');
     } finally {
       setIsLoading(false);
+      setAssessmentProgress(null);
     }
   };
 
   const dismissAlert = (id: string) => {
     setAlerts(prev => prev.filter(a => a.id !== id));
+  };
+
+  const handleGoBack = () => {
+    if (messages.length > 0 || questions.length > 0) {
+      setShowBackConfirm(true);
+    } else {
+      navigate('/hypothesis-generation');
+    }
+  };
+
+  const confirmGoBack = () => {
+    setShowBackConfirm(false);
+    navigate('/hypothesis-generation');
   };
 
   // Redirect to hypothesis generation if no hypotheses entered
@@ -356,7 +393,30 @@ export function Interview() {
         showTargetRange={scaffolding.showTargetRange ? currentCase.expertContent.expertQuestionCount : undefined}
       />
 
-      <div className="flex gap-6 mt-4">
+      {/* Navigation bar */}
+      <div className="flex justify-between items-center mt-4 mb-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleGoBack}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Hypotheses
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={handleEndInterview}
+          disabled={isLoading}
+          className="flex items-center gap-2"
+        >
+          End Interview
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <div className="flex gap-6 mt-2">
         {/* Main chat area */}
         <div className="flex-1 flex flex-col" style={{ minHeight: 'calc(100vh - 250px)' }}>
           {/* Alerts */}
@@ -489,6 +549,76 @@ export function Interview() {
                     </Button>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Back confirmation modal */}
+      {showBackConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="max-w-md mx-4">
+            <CardContent className="py-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Go Back?</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    You have an interview in progress with {messages.length} messages.
+                    Going back will allow you to edit your hypotheses, but your conversation progress will be preserved.
+                  </p>
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={() => setShowBackConfirm(false)}>
+                      Stay Here
+                    </Button>
+                    <Button onClick={confirmGoBack}>
+                      Go Back
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Assessment loading overlay */}
+      {assessmentProgress && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <Card className="max-w-md mx-4 w-full">
+            <CardContent className="py-8 px-6">
+              <div className="flex flex-col items-center text-center">
+                {/* Animated spinner */}
+                <div className="w-16 h-16 mb-6 relative">
+                  <div className="absolute inset-0 rounded-full border-4 border-blue-100"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+                </div>
+
+                <h3 className="font-semibold text-gray-900 text-lg mb-2">Analyzing Your Performance</h3>
+                <p className="text-sm text-gray-600 mb-6">
+                  {assessmentProgress}
+                </p>
+
+                {/* Progress bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      width: assessmentProgress.includes('Classifying') ? '20%' :
+                             assessmentProgress.includes('information') ? '40%' :
+                             assessmentProgress.includes('hypothesis') ? '60%' :
+                             assessmentProgress.includes('phase') ? '80%' :
+                             assessmentProgress.includes('Finalizing') ? '95%' : '90%'
+                    }}
+                  ></div>
+                </div>
+
+                <p className="text-xs text-gray-500 mt-4">
+                  Using literature-grounded assessment framework
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
+import { assessPerformanceLegacyFormat } from './assessment';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -270,7 +271,8 @@ Evaluate the student's differential diagnosis and respond in JSON format ONLY:
   }
 });
 
-// Full Assessment endpoint
+// Full Assessment endpoint - Literature-Grounded Pipeline
+// Based on Daniel et al. (2019) and Hasnain et al. (2001)
 app.post('/api/assess-performance', async (req, res) => {
   try {
     const {
@@ -281,10 +283,10 @@ app.post('/api/assess-performance', async (req, res) => {
       patient,
       assignedTrack,
     } = req.body as {
-      questions: { text: string; category: string; analysis: { hypothesesTested: string[]; isRedundant: boolean; isOpen: boolean } }[];
+      questions: { text: string; category: string; analysis?: any }[];
       hypotheses: { name: string; confidence: number }[];
       expertContent: {
-        expectedHypotheses: { mustConsider: string[]; shouldConsider: string[]; acceptable: string[] };
+        expectedHypotheses: { mustConsider: string[]; shouldConsider: string[]; acceptable?: string[] };
         requiredTopics: string[];
         expertQuestionCount: { min: number; max: number };
       };
@@ -293,82 +295,25 @@ app.post('/api/assess-performance', async (req, res) => {
       assignedTrack?: string;
     };
 
-    const systemPrompt = `You are a medical education expert assessing a student's hypothesis-driven history taking performance.
+    console.log(`[Assessment] Starting literature-grounded assessment for ${questions.length} questions`);
 
-PATIENT: ${patient.name}, ${patient.age}yo ${patient.sex}
-CHIEF COMPLAINT: ${chiefComplaint}
-
-EXPECTED HYPOTHESES:
-- Must consider: ${expertContent.expectedHypotheses.mustConsider.join(', ')}
-- Should consider: ${expertContent.expectedHypotheses.shouldConsider.join(', ')}
-
-REQUIRED TOPICS: ${expertContent.requiredTopics.join(', ')}
-EXPERT QUESTION RANGE: ${expertContent.expertQuestionCount.min}-${expertContent.expertQuestionCount.max}
-
-STUDENT'S HYPOTHESES:
-${hypotheses.map((h: { name: string; confidence: number }) => `- ${h.name}`).join('\n')}
-
-STUDENT'S QUESTIONS (${questions.length} total):
-${questions.map((q: { text: string; category: string }, i: number) => `${i + 1}. [${q.category}] ${q.text}`).join('\n')}
-
-${assignedTrack ? `NOTE: Student is being remediated for ${assignedTrack} deficit. Pay special attention to this dimension.` : ''}
-
-Assess the performance and respond in JSON format ONLY:
-{
-  "scores": {
-    "hypothesisGeneration": <0-100>,
-    "hypothesisAlignment": <0-100>,
-    "organization": <0-100>,
-    "completeness": <0-100>,
-    "efficiency": <0-100>,
-    "patientCenteredness": <0-100>,
-    "overall": <0-100 weighted average>
-  },
-  "feedback": {
-    "strengths": ["<2-3 specific strengths>"],
-    "improvements": ["<2-3 specific areas for improvement>"],
-    "deficitSpecific": "<targeted feedback for the ${assignedTrack || 'primary'} dimension>"
-  },
-  "topicsCovered": ["<topics that were adequately covered>"],
-  "topicsMissed": ["<important topics that were missed>"],
-  "organizationAnalysis": "<brief analysis of question flow and organization>",
-  "hypothesisAlignmentAnalysis": "<brief analysis of how well questions mapped to hypotheses>"
-}`;
-
-    const response = await anthropic.messages.create({
-      model: 'claude-opus-4-5',
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: 'Assess the performance and respond with JSON only.' }],
+    // Use the new staged assessment pipeline
+    const result = await assessPerformanceLegacyFormat(anthropic, {
+      questions: questions.map(q => ({ text: q.text })),
+      hypotheses,
+      chiefComplaint,
+      patient,
+      expertContent: {
+        expectedHypotheses: expertContent.expectedHypotheses,
+        requiredTopics: expertContent.requiredTopics,
+        expertQuestionCount: expertContent.expertQuestionCount,
+      },
+      assignedTrack,
     });
 
-    const responseText = response.content[0].type === 'text' ? response.content[0].text : '{}';
+    console.log(`[Assessment] Complete. Phase: ${result.phase}`);
 
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      res.json(JSON.parse(jsonMatch[0]));
-    } else {
-      res.json({
-        scores: {
-          hypothesisGeneration: 50,
-          hypothesisAlignment: 50,
-          organization: 50,
-          completeness: 50,
-          efficiency: 50,
-          patientCenteredness: 50,
-          overall: 50,
-        },
-        feedback: {
-          strengths: ['Completed the interview'],
-          improvements: ['Continue practicing hypothesis-driven questioning'],
-          deficitSpecific: 'Focus on connecting your questions to your differential diagnosis.',
-        },
-        topicsCovered: [],
-        topicsMissed: expertContent.requiredTopics,
-        organizationAnalysis: 'Unable to fully analyze organization.',
-        hypothesisAlignmentAnalysis: 'Unable to fully analyze hypothesis alignment.',
-      });
-    }
+    res.json(result);
   } catch (error) {
     console.error('Assessment error:', error);
     res.status(500).json({ error: 'Failed to assess performance' });
