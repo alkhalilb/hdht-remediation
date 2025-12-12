@@ -32,7 +32,7 @@ interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className = '', children, ...props }, ref) => (
-    <div ref={ref} className={`px-6 py-4 border-b border-gray-100 ${className}`} {...props}>
+    <div ref={ref} className={`border-b border-gray-100 ${className}`} style={{ padding: '16px 24px' }} {...props}>
       {children}
     </div>
   )
@@ -44,7 +44,7 @@ interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ className = '', children, ...props }, ref) => (
-    <div ref={ref} className={`px-6 py-4 ${className}`} {...props}>
+    <div ref={ref} className={className} style={{ padding: '16px 24px' }} {...props}>
       {children}
     </div>
   )
@@ -56,7 +56,7 @@ interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
 
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className = '', children, ...props }, ref) => (
-    <div ref={ref} className={`px-6 py-4 border-t border-gray-100 ${className}`} {...props}>
+    <div ref={ref} className={`border-t border-gray-100 ${className}`} style={{ padding: '16px 24px' }} {...props}>
       {children}
     </div>
   )

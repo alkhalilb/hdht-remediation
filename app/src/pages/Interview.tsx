@@ -67,6 +67,25 @@ export function Interview() {
   const [debugFilling, setDebugFilling] = useState(false);
   const [debugComplete, setDebugComplete] = useState<DebugQuality | null>(null);
 
+  // Voice settings - persist in localStorage
+  const [voiceInputEnabled, setVoiceInputEnabled] = useState(() => {
+    return localStorage.getItem('hdht-voice-input') === 'true';
+  });
+  const [ttsEnabled, setTtsEnabled] = useState(() => {
+    return localStorage.getItem('hdht-tts') === 'true';
+  });
+
+  // Persist voice settings
+  const handleToggleVoiceInput = (enabled: boolean) => {
+    setVoiceInputEnabled(enabled);
+    localStorage.setItem('hdht-voice-input', enabled ? 'true' : 'false');
+  };
+
+  const handleToggleTTS = (enabled: boolean) => {
+    setTtsEnabled(enabled);
+    localStorage.setItem('hdht-tts', enabled ? 'true' : 'false');
+  };
+
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
   const removePlannedQuestion = useAppStore((state) => state.removePlannedQuestion);
@@ -583,7 +602,7 @@ export function Interview() {
           )}
 
           {/* Chat window */}
-          <ChatWindow messages={messages} isLoading={isLoading} />
+          <ChatWindow messages={messages} isLoading={isLoading} ttsEnabled={ttsEnabled} />
 
           {/* Question input */}
           <QuestionInput
@@ -594,6 +613,10 @@ export function Interview() {
             showHint={scaffolding.promptHypothesisMapping !== 'none' && hypotheses.length > 0
               ? "Consider: which of your hypotheses will this question help test?"
               : undefined}
+            voiceInputEnabled={voiceInputEnabled}
+            ttsEnabled={ttsEnabled}
+            onToggleVoiceInput={handleToggleVoiceInput}
+            onToggleTTS={handleToggleTTS}
           />
         </div>
 
