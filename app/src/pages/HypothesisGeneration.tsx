@@ -53,9 +53,10 @@ export function HypothesisGeneration() {
     // Get debug data for this case
     const debugData = getDebugInterview(currentCase.id, quality);
 
-    // Add hypotheses with confidence levels
+    // Add hypotheses WITHOUT confidence (pre-encounter, no info yet)
+    // Confidence will be adjusted during the interview
     debugData.hypotheses.forEach(hyp => {
-      addHypothesis({ name: hyp.name, confidence: hyp.confidence });
+      addHypothesis({ name: hyp.name, confidence: 3 }); // Neutral confidence
     });
 
     setDebugFilled(quality);

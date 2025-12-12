@@ -67,11 +67,13 @@ export function Interview() {
   const [debugFilling, setDebugFilling] = useState(false);
   const [debugComplete, setDebugComplete] = useState<DebugQuality | null>(null);
 
-  // Voice settings - persist in localStorage
+  // Voice settings - persist in localStorage (but disable TTS in debug mode)
   const [voiceInputEnabled, setVoiceInputEnabled] = useState(() => {
     return localStorage.getItem('hdht-voice-input') === 'true';
   });
   const [ttsEnabled, setTtsEnabled] = useState(() => {
+    // Default to off in debug mode to avoid reading all responses during auto-fill
+    if (isDebugMode()) return false;
     return localStorage.getItem('hdht-tts') === 'true';
   });
 
