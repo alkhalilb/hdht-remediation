@@ -187,8 +187,16 @@ export function Interview() {
       });
 
       // Check for hypothesis mapping prompt
-      if (scaffolding.promptHypothesisMapping === 'after_each' ||
-          (scaffolding.promptHypothesisMapping === 'periodic' && (liveMetrics.questionCount + 1) % 5 === 0)) {
+      // Skip for OLDCARTS-style questions (HPI questions: Onset, Location, Duration, Character,
+      // Aggravating/Alleviating, Radiation, Timing, Severity) - these are standard history-taking
+      // questions where the intent is obvious
+      const isOLDCARTSQuestion = analysis.category.startsWith('hpi_');
+      const shouldPromptMapping = !isOLDCARTSQuestion && (
+        scaffolding.promptHypothesisMapping === 'after_each' ||
+        (scaffolding.promptHypothesisMapping === 'periodic' && (liveMetrics.questionCount + 1) % 5 === 0)
+      );
+
+      if (shouldPromptMapping) {
         setPendingHypothesisMapping({ question: questionText, analysis });
         addQuestion(questionEntry);
         setIsLoading(false);
