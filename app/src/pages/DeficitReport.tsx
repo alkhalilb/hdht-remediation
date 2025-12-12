@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, ScoreGrid } from '../components/common';
-import { getDeficitDisplayName, getTrackDescription, getCompetencyLevel } from '../services/scoring';
-import { Target, ArrowRight, BookOpen } from 'lucide-react';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay, PhaseBadge } from '../components/common';
+import { getDeficitDisplayName, getTrackDescription } from '../services/scoring';
+import { Target, ArrowRight, BookOpen, AlertCircle } from 'lucide-react';
+import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
 
 export function DeficitReport() {
   const navigate = useNavigate();
-  const { diagnosticScores, assignedDeficit, assignedTrack, setPhase } = useAppStore();
+  const { diagnosticScores, assignedDeficit, assignedTrack, setPhase, currentSession } = useAppStore();
 
   if (!diagnosticScores || !assignedDeficit || !assignedTrack) {
     navigate('/');
@@ -18,12 +19,21 @@ export function DeficitReport() {
     navigate('/track-intro');
   };
 
-  const overallLevel = getCompetencyLevel(diagnosticScores.overall);
   const deficitName = getDeficitDisplayName(assignedDeficit);
   const trackDescription = getTrackDescription(assignedTrack);
 
-  // Get the specific dimension score that's the focus
-  const focusScore = diagnosticScores[assignedDeficit === 'hypothesisAlignment' ? 'hypothesisAlignment' : assignedDeficit];
+  // Get the assessment from the session
+  const assessment = currentSession?.assessment;
+  const phase = assessment?.phase || 'APPROACHING';
+  const phaseRationale = assessment?.phaseRationale || [];
+  const metrics = assessment?.metrics;
+
+  // Map the deficit type to the remediation track type
+  const highlightCategory: RemediationTrackType = 
+    assignedDeficit === 'organization' ? 'Organization' :
+    assignedDeficit === 'hypothesisAlignment' ? 'HypothesisAlignment' :
+    assignedDeficit === 'completeness' ? 'Completeness' :
+    'Efficiency';
 
   return (
     <Layout>
@@ -40,30 +50,54 @@ export function DeficitReport() {
           </p>
         </div>
 
+        {/* Phase Badge - Primary Result */}
         <Card className="mb-6">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Overall Performance</h2>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                diagnosticScores.overall >= 60
-                  ? 'bg-green-100 text-green-700'
-                  : diagnosticScores.overall >= 45
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-red-100 text-red-700'
-              }`}>
-                {overallLevel}
-              </span>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Performance Level</h2>
           </CardHeader>
           <CardContent>
-            <ScoreGrid
-              scores={diagnosticScores}
-              highlightDimension={assignedDeficit}
-              showOverall={true}
+            <PhaseBadge 
+              phase={phase as PCMC1Phase} 
+              rationale={phaseRationale}
+              size="lg"
             />
           </CardContent>
         </Card>
 
+        {/* Metrics Display - Detailed Breakdown */}
+        {metrics ? (
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-lg font-semibold text-gray-900">Detailed Metrics</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Based on Hasnain et al. (2001) and Daniel et al. (2019) clinical reasoning frameworks
+              </p>
+            </CardHeader>
+            <CardContent>
+              <MetricsDisplay
+                phase={phase as PCMC1Phase}
+                metrics={metrics as AllMetrics}
+                highlightCategory={highlightCategory}
+                showPhase={false}
+                compact={false}
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          // Fallback if metrics not available (shouldn't happen with new system)
+          <Card className="mb-6">
+            <CardContent className="py-6">
+              <div className="flex items-center gap-3 text-yellow-700 bg-yellow-50 p-4 rounded-lg">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <p className="text-sm">
+                  Detailed metrics are being computed. Your primary deficit has been identified as <strong>{deficitName}</strong>.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Primary Deficit Card */}
         <Card className="mb-6 border-2 border-blue-200">
           <CardContent className="py-6">
             <div className="flex items-start gap-4">
@@ -75,21 +109,8 @@ export function DeficitReport() {
                   Your Primary Area for Improvement: {deficitName}
                 </h3>
 
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-sm text-gray-600">Current Score:</span>
-                  <span className={`text-lg font-bold ${
-                    focusScore >= 60 ? 'text-green-600' :
-                    focusScore >= 45 ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
-                    {focusScore}
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">Target:</span>
-                  <span className="text-lg font-bold text-green-600">60+</span>
-                </div>
-
                 <p className="text-gray-700 mb-4">
-                  {getDeficitExplanation(assignedDeficit, diagnosticScores)}
+                  {getDeficitExplanation(assignedDeficit, metrics)}
                 </p>
 
                 <div className="p-4 bg-blue-50 rounded-lg">
@@ -101,6 +122,7 @@ export function DeficitReport() {
           </CardContent>
         </Card>
 
+        {/* What's Next */}
         <Card className="mb-8">
           <CardContent className="py-4">
             <h3 className="font-semibold text-gray-900 mb-3">What's Next?</h3>
@@ -150,21 +172,38 @@ export function DeficitReport() {
   );
 }
 
-function getDeficitExplanation(deficit: string, scores: any): string {
+function getDeficitExplanation(deficit: string, metrics?: AllMetrics): string {
+  if (!metrics) {
+    // Fallback explanations without metrics
+    switch (deficit) {
+      case 'organization':
+        return `Your questioning pattern showed some disorganization. You may have jumped between topics or not followed a logical sequence. Organized history-taking follows a predictable flow: HPI → PMH → Medications → Family History → Social History → ROS.`;
+      case 'completeness':
+        return `Your history was missing some important topics. A complete history covers all relevant domains thoroughly. You need to ensure you're asking about all the key areas before moving on.`;
+      case 'hypothesisAlignment':
+        return `Your questions didn't consistently connect to your differential diagnoses. While you asked good questions, they weren't clearly designed to test specific hypotheses. Each question should help you rule in or rule out conditions on your differential.`;
+      case 'efficiency':
+        return `Your history-taking could be more efficient. You may have asked redundant questions or included too many tangential queries. Expert clinicians gather complete information in 15-25 focused questions.`;
+      default:
+        return `Focus on improving your overall approach to hypothesis-driven history taking.`;
+    }
+  }
+
+  // Metric-grounded explanations
   switch (deficit) {
     case 'organization':
-      return `Your questioning pattern showed some disorganization. You may have jumped between topics or not followed a logical sequence. Organized history-taking follows a predictable flow: HPI → PMH → Medications → Family History → Social History → ROS.`;
-
+      return `Your early HPI focus was ${(metrics.ig.earlyHPIFocus * 100).toFixed(0)}% (target: ≥60%) and your line-of-reasoning score was ${metrics.ig.lineOfReasoningScore.toFixed(1)} (target: ≥2.5). ${metrics.ig.prematureROSDetected ? 'You also jumped to systems review before adequately exploring the chief complaint.' : ''} Practice maintaining a logical flow: start with the chief complaint, then proceed through PMH, medications, family history, social history, and finally ROS.`;
+    
     case 'completeness':
-      return `Your history was missing some important topics. A complete history covers all relevant domains thoroughly. You need to ensure you're asking about all the key areas before moving on.`;
-
+      return `You covered ${(metrics.completeness.completenessRatio * 100).toFixed(0)}% of required topics (target: ≥70%). ${metrics.completeness.requiredTopicsMissed.length > 0 ? `Missing topics include: ${metrics.completeness.requiredTopicsMissed.slice(0, 3).join(', ')}.` : ''} Practice using a mental checklist to ensure you cover all relevant domains before concluding.`;
+    
     case 'hypothesisAlignment':
-      return `Your questions didn't consistently connect to your differential diagnoses. While you asked good questions, they weren't clearly designed to test specific hypotheses. Each question should help you rule in or rule out conditions on your differential.`;
-
+      return `Only ${(metrics.hd.alignmentRatio * 100).toFixed(0)}% of your questions clearly tested your stated hypotheses (target: ≥50%), and ${(metrics.hd.discriminatingRatio * 100).toFixed(0)}% were discriminating questions that help differentiate between diagnoses (target: ≥30%). Practice asking yourself before each question: "Which of my differential diagnoses will this help me rule in or out?"`;
+    
     case 'efficiency':
-      return `Your history-taking could be more efficient. You may have asked redundant questions or included too many tangential queries. Expert clinicians gather complete information in 15-25 focused questions.`;
-
+      return `You asked ${metrics.efficiency.totalQuestions} questions ${metrics.efficiency.isWithinExpertRange ? 'within' : 'outside'} the expert range of ${metrics.efficiency.expertQuestionRange.min}-${metrics.efficiency.expertQuestionRange.max}. ${metrics.ig.redundantQuestionCount > 0 ? `${metrics.ig.redundantQuestionCount} questions were redundant.` : ''} Practice asking discriminating questions that efficiently narrow your differential.`;
+    
     default:
-      return `Focus on improving your overall approach to hypothesis-driven history taking.`;
+      return `Focus on connecting your questions to your hypotheses.`;
   }
 }

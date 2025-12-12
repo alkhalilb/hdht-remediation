@@ -1,4 +1,4 @@
-import { RemediationCase, QuestionAnalysis, DimensionScores, HypothesisEntry } from '../types';
+import { RemediationCase, QuestionAnalysis, DimensionScores, HypothesisEntry, PCMC1Phase, AllMetrics } from '../types';
 
 const API_URL = '/api';
 
@@ -44,6 +44,9 @@ interface AssessmentResponse {
   topicsMissed: string[];
   organizationAnalysis: string;
   hypothesisAlignmentAnalysis: string;
+  // New literature-grounded fields
+  phase: PCMC1Phase;
+  metrics: AllMetrics;
 }
 
 export async function getPatientResponse(request: VirtualPatientRequest): Promise<string> {

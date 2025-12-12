@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, ScoreGrid } from '../components/common';
-import { getDeficitDisplayName, getCompetencyLevel } from '../services/scoring';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay, PhaseBadge } from '../components/common';
+import { getDeficitDisplayName } from '../services/scoring';
 import { CheckCircle, ArrowRight, TrendingUp, Target, AlertTriangle } from 'lucide-react';
+import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
 
 export function TrackFeedback() {
   const navigate = useNavigate();
@@ -25,7 +26,18 @@ export function TrackFeedback() {
   const assessment = currentSession?.assessment;
   const trackName = getDeficitDisplayName(assignedTrack);
 
-  // Get the focus dimension score
+  // Get the new assessment data
+  const phase = assessment?.phase || 'APPROACHING';
+  const metrics = assessment?.metrics;
+
+  // Map the deficit type to the remediation track type
+  const highlightCategory: RemediationTrackType = 
+    assignedTrack === 'organization' ? 'Organization' :
+    assignedTrack === 'hypothesisAlignment' ? 'HypothesisAlignment' :
+    assignedTrack === 'completeness' ? 'Completeness' :
+    'Efficiency';
+
+  // Get legacy focus dimension score for backward compatibility
   const focusKey = assignedTrack === 'hypothesisAlignment' ? 'hypothesisAlignment' : assignedTrack;
   const focusScore = latestScore[focusKey as keyof typeof latestScore] as number;
   const diagnosticFocusScore = diagnosticScores?.[focusKey as keyof typeof diagnosticScores] as number || 0;
@@ -66,7 +78,20 @@ export function TrackFeedback() {
           </p>
         </div>
 
-        {/* Progress comparison */}
+        {/* Phase Result - Primary */}
+        <Card className="mb-6">
+          <CardHeader>
+            <h2 className="text-lg font-semibold text-gray-900">Performance Level</h2>
+          </CardHeader>
+          <CardContent>
+            <PhaseBadge 
+              phase={phase as PCMC1Phase} 
+              size="lg"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Progress indicator - show improvement in key metric */}
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -75,83 +100,80 @@ export function TrackFeedback() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between mb-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-1">Diagnostic</p>
-                <p className={`text-2xl font-bold ${
-                  diagnosticFocusScore >= 60 ? 'text-green-600' :
-                  diagnosticFocusScore >= 45 ? 'text-yellow-600' : 'text-red-600'
-                }`}>
-                  {diagnosticFocusScore}
-                </p>
-              </div>
-
-              <div className="flex-1 mx-8">
-                <div className="flex items-center gap-2">
-                  {trackScores.map((score, index) => {
-                    const s = score[focusKey as keyof typeof score] as number;
-                    return (
-                      <div key={index} className="flex-1 flex items-center">
-                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              s >= 60 ? 'bg-green-500' :
-                              s >= 45 ? 'bg-yellow-500' : 'bg-red-500'
-                            }`}
-                            style={{ width: `${s}%` }}
-                          />
-                        </div>
-                        {index < trackScores.length - 1 && (
-                          <ArrowRight className="w-4 h-4 text-gray-400 mx-1" />
-                        )}
-                      </div>
-                    );
-                  })}
+            {metrics ? (
+              <div className="space-y-4">
+                {/* Key metrics comparison */}
+                <div className="grid grid-cols-2 gap-4">
+                  <MetricComparisonBox
+                    label="Early HPI Focus"
+                    current={`${(metrics.ig.earlyHPIFocus * 100).toFixed(0)}%`}
+                    target="≥60%"
+                    isMet={metrics.ig.earlyHPIFocus >= 0.6}
+                  />
+                  <MetricComparisonBox
+                    label="Question Alignment"
+                    current={`${(metrics.hd.alignmentRatio * 100).toFixed(0)}%`}
+                    target="≥50%"
+                    isMet={metrics.hd.alignmentRatio >= 0.5}
+                  />
+                  <MetricComparisonBox
+                    label="Completeness"
+                    current={`${(metrics.completeness.completenessRatio * 100).toFixed(0)}%`}
+                    target="≥70%"
+                    isMet={metrics.completeness.completenessRatio >= 0.7}
+                  />
+                  <MetricComparisonBox
+                    label="Discriminating Qs"
+                    current={`${(metrics.hd.discriminatingRatio * 100).toFixed(0)}%`}
+                    target="≥30%"
+                    isMet={metrics.hd.discriminatingRatio >= 0.3}
+                  />
                 </div>
               </div>
-
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-1">Current</p>
-                <p className={`text-2xl font-bold ${
-                  focusScore >= 60 ? 'text-green-600' :
-                  focusScore >= 45 ? 'text-yellow-600' : 'text-red-600'
-                }`}>
-                  {focusScore}
-                </p>
+            ) : (
+              // Fallback to legacy score comparison
+              <div className="flex items-center justify-between">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-1">Diagnostic</p>
+                  <p className={`text-2xl font-bold ${
+                    diagnosticFocusScore >= 60 ? 'text-green-600' :
+                    diagnosticFocusScore >= 45 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {diagnosticFocusScore}
+                  </p>
+                </div>
+                <div className="text-2xl text-gray-400">→</div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-1">Current</p>
+                  <p className={`text-2xl font-bold ${
+                    focusScore >= 60 ? 'text-green-600' :
+                    focusScore >= 45 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {focusScore}
+                  </p>
+                </div>
               </div>
-            </div>
-
-            <div className={`p-4 rounded-lg ${
-              improvement > 0 ? 'bg-green-50' : improvement < 0 ? 'bg-yellow-50' : 'bg-gray-50'
-            }`}>
-              <p className={`text-center font-medium ${
-                improvement > 0 ? 'text-green-800' : improvement < 0 ? 'text-yellow-800' : 'text-gray-800'
-              }`}>
-                {improvement > 0 ? (
-                  <>+{improvement} point improvement from diagnostic!</>
-                ) : improvement < 0 ? (
-                  <>Score decreased by {Math.abs(improvement)} points - keep practicing!</>
-                ) : (
-                  <>Same score as diagnostic - let's keep working!</>
-                )}
-              </p>
-            </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Full scores */}
-        <Card className="mb-6">
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-gray-900">Dimension Breakdown</h2>
-          </CardHeader>
-          <CardContent>
-            <ScoreGrid
-              scores={latestScore}
-              highlightDimension={assignedTrack}
-              showOverall={true}
-            />
-          </CardContent>
-        </Card>
+        {/* Detailed Metrics */}
+        {metrics && (
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-lg font-semibold text-gray-900">Detailed Metrics</h2>
+            </CardHeader>
+            <CardContent>
+              <MetricsDisplay
+                phase={phase as PCMC1Phase}
+                metrics={metrics as AllMetrics}
+                highlightCategory={highlightCategory}
+                showPhase={false}
+                compact={true}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Feedback */}
         {assessment?.feedback && (
@@ -178,10 +200,10 @@ export function TrackFeedback() {
                 <div className="mb-4">
                   <h3 className="font-medium text-amber-700 mb-2">Areas for Improvement</h3>
                   <ul className="space-y-1">
-                    {assessment.feedback.improvements.map((improvement, i) => (
+                    {assessment.feedback.improvements.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                         <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                        {improvement}
+                        {item}
                       </li>
                     ))}
                   </ul>
@@ -196,7 +218,7 @@ export function TrackFeedback() {
           </Card>
         )}
 
-        {/* What's next */}
+        {/* What's Next */}
         <Card className="mb-8">
           <CardContent className="py-4">
             <h3 className="font-semibold text-gray-900 mb-3">What's Next?</h3>
@@ -223,5 +245,32 @@ export function TrackFeedback() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+// Helper component for metric comparison boxes
+interface MetricComparisonBoxProps {
+  label: string;
+  current: string;
+  target: string;
+  isMet: boolean;
+}
+
+function MetricComparisonBox({ label, current, target, isMet }: MetricComparisonBoxProps) {
+  return (
+    <div className={`p-3 rounded-lg ${isMet ? 'bg-green-50' : 'bg-yellow-50'}`}>
+      <p className="text-xs text-gray-500 mb-1">{label}</p>
+      <div className="flex items-center justify-between">
+        <p className={`text-lg font-bold ${isMet ? 'text-green-700' : 'text-yellow-700'}`}>
+          {current}
+        </p>
+        <span className="text-xs text-gray-500">{target}</span>
+      </div>
+      {isMet ? (
+        <CheckCircle className="w-4 h-4 text-green-600 mt-1" />
+      ) : (
+        <AlertTriangle className="w-4 h-4 text-yellow-600 mt-1" />
+      )}
+    </div>
   );
 }

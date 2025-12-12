@@ -1,0 +1,169 @@
+# PCMC-1 Assessment UI Refactor - Changes Made
+# Date: December 11, 2025
+# Purpose: Replace opaque 0-100 scores with literature-grounded metrics display
+
+================================================================================
+PROBLEM ADDRESSED
+================================================================================
+
+The UI was displaying meaningless 0-100 scores like:
+  - Organization: 52
+  - Hypothesis Alignment: 35
+  - Completeness: 67
+
+Users could not understand what these numbers meant or how to improve.
+
+The backend was correctly computing literature-grounded metrics, but the frontend
+was converting them back to opaque scores via `convertToLegacyScores()`.
+
+================================================================================
+CHANGES MADE
+================================================================================
+
+## 1. Updated Specification
+   File: /Users/bilal/Claude/HBHx/literature_grounded_assessment_spec.md
+   
+   Added section "⚠️ CRITICAL: UI Requirements (What MUST Change)" that specifies:
+   - UI must show PCMC-1 Phase (DEVELOPING/APPROACHING/MEETING/EXCEEDING) as primary output
+   - Must show actual metrics with targets (e.g., "Early HPI Focus: 60% (target: ≥60%)")
+   - Explicitly states what NOT to display (the opaque 0-100 scores)
+   - Provides component specifications for MetricsDisplay
+
+## 2. New Component: MetricsDisplay.tsx
+   File: /Users/bilal/Claude/HBHx/app/src/components/common/MetricsDisplay.tsx
+   
+   Created new component that provides:
+   - PhaseBadge: Shows PCMC-1 phase prominently with color coding
+   - MetricsDisplay: Shows all metrics grouped by category with:
+     * Metric name with tooltip explanation
+     * Actual value
+     * Progress bar visualization
+     * Pass/warn/fail indicator
+     * Target threshold
+   - MetricsComparison: For showing progress between assessments
+   
+   Categories displayed:
+   - Information Gathering (Hasnain et al. 2001)
+   - Hypothesis-Driven Inquiry (Daniel et al. 2019)
+   - Completeness
+   - Efficiency
+
+## 3. Updated Types
+   File: /Users/bilal/Claude/HBHx/app/src/types/index.ts
+   
+   Added interfaces:
+   - PCMC1Phase type
+   - RemediationTrackType type
+   - InformationGatheringMetrics interface
+   - HypothesisDrivenMetrics interface
+   - CompletenessMetrics interface
+   - EfficiencyMetrics interface
+   - PatientCenterednessMetrics interface
+   - AllMetrics interface
+   - DeficitClassificationResult interface
+   - Extended CaseAssessment to include phase, phaseRationale, metrics, deficit
+
+## 4. Updated Component Exports
+   File: /Users/bilal/Claude/HBHx/app/src/components/common/index.ts
+   
+   Added exports for MetricsDisplay, PhaseBadge, MetricsComparison
+
+## 5. Updated DeficitReport Page
+   File: /Users/bilal/Claude/HBHx/app/src/pages/DeficitReport.tsx
+   
+   Changes:
+   - Replaced ScoreGrid with MetricsDisplay
+   - Shows PhaseBadge prominently as primary result
+   - Shows detailed metrics breakdown grouped by category
+   - Provides metric-grounded explanations for the assigned deficit
+   - Each metric shows actual value, target, and pass/fail status
+
+## 6. Updated TrackFeedback Page
+   File: /Users/bilal/Claude/HBHx/app/src/pages/TrackFeedback.tsx
+   
+   Changes:
+   - Shows PhaseBadge as primary result
+   - Added MetricComparisonBox components showing key metrics with targets
+   - Uses MetricsDisplay for detailed breakdown
+   - Progress shown via actual metric values, not opaque scores
+
+## 7. Updated API Service
+   File: /Users/bilal/Claude/HBHx/app/src/services/api.ts
+   
+   Changes:
+   - Updated AssessmentResponse interface to include phase and metrics
+   - Import PCMC1Phase and AllMetrics types
+
+## 8. Updated Interview Page
+   File: /Users/bilal/Claude/HBHx/app/src/pages/Interview.tsx
+   
+   Changes:
+   - endCase() now passes phase and metrics from assessment response
+
+================================================================================
+WHAT THE UI NOW SHOWS
+================================================================================
+
+BEFORE (problematic):
+┌─────────────────────────────────────────────┐
+│  Organization:           52                 │
+│  Hypothesis Alignment:   35                 │
+│  Completeness:           67                 │
+│  Overall:                50                 │
+└─────────────────────────────────────────────┘
+
+AFTER (transparent, literature-grounded):
+┌─────────────────────────────────────────────┐
+│  Performance Level: APPROACHING             │
+│  ─────────────────────────────────────────  │
+│  You're organized but questions aren't      │
+│  consistently linked to your hypotheses.    │
+└─────────────────────────────────────────────┘
+
+Information Gathering (Hasnain et al. 2001)
+─────────────────────────────────────────────
+Early HPI Focus       60%  ━━━━━━━━━━━━━━━━ ✓ (target: ≥60%)
+Line of Reasoning     1.8  ━━━━━━━━━━━━━━   ⚠ (target: ≥2.5)
+Clarifying Questions  3    ━━━━━━━━━━━━━━━━ ✓ (target: ≥2)
+
+Hypothesis-Driven Inquiry (Daniel et al. 2019)
+─────────────────────────────────────────────
+Hypothesis Coverage   70%  ━━━━━━━━━━━━━━━━ ✓ (target: ≥70%)
+Question Alignment    35%  ━━━━━━━━━━━━     ✗ (target: ≥50%)
+Discriminating Qs     20%  ━━━━━━━━━        ⚠ (target: ≥30%)
+
+================================================================================
+KEY BENEFITS
+================================================================================
+
+1. TRANSPARENT: Every metric is traceable to specific, observable behaviors
+2. LITERATURE-GROUNDED: Based on Hasnain (2001) and Daniel (2019) frameworks
+3. ACTIONABLE: Students know exactly what threshold they need to meet
+4. EDUCATIONAL: Tooltips explain what each metric measures
+5. VISUAL: Progress bars and pass/warn/fail icons make status clear
+
+================================================================================
+REMAINING WORK (if needed)
+================================================================================
+
+1. Restart development server to pick up changes
+2. Clear localStorage if you see stale persisted state
+3. Update store to persist phase/metrics if needed for later retrieval
+4. Consider updating ExitFeedback.tsx similarly (if not already done)
+
+================================================================================
+FILES MODIFIED
+================================================================================
+
+Modified:
+- /Users/bilal/Claude/HBHx/literature_grounded_assessment_spec.md
+- /Users/bilal/Claude/HBHx/app/src/components/common/index.ts
+- /Users/bilal/Claude/HBHx/app/src/types/index.ts
+- /Users/bilal/Claude/HBHx/app/src/services/api.ts
+- /Users/bilal/Claude/HBHx/app/src/pages/DeficitReport.tsx
+- /Users/bilal/Claude/HBHx/app/src/pages/TrackFeedback.tsx
+- /Users/bilal/Claude/HBHx/app/src/pages/Interview.tsx
+
+Created:
+- /Users/bilal/Claude/HBHx/app/src/components/common/MetricsDisplay.tsx
+- /Users/bilal/Claude/HBHx/claude_desktop_changes.txt (this file)

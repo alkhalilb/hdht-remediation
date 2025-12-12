@@ -178,7 +178,72 @@ export interface ScaffoldingEvent {
   studentResponse?: string;
 }
 
+// Literature-grounded metrics types
+export type PCMC1Phase = 'DEVELOPING' | 'APPROACHING' | 'MEETING' | 'EXCEEDING' | 'EXEMPLARY';
+export type RemediationTrackType = 'Organization' | 'HypothesisAlignment' | 'Completeness' | 'Efficiency';
+
+export interface InformationGatheringMetrics {
+  earlyHPIFocus: number;
+  clarifyingQuestionCount: number;
+  summarizingCount: number;
+  lineOfReasoningScore: number;
+  prematureROSDetected: boolean;
+  redundantQuestionCount: number;
+  topicSwitchCount: number;
+}
+
+export interface HypothesisDrivenMetrics {
+  hypothesisCoverage: number;
+  hypothesisCount: number;
+  includesMustNotMiss: boolean;
+  alignmentRatio: number;
+  discriminatingRatio: number;
+  hypothesisClusteringScore: number;
+  hypothesisCoverageDetail: {
+    hypothesisName: string;
+    questionCount: number;
+    hasDiscriminatingQuestion: boolean;
+  }[];
+}
+
+export interface CompletenessMetrics {
+  requiredTopicsCovered: string[];
+  requiredTopicsMissed: string[];
+  completenessRatio: number;
+  keyDiscriminatingQuestionsAsked: number;
+  keyDiscriminatingQuestionsMissed: string[];
+}
+
+export interface EfficiencyMetrics {
+  totalQuestions: number;
+  expertQuestionRange: { min: number; max: number };
+  isWithinExpertRange: boolean;
+  redundancyPenalty: number;
+  informationYield: number;
+}
+
+export interface PatientCenterednessMetrics {
+  openQuestionRatio: number;
+  clarifyingQuestionRatio: number;
+  leadingQuestionCount: number;
+}
+
+export interface AllMetrics {
+  ig: InformationGatheringMetrics;
+  hd: HypothesisDrivenMetrics;
+  completeness: CompletenessMetrics;
+  efficiency: EfficiencyMetrics;
+  pc: PatientCenterednessMetrics;
+}
+
+export interface DeficitClassificationResult {
+  primaryDeficit: RemediationTrackType;
+  deficitScores: Record<RemediationTrackType, number>;
+  rationale: string;
+}
+
 export interface CaseAssessment {
+  // Legacy scores (for backward compatibility - prefer phase/metrics)
   scores: DimensionScores;
   feedback: {
     strengths: string[];
@@ -186,6 +251,11 @@ export interface CaseAssessment {
     deficitSpecific: string;
   };
   passedMastery: boolean;
+  // New literature-grounded assessment
+  phase?: PCMC1Phase;
+  phaseRationale?: string[];
+  metrics?: AllMetrics;
+  deficit?: DeficitClassificationResult;
 }
 
 export interface RemediationSession {

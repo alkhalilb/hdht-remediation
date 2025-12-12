@@ -319,11 +319,14 @@ export function Interview() {
         passedMastery = trackScore >= masteryThreshold && assessment.scores.overall >= 50;
       }
 
-      // End the case
+      // End the case with both legacy scores and new metrics
       endCase({
         scores: assessment.scores,
         feedback: assessment.feedback,
         passedMastery,
+        // New literature-grounded fields
+        phase: assessment.phase,
+        metrics: assessment.metrics,
       });
 
       // Navigate based on phase

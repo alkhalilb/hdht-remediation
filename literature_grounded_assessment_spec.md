@@ -1025,6 +1025,174 @@ const chestPainExpertContent: ExpertContent = {
 
 ---
 
+## ⚠️ CRITICAL: UI Requirements (What MUST Change)
+
+### The Problem with Current UI
+
+Even with the correct backend architecture, **the UI still displays legacy 0-100 scores** which are:
+1. **Opaque** - User cannot trace "Organization: 52" back to specific behaviors
+2. **Transformed** - Scores are computed from deficits via `85 - (deficit * 0.5)`, adding another layer of indirection
+3. **Not literature-grounded** - "52" has no meaning in Daniel or Hasnain frameworks
+
+### What the UI MUST Display Instead
+
+#### Primary Output: PCMC-1 Phase (NOT 0-100 Score)
+
+```
+┌─────────────────────────────────────────────┐
+│  Your Performance Level: APPROACHING        │
+│  ─────────────────────────────────────────  │
+│  You're organized but questions aren't      │
+│  consistently linked to your hypotheses.    │
+└─────────────────────────────────────────────┘
+```
+
+**The phase label should be prominent.** The legacy 0-100 scores should NOT be displayed at all, or only as a small secondary indicator.
+
+#### Secondary Output: Actual Metrics with Targets
+
+```
+Information Gathering
+─────────────────────────────────────────────
+Early HPI Focus       60%  ━━━━━━━━━━━━━━━━━━ ✓ (target: ≥60%)
+Line of Reasoning     1.8  ━━━━━━━━━━━━━━━    ⚠ (target: ≥2.5)
+Clarifying Questions  3    ━━━━━━━━━━━━━━━━━━ ✓ (target: ≥2)
+Redundant Questions   2    ━━━━━━━━            ⚠ (target: 0)
+
+Hypothesis-Driven Inquiry
+─────────────────────────────────────────────
+Hypothesis Coverage   70%  ━━━━━━━━━━━━━━━━━━ ✓ (target: ≥70%)
+Question Alignment    35%  ━━━━━━━━━━━━       ✗ (target: ≥50%)
+Discriminating Qs     20%  ━━━━━━━━━          ⚠ (target: ≥30%)
+```
+
+**Each metric must show:**
+1. The metric name (from Hasnain/Daniel)
+2. The actual value (with units or %)
+3. Visual progress bar
+4. Pass/warn/fail indicator
+5. The target threshold (making grading criteria transparent)
+
+#### DO NOT Display
+
+```
+❌ WRONG - Do not show:
+┌─────────────────────────────────────────────┐
+│  Organization:           52                 │
+│  Hypothesis Alignment:   35                 │
+│  Completeness:           67                 │
+│  Efficiency:             48                 │
+│  Overall:                50                 │
+└─────────────────────────────────────────────┘
+```
+
+This display is problematic because:
+- "52" is meaningless - what does it represent?
+- Cannot trace back to specific behaviors
+- No indication of what threshold means "passing"
+- Suggests false precision
+
+### UI Component Changes Required
+
+#### 1. Replace `ScoreGrid` with `MetricsDisplay`
+
+The current `ScoreGrid` component displays legacy 0-100 scores. Replace with:
+
+```typescript
+// ❌ OLD: ScoreGrid shows meaningless 0-100 scores
+<ScoreGrid scores={diagnosticScores} />
+
+// ✓ NEW: MetricsDisplay shows actual metrics with targets
+<MetricsDisplay 
+  phase={assessment.phase}
+  metrics={assessment.metrics}
+  phaseRationale={assessment.phaseRationale}
+/>
+```
+
+#### 2. Update DeficitReport.tsx
+
+Change from showing scores to showing:
+1. **Phase badge** (DEVELOPING/APPROACHING/MEETING/EXCEEDING)
+2. **Phase rationale** (why this phase was assigned)
+3. **Metrics breakdown** grouped by category
+4. **Deficit-specific feedback** grounded in metrics
+
+#### 3. Update TrackFeedback.tsx
+
+Change from score comparison to:
+1. **Phase progression** (e.g., DEVELOPING → APPROACHING)
+2. **Metrics improvement** (e.g., "Line of Reasoning: 1.8 → 2.6")
+3. **Specific behavior changes** noted
+
+### New Component: MetricsDisplay
+
+```tsx
+interface MetricsDisplayProps {
+  phase: PCMC1Phase;
+  phaseRationale: string[];
+  metrics: AllMetrics;
+  highlightCategory?: 'Organization' | 'HypothesisAlignment' | 'Completeness' | 'Efficiency';
+}
+
+function MetricsDisplay({ phase, phaseRationale, metrics, highlightCategory }: MetricsDisplayProps) {
+  return (
+    <div>
+      {/* Phase Badge */}
+      <div className="phase-badge">
+        <span className={`phase-${phase.toLowerCase()}`}>{phase}</span>
+        <ul className="rationale">
+          {phaseRationale.map((r, i) => <li key={i}>{r}</li>)}
+        </ul>
+      </div>
+      
+      {/* Information Gathering Section */}
+      <MetricSection title="Information Gathering" highlight={highlightCategory === 'Organization'}>
+        <MetricRow 
+          label="Early HPI Focus" 
+          value={`${(metrics.ig.earlyHPIFocus * 100).toFixed(0)}%`}
+          target="≥60%"
+          status={metrics.ig.earlyHPIFocus >= 0.6 ? 'pass' : 'fail'}
+        />
+        <MetricRow 
+          label="Line of Reasoning" 
+          value={metrics.ig.lineOfReasoningScore.toFixed(1)}
+          target="≥2.5"
+          status={metrics.ig.lineOfReasoningScore >= 2.5 ? 'pass' : 
+                  metrics.ig.lineOfReasoningScore >= 1.5 ? 'warn' : 'fail'}
+        />
+        {/* ... more metrics */}
+      </MetricSection>
+      
+      {/* Hypothesis-Driven Section */}
+      <MetricSection title="Hypothesis-Driven Inquiry" highlight={highlightCategory === 'HypothesisAlignment'}>
+        <MetricRow 
+          label="Hypothesis Coverage" 
+          value={`${(metrics.hd.hypothesisCoverage * 100).toFixed(0)}%`}
+          target="≥70%"
+          status={metrics.hd.hypothesisCoverage >= 0.7 ? 'pass' : 'fail'}
+        />
+        {/* ... more metrics */}
+      </MetricSection>
+      
+      {/* Completeness & Efficiency sections */}
+    </div>
+  );
+}
+```
+
+### Summary: What Changes
+
+| Current | New |
+|---------|-----|
+| Shows "Organization: 52" | Shows "Early HPI Focus: 40% (target: ≥60%)" |
+| 0-100 scores with no meaning | Actual metrics with literature-based thresholds |
+| Single "Overall: 50" | Phase label: "APPROACHING" with rationale |
+| Cannot explain scores | Every number traceable to specific behaviors |
+| `ScoreGrid` component | `MetricsDisplay` component |
+
+---
+
 ## Implementation Checklist
 
 ### Files to Create/Modify
