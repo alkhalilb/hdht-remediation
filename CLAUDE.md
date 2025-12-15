@@ -202,14 +202,25 @@ The UI now displays transparent, literature-grounded metrics in an organized, ex
   - Summary badge showing overall status (pass/warn/fail icon + value)
   - Click to expand/collapse detailed metrics
   - Progress bars with color-coded status (green=pass, yellow=warn, red=fail)
+  - No target markers (removed black lines)
 - Focus area auto-expands to show relevant metrics
-- Cleaner, more organized presentation of assessment data
-- **Conversation Review**: All feedback pages now have expandable "Review Conversation" section
+- **Differential Review**: All feedback pages have "Your Differential Diagnosis" section
+  - Shows ranked hypotheses with confidence indicators
+- **Conversation Review**: All feedback pages have expandable "Review Conversation" section
   - Shows all questions asked with patient responses
   - Displays category badges (HPI, PMH, etc.) and tags (Discriminating, Redundant)
   - Scrollable with max height for long conversations
 - **Retry Case**: TrackFeedback has "Retry This Case" button to practice again
 - Updated ExitFeedback to use MetricsDisplay instead of ScoreGrid
+- Fixed loading bar animation (now starts at 10% instead of 90%)
+
+### Assessment Accuracy Fixes (December 2025)
+- **Redundant Question Classification**: Standard history questions (PMH, PSH, Medications, Allergies, Family History) are never marked as redundant
+- **Hypothesis Matching**: Improved matching algorithm with:
+  - Common abbreviations (TTH, MOH, PUD, PAD, etc.)
+  - Key term matching (e.g., "tension headache" matches "tension-type headache")
+  - More flexible synonym handling
+- **Feedback Accuracy**: Claude prompt now explicitly shows student's diagnoses to prevent suggesting diagnoses they already listed
 
 ### Voice Features
 - **Text-to-Speech**: Patient responses can be read aloud using ElevenLabs API (Rachel voice)
