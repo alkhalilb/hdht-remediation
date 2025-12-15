@@ -201,11 +201,15 @@ The UI now displays transparent, literature-grounded metrics in an organized, ex
 - Each metric category is now a collapsible card with:
   - Summary badge showing overall status (pass/warn/fail icon + value)
   - Click to expand/collapse detailed metrics
-  - Progress bars with visual target markers
-  - Color-coded status (green=pass, yellow=warn, red=fail)
+  - Progress bars with color-coded status (green=pass, yellow=warn, red=fail)
 - Focus area auto-expands to show relevant metrics
 - Cleaner, more organized presentation of assessment data
-- Used on DeficitReport and TrackFeedback pages
+- **Conversation Review**: All feedback pages now have expandable "Review Conversation" section
+  - Shows all questions asked with patient responses
+  - Displays category badges (HPI, PMH, etc.) and tags (Discriminating, Redundant)
+  - Scrollable with max height for long conversations
+- **Retry Case**: TrackFeedback has "Retry This Case" button to practice again
+- Updated ExitFeedback to use MetricsDisplay instead of ScoreGrid
 
 ### Voice Features
 - **Text-to-Speech**: Patient responses can be read aloud using ElevenLabs API (Rachel voice)
