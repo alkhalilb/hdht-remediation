@@ -485,7 +485,6 @@ export function MetricsDisplay({
           value={ig.earlyHPIFocus * 100}
           displayValue={`${(ig.earlyHPIFocus * 100).toFixed(0)}%`}
           target={60}
-          targetLabel="≥60%"
           tooltip="Percentage of first 5 questions exploring chief complaint"
         />
         <MetricRow
@@ -493,7 +492,6 @@ export function MetricsDisplay({
           value={ig.lineOfReasoningScore}
           displayValue={ig.lineOfReasoningScore.toFixed(1)}
           target={2.5}
-          targetLabel="≥2.5"
           maxValue={5}
           tooltip="Average consecutive questions on same topic before switching"
         />
@@ -501,7 +499,7 @@ export function MetricsDisplay({
           label="Clarifying Questions"
           value={ig.clarifyingQuestionCount}
           status={ig.clarifyingQuestionCount >= 2 ? 'pass' : ig.clarifyingQuestionCount >= 1 ? 'warn' : 'fail'}
-          tooltip="Questions asking patient to elaborate (target: ≥2)"
+          tooltip="Questions asking patient to elaborate"
         />
         {!compact && (
           <>
@@ -509,13 +507,13 @@ export function MetricsDisplay({
               label="Summarizing Statements"
               value={ig.summarizingCount}
               status={ig.summarizingCount >= 1 ? 'pass' : 'warn'}
-              tooltip="Restating information to confirm understanding (target: ≥1)"
+              tooltip="Restating information to confirm understanding"
             />
             <SimpleMetricRow
               label="Redundant Questions"
               value={ig.redundantQuestionCount}
               status={ig.redundantQuestionCount === 0 ? 'pass' : ig.redundantQuestionCount <= 2 ? 'warn' : 'fail'}
-              tooltip="Questions asking about already-covered information (target: 0)"
+              tooltip="Questions asking about already-covered information"
             />
           </>
         )}
@@ -540,7 +538,6 @@ export function MetricsDisplay({
           value={hd.hypothesisCoverage * 100}
           displayValue={`${(hd.hypothesisCoverage * 100).toFixed(0)}%`}
           target={70}
-          targetLabel="≥70%"
           tooltip="How many must-consider diagnoses were in your differential"
         />
         <MetricRow
@@ -548,7 +545,6 @@ export function MetricsDisplay({
           value={hd.alignmentRatio * 100}
           displayValue={`${(hd.alignmentRatio * 100).toFixed(0)}%`}
           target={50}
-          targetLabel="≥50%"
           tooltip="Percentage of questions that test your stated hypotheses"
         />
         <MetricRow
@@ -556,7 +552,6 @@ export function MetricsDisplay({
           value={hd.discriminatingRatio * 100}
           displayValue={`${(hd.discriminatingRatio * 100).toFixed(0)}%`}
           target={30}
-          targetLabel="≥30%"
           tooltip="Questions that help differentiate between diagnoses"
         />
         {!compact && (
@@ -565,7 +560,6 @@ export function MetricsDisplay({
             value={hd.hypothesisClusteringScore * 100}
             displayValue={`${(hd.hypothesisClusteringScore * 100).toFixed(0)}%`}
             target={60}
-            targetLabel="≥60%"
             tooltip="Are questions for the same hypothesis grouped together?"
           />
         )}
@@ -590,7 +584,6 @@ export function MetricsDisplay({
           value={completeness.completenessRatio * 100}
           displayValue={`${(completeness.completenessRatio * 100).toFixed(0)}%`}
           target={70}
-          targetLabel="≥70%"
           tooltip="Percentage of required history topics addressed"
         />
         {completeness.requiredTopicsMissed.length > 0 && (
@@ -628,21 +621,20 @@ export function MetricsDisplay({
             <SimpleMetricRow
               label="Total Questions Asked"
               value={efficiency.totalQuestions}
-              tooltip={`Expert range: ${efficiency.expertQuestionRange.min}-${efficiency.expertQuestionRange.max}`}
+              tooltip="Number of questions you asked during the interview"
             />
             <MetricRow
               label="Open-Ended Questions"
               value={pc.openQuestionRatio * 100}
               displayValue={`${(pc.openQuestionRatio * 100).toFixed(0)}%`}
               target={30}
-              targetLabel="≥30%"
               tooltip="Percentage of questions that are open-ended"
             />
             <SimpleMetricRow
               label="Leading Questions"
               value={pc.leadingQuestionCount}
               status={pc.leadingQuestionCount === 0 ? 'pass' : pc.leadingQuestionCount <= 2 ? 'warn' : 'fail'}
-              tooltip="Questions that suggest a particular answer (target: 0)"
+              tooltip="Questions that suggest a particular answer"
             />
           </div>
         </MetricSection>

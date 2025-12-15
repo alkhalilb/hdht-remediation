@@ -1,13 +1,15 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName, getTrackDescription } from '../services/scoring';
-import { Target, ArrowRight, BookOpen, AlertCircle } from 'lucide-react';
+import { Target, ArrowRight, BookOpen, AlertCircle, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
 
 export function DeficitReport() {
+  const [showConversation, setShowConversation] = useState(false);
   const navigate = useNavigate();
-  const { diagnosticScores, assignedDeficit, assignedTrack, setPhase, currentSession } = useAppStore();
+  const { diagnosticScores, assignedDeficit, assignedTrack, setPhase, currentSession, questions } = useAppStore();
 
   if (!diagnosticScores || !assignedDeficit || !assignedTrack) {
     navigate('/');
@@ -102,6 +104,61 @@ export function DeficitReport() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Conversation Review */}
+        {questions.length > 0 && (
+          <Card className="mb-6">
+            <button
+              onClick={() => setShowConversation(!showConversation)}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Review Your Interview</h2>
+                <span className="text-sm text-gray-500">({questions.length} questions)</span>
+              </div>
+              {showConversation ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+            {showConversation && (
+              <CardContent className="border-t border-gray-200">
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {questions.map((q, i) => (
+                    <div key={q.id} className="border-b border-gray-100 pb-4 last:border-0">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-medium text-gray-400 mt-1">Q{i + 1}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-800 mb-1">{q.text}</p>
+                          <p className="text-sm text-gray-600">{q.response}</p>
+                          {q.analysis && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                {q.analysis.category}
+                              </span>
+                              {q.analysis.isDiscriminating && (
+                                <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                                  Discriminating
+                                </span>
+                              )}
+                              {q.analysis.isRedundant && (
+                                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">
+                                  Redundant
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        )}
 
         {/* What's Next */}
         <Card className="mb-8">

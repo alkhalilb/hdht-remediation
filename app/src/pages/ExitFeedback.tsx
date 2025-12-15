@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, ScoreGrid } from '../components/common';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName, getCompetencyLevel } from '../services/scoring';
-import { CheckCircle, XCircle, ArrowRight, TrendingUp, Award, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowRight, TrendingUp, Award, AlertTriangle, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
 
 export function ExitFeedback() {
+  const [showConversation, setShowConversation] = useState(false);
   const navigate = useNavigate();
   const {
     exitPassed,
@@ -14,10 +17,13 @@ export function ExitFeedback() {
     trackScores,
     currentSession,
     setPhase,
+    questions,
   } = useAppStore();
 
   const assessment = currentSession?.assessment;
   const exitScores = assessment?.scores;
+  const metrics = assessment?.metrics;
+  const phase = assessment?.phase || 'APPROACHING';
 
   if (!exitScores || !assignedTrack) {
     navigate('/');
@@ -174,19 +180,27 @@ export function ExitFeedback() {
           </CardContent>
         </Card>
 
-        {/* Full scores */}
-        <Card className="mb-6">
-          <CardHeader>
-            <h2 className="text-lg font-semibold text-gray-900">Exit Case Breakdown</h2>
-          </CardHeader>
-          <CardContent>
-            <ScoreGrid
-              scores={exitScores}
-              highlightDimension={assignedTrack}
-              showOverall={true}
-            />
-          </CardContent>
-        </Card>
+        {/* Detailed Metrics */}
+        {metrics && (
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-lg font-semibold text-gray-900">Detailed Metrics</h2>
+            </CardHeader>
+            <CardContent>
+              <MetricsDisplay
+                phase={phase as PCMC1Phase}
+                metrics={metrics as AllMetrics}
+                highlightCategory={
+                  assignedTrack === 'organization' ? 'Organization' :
+                  assignedTrack === 'hypothesisAlignment' ? 'HypothesisAlignment' :
+                  'Completeness'
+                }
+                showPhase={false}
+                compact={false}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Feedback */}
         {assessment?.feedback && (
@@ -232,6 +246,61 @@ export function ExitFeedback() {
                 </p>
               </div>
             </CardContent>
+          </Card>
+        )}
+
+        {/* Conversation Review */}
+        {questions.length > 0 && (
+          <Card className="mb-6">
+            <button
+              onClick={() => setShowConversation(!showConversation)}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Review Conversation</h2>
+                <span className="text-sm text-gray-500">({questions.length} questions)</span>
+              </div>
+              {showConversation ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+            {showConversation && (
+              <CardContent className="border-t border-gray-200">
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {questions.map((q, i) => (
+                    <div key={q.id} className="border-b border-gray-100 pb-4 last:border-0">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-medium text-gray-400 mt-1">Q{i + 1}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-800 mb-1">{q.text}</p>
+                          <p className="text-sm text-gray-600">{q.response}</p>
+                          {q.analysis && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                {q.analysis.category}
+                              </span>
+                              {q.analysis.isDiscriminating && (
+                                <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                                  Discriminating
+                                </span>
+                              )}
+                              {q.analysis.isRedundant && (
+                                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">
+                                  Redundant
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            )}
           </Card>
         )}
 

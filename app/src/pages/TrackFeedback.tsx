@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName } from '../services/scoring';
-import { CheckCircle, ArrowRight, TrendingUp, Target, AlertTriangle } from 'lucide-react';
+import { CheckCircle, ArrowRight, TrendingUp, Target, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
 
 export function TrackFeedback() {
+  const [showConversation, setShowConversation] = useState(false);
   const navigate = useNavigate();
   const {
     assignedTrack,
@@ -15,6 +17,8 @@ export function TrackFeedback() {
     advanceTrackCase,
     setPhase,
     currentSession,
+    questions,
+    resetSession,
   } = useAppStore();
 
   if (!assignedTrack || trackScores.length === 0) {
@@ -54,6 +58,14 @@ export function TrackFeedback() {
       setPhase('track_intro');
       navigate('/track-intro');
     }
+  };
+
+  const handleRetry = () => {
+    // Reset session state but keep track progress
+    resetSession();
+    // Go back to track intro to retry the same case
+    setPhase('track_intro');
+    navigate('/track-intro');
   };
 
   return (
@@ -196,6 +208,61 @@ export function TrackFeedback() {
           </Card>
         )}
 
+        {/* Conversation Review */}
+        {questions.length > 0 && (
+          <Card className="mb-6">
+            <button
+              onClick={() => setShowConversation(!showConversation)}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Review Conversation</h2>
+                <span className="text-sm text-gray-500">({questions.length} questions)</span>
+              </div>
+              {showConversation ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+            {showConversation && (
+              <CardContent className="border-t border-gray-200">
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {questions.map((q, i) => (
+                    <div key={q.id} className="border-b border-gray-100 pb-4 last:border-0">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-medium text-gray-400 mt-1">Q{i + 1}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-800 mb-1">{q.text}</p>
+                          <p className="text-sm text-gray-600">{q.response}</p>
+                          {q.analysis && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                {q.analysis.category}
+                              </span>
+                              {q.analysis.isDiscriminating && (
+                                <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                                  Discriminating
+                                </span>
+                              )}
+                              {q.analysis.isRedundant && (
+                                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">
+                                  Redundant
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        )}
+
         {/* What's Next */}
         <Card className="mb-8">
           <CardContent className="py-4">
@@ -215,7 +282,11 @@ export function TrackFeedback() {
           </CardContent>
         </Card>
 
-        <div className="text-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button variant="outline" onClick={handleRetry}>
+            <RotateCcw className="w-5 h-5 mr-2" />
+            Retry This Case
+          </Button>
           <Button size="lg" onClick={handleContinue}>
             {isLastTrackCase ? 'Proceed to Exit Case' : `Continue to Case ${currentTrackCaseIndex + 2}`}
             <ArrowRight className="w-5 h-5 ml-2" />
