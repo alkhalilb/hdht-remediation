@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
 import { getPatientResponse, analyzeQuestion, assessPerformance } from '../services/api';
-import { classifyDeficit } from '../services/scoring';
+import { classifyDeficit, analyzeAllDeficits } from '../services/scoring';
 import { Layout, PatientInfoBar, Button, Card, CardContent } from '../components/common';
 import { HypothesisPanel, ChatWindow, QuestionInput, QuestionInputRef } from '../components/interview';
 import {
@@ -401,8 +401,8 @@ export function Interview() {
 
       // Navigate based on phase
       if (phase === 'diagnostic') {
-        const deficit = classifyDeficit(assessment.scores);
-        setDiagnosticResults(assessment.scores, deficit, deficit);
+        const deficitAnalysis = analyzeAllDeficits(assessment.scores);
+        setDiagnosticResults(assessment.scores, deficitAnalysis.primaryDeficit, deficitAnalysis.primaryDeficit, deficitAnalysis);
         setPhase('deficit_report');
         navigate('/deficit-report');
       } else if (phase === 'track_case') {

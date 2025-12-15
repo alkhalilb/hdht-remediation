@@ -14,6 +14,7 @@ import {
   RemediationCase,
   ScaffoldingEvent,
   SurveyResponse,
+  MultiDeficitAnalysis,
 } from '../types';
 import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
 
@@ -74,7 +75,8 @@ interface AppState {
   diagnosticScores: DimensionScores | null;
   assignedDeficit: DeficitType | null;
   assignedTrack: TrackType | null;
-  setDiagnosticResults: (scores: DimensionScores, deficit: DeficitType, track: TrackType) => void;
+  deficitAnalysis: MultiDeficitAnalysis | null;
+  setDiagnosticResults: (scores: DimensionScores, deficit: DeficitType, track: TrackType, analysis?: MultiDeficitAnalysis) => void;
 
   // Track progress
   currentTrackCaseIndex: number;
@@ -319,11 +321,13 @@ export const useAppStore = create<AppState>()(
       diagnosticScores: null,
       assignedDeficit: null,
       assignedTrack: null,
-      setDiagnosticResults: (scores, deficit, track) => {
+      deficitAnalysis: null,
+      setDiagnosticResults: (scores, deficit, track, analysis) => {
         set({
           diagnosticScores: scores,
           assignedDeficit: deficit,
           assignedTrack: track,
+          deficitAnalysis: analysis || null,
         });
         // Update student track progress
         const { student } = get();
@@ -403,6 +407,7 @@ export const useAppStore = create<AppState>()(
           diagnosticScores: null,
           assignedDeficit: null,
           assignedTrack: null,
+          deficitAnalysis: null,
           currentTrackCaseIndex: 0,
           trackScores: [],
           exitAttempts: 0,
@@ -421,6 +426,7 @@ export const useAppStore = create<AppState>()(
         diagnosticScores: state.diagnosticScores,
         assignedDeficit: state.assignedDeficit,
         assignedTrack: state.assignedTrack,
+        deficitAnalysis: state.deficitAnalysis,
         currentTrackCaseIndex: state.currentTrackCaseIndex,
         trackScores: state.trackScores,
         exitAttempts: state.exitAttempts,

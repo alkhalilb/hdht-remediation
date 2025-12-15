@@ -1,39 +1,83 @@
-import { DeficitType, DimensionScores, QuestionEntry, HypothesisEntry, RemediationCase } from '../types';
+import { DeficitType, DimensionScores, QuestionEntry, HypothesisEntry, RemediationCase, DeficitInfo, MultiDeficitAnalysis } from '../types';
 
 const DEFICIT_THRESHOLD = 50;
 const MASTERY_THRESHOLD = 60;
+const CRITICAL_THRESHOLD = 35;
+const MODERATE_THRESHOLD = 45;
 
-// Classify the student's primary deficit based on diagnostic scores
-export function classifyDeficit(scores: DimensionScores): DeficitType {
-  const deficits: { type: DeficitType; score: number }[] = [];
+// Get severity level based on score
+function getSeverity(score: number): 'critical' | 'moderate' | 'mild' {
+  if (score < CRITICAL_THRESHOLD) return 'critical';
+  if (score < MODERATE_THRESHOLD) return 'moderate';
+  return 'mild';
+}
 
-  if (scores.organization < DEFICIT_THRESHOLD) {
-    deficits.push({ type: 'organization', score: scores.organization });
-  }
-  if (scores.hypothesisAlignment < DEFICIT_THRESHOLD) {
-    deficits.push({ type: 'hypothesisAlignment', score: scores.hypothesisAlignment });
-  }
-  if (scores.completeness < DEFICIT_THRESHOLD) {
-    deficits.push({ type: 'completeness', score: scores.completeness });
-  }
-  if (scores.efficiency < DEFICIT_THRESHOLD) {
-    deficits.push({ type: 'efficiency', score: scores.efficiency });
-  }
+// Analyze all deficits (not just primary) - handles correlated deficits
+export function analyzeAllDeficits(scores: DimensionScores): MultiDeficitAnalysis {
+  const allDeficits: DeficitInfo[] = [];
+  const deficitDisplayNames: Record<DeficitType, string> = {
+    organization: 'Information Gathering',
+    hypothesisAlignment: 'Hypothesis-Driven Inquiry',
+    completeness: 'Completeness',
+    efficiency: 'Efficiency',
+  };
 
-  if (deficits.length === 0) {
-    // No clear deficit — default to hypothesis alignment (core skill)
-    return 'hypothesisAlignment';
+  // Check each dimension for deficits
+  const dimensions: DeficitType[] = ['organization', 'hypothesisAlignment', 'completeness', 'efficiency'];
+
+  for (const dim of dimensions) {
+    const score = scores[dim];
+    if (score < DEFICIT_THRESHOLD) {
+      allDeficits.push({
+        type: dim,
+        score,
+        severity: getSeverity(score),
+        displayName: deficitDisplayNames[dim],
+      });
+    }
   }
 
   // Sort by score (lowest first), then by priority
   const priority: DeficitType[] = ['organization', 'hypothesisAlignment', 'completeness', 'efficiency'];
 
-  deficits.sort((a, b) => {
+  allDeficits.sort((a, b) => {
     if (a.score !== b.score) return a.score - b.score;
     return priority.indexOf(a.type) - priority.indexOf(b.type);
   });
 
-  return deficits[0].type;
+  // Determine primary deficit
+  const primaryDeficit: DeficitType = allDeficits.length > 0
+    ? allDeficits[0].type
+    : 'hypothesisAlignment'; // Default to core skill
+
+  // Generate correlation note if multiple deficits exist
+  let correlationNote: string | undefined;
+  if (allDeficits.length > 1) {
+    const types = allDeficits.map(d => d.type);
+
+    // Check for common correlation patterns
+    if (types.includes('organization') && types.includes('hypothesisAlignment')) {
+      correlationNote = 'Organization and hypothesis alignment often improve together—when you maintain a logical flow, it becomes easier to connect questions to your differential.';
+    } else if (types.includes('completeness') && types.includes('efficiency')) {
+      correlationNote = 'Completeness and efficiency can seem at odds, but focused questioning actually helps cover more ground in fewer questions.';
+    } else if (types.includes('organization') && types.includes('completeness')) {
+      correlationNote = 'A well-organized approach naturally leads to better coverage—following a systematic sequence helps ensure nothing is missed.';
+    } else {
+      correlationNote = 'These areas are interconnected—improving your primary deficit will likely help the others as well.';
+    }
+  }
+
+  return {
+    primaryDeficit,
+    allDeficits,
+    hasMultipleDeficits: allDeficits.length > 1,
+    correlationNote,
+  };
+}
+
+// Classify the student's primary deficit based on diagnostic scores (legacy - use analyzeAllDeficits for full picture)
+export function classifyDeficit(scores: DimensionScores): DeficitType {
+  return analyzeAllDeficits(scores).primaryDeficit;
 }
 
 // Check if student has achieved mastery for their track

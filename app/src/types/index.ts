@@ -242,6 +242,21 @@ export interface DeficitClassificationResult {
   rationale: string;
 }
 
+// Multi-deficit analysis (handles correlated deficits)
+export interface DeficitInfo {
+  type: DeficitType;
+  score: number;
+  severity: 'critical' | 'moderate' | 'mild';
+  displayName: string;
+}
+
+export interface MultiDeficitAnalysis {
+  primaryDeficit: DeficitType;
+  allDeficits: DeficitInfo[];
+  hasMultipleDeficits: boolean;
+  correlationNote?: string; // Explains relationship between deficits
+}
+
 export interface CaseAssessment {
   // Legacy scores (for backward compatibility - prefer phase/metrics)
   scores: DimensionScores;

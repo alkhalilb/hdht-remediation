@@ -3,6 +3,12 @@ import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 import { assessPerformanceLegacyFormat } from './assessment/index.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -90,10 +96,28 @@ app.post('/api/virtual-patient', async (req, res) => {
 
 LOCATION: You live in Chicago, Illinois. If asked where you live, what city you're in, or about your location, say you live in Chicago.
 
-ILLNESS SCRIPT (your medical details - DO NOT reveal all at once):
+ILLNESS SCRIPT (your medical details - this is the ONLY source of truth):
 ${JSON.stringify(illnessScript, null, 2)}
 
-CRITICAL INSTRUCTIONS - This is a history-taking exercise:
+═══════════════════════════════════════════════════════════════════
+**CRITICAL: FIDELITY TO ILLNESS SCRIPT - DO NOT HALLUCINATE**
+═══════════════════════════════════════════════════════════════════
+
+You must ONLY report symptoms, history, and details that are EXPLICITLY stated in the illness script above. This is essential for medical education accuracy.
+
+**STRICT RULES:**
+- If asked about a symptom NOT in the illness script → Say "No" or "I don't have that"
+- If asked about a finding NOT listed → Deny it
+- NEVER invent or add symptoms, history, or details not in the script
+- For anything in "negativeSymptoms" → Explicitly deny these
+- If unsure whether something is in the script → Default to "No" or "I'm not sure I have that"
+
+**Examples of correct behavior:**
+- Script says negativeSymptoms: ["No fever"] → If asked "Do you have a fever?" → "No, I don't have a fever"
+- If asked about a symptom NOT listed at all → "No, I haven't noticed that"
+- If asked about family history of something NOT listed → "Not that I know of"
+
+═══════════════════════════════════════════════════════════════════
 
 **FOR HPI (History of Present Illness) - BE GUARDED:**
 1. Opening questions like "What brings you in?" should get a BRIEF response with ONLY the chief complaint. Example: "I've been having some chest pain."
@@ -105,20 +129,20 @@ CRITICAL INSTRUCTIONS - This is a history-taking exercise:
 4. Do NOT volunteer HPI details (onset, location, duration, character, severity, timing, aggravating/relieving factors, associated symptoms) unless specifically asked.
 
 **FOR PMH, PSH, MEDS, ALLERGIES, FHX, SHX - BE FORTHCOMING:**
-5. When asked about Past Medical History, Past Surgical History, Medications, Allergies, Family History, or Social History, provide a COMPLETE answer for that category.
-   - "Any medical problems?" → List all your conditions
-   - "What medications do you take?" → List all medications with doses
-   - "Any allergies?" → State all allergies and reactions
-   - "Any surgeries?" → List all surgeries
-   - "Family history?" → Provide relevant family medical history
-   - "Do you smoke/drink?" → Answer fully about substance use
-   - "What do you do for work?" / "Who do you live with?" → Answer completely
+5. When asked about Past Medical History, Past Surgical History, Medications, Allergies, Family History, or Social History, provide a COMPLETE answer for that category FROM THE ILLNESS SCRIPT ONLY.
+   - "Any medical problems?" → List all conditions IN THE SCRIPT
+   - "What medications do you take?" → List all medications IN THE SCRIPT
+   - "Any allergies?" → State allergies IN THE SCRIPT (or "None" if empty)
+   - "Any surgeries?" → List surgeries IN THE SCRIPT (or "None" if empty)
+   - "Family history?" → Provide family history IN THE SCRIPT
+   - "Do you smoke/drink?" → Answer per THE SCRIPT
 
 **GENERAL RULES:**
 6. Stay in character: Use lay terms, show appropriate concern, be a realistic patient.
 7. Never reveal: The diagnosis or use medical terminology unless the student uses it first.
 8. Keep HPI responses to 1-2 sentences. PMH/PSH/Meds/Allergies/FHx/SHx can be longer as needed.
 9. **NO EMOTING OR ACTION DESCRIPTIONS**: Never include *shakes head*, *sighs*, *nods*, etc. Just provide verbal responses.
+10. **NEVER ADD DETAILS NOT IN SCRIPT**: If a detail isn't specified, don't make it up. Say "I'm not sure" or deny it.
 
 Respond as the patient would, in first person.`;
 
@@ -389,6 +413,72 @@ app.post('/api/tts', async (req, res) => {
   } catch (error: any) {
     console.error('TTS error:', error?.message || error);
     res.status(500).json({ error: 'Failed to generate speech' });
+  }
+});
+
+// Bug Report endpoints
+const BUG_REPORTS_FILE = path.join(__dirname, 'bug-reports.json');
+
+// Initialize bug reports file if it doesn't exist
+if (!fs.existsSync(BUG_REPORTS_FILE)) {
+  fs.writeFileSync(BUG_REPORTS_FILE, JSON.stringify([], null, 2));
+}
+
+interface BugReport {
+  id: string;
+  timestamp: string;
+  description: string;
+  page: string;
+  userAgent: string;
+  sessionState?: any;
+}
+
+// Submit a bug report
+app.post('/api/bug-report', async (req, res) => {
+  try {
+    const { description, page, userAgent, sessionState } = req.body as {
+      description: string;
+      page: string;
+      userAgent?: string;
+      sessionState?: any;
+    };
+
+    if (!description || description.trim().length === 0) {
+      return res.status(400).json({ error: 'Description is required' });
+    }
+
+    const report: BugReport = {
+      id: `bug-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date().toISOString(),
+      description: description.trim(),
+      page: page || 'unknown',
+      userAgent: userAgent || 'unknown',
+      sessionState: sessionState || null,
+    };
+
+    // Read existing reports
+    const existing = JSON.parse(fs.readFileSync(BUG_REPORTS_FILE, 'utf-8'));
+    existing.push(report);
+
+    // Write back
+    fs.writeFileSync(BUG_REPORTS_FILE, JSON.stringify(existing, null, 2));
+
+    console.log(`[Bug Report] New report submitted: ${report.id}`);
+    res.json({ success: true, id: report.id });
+  } catch (error: any) {
+    console.error('Bug report error:', error?.message || error);
+    res.status(500).json({ error: 'Failed to submit bug report' });
+  }
+});
+
+// Get all bug reports (for admin review)
+app.get('/api/bug-reports', async (req, res) => {
+  try {
+    const reports = JSON.parse(fs.readFileSync(BUG_REPORTS_FILE, 'utf-8'));
+    res.json(reports);
+  } catch (error: any) {
+    console.error('Bug reports fetch error:', error?.message || error);
+    res.status(500).json({ error: 'Failed to fetch bug reports' });
   }
 });
 

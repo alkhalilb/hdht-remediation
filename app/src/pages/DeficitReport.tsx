@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName, getTrackDescription } from '../services/scoring';
-import { Target, ArrowRight, BookOpen, AlertCircle, MessageSquare, ChevronDown, ChevronUp, ListOrdered } from 'lucide-react';
-import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
+import { Target, ArrowRight, BookOpen, AlertCircle, MessageSquare, ChevronDown, ChevronUp, ListOrdered, AlertTriangle, Link } from 'lucide-react';
+import { PCMC1Phase, AllMetrics, RemediationTrackType, DeficitInfo } from '../types';
 
 export function DeficitReport() {
   const [showConversation, setShowConversation] = useState(false);
   const [showDifferential, setShowDifferential] = useState(false);
   const navigate = useNavigate();
-  const { diagnosticScores, assignedDeficit, assignedTrack, setPhase, currentSession, questions, hypotheses } = useAppStore();
+  const { diagnosticScores, assignedDeficit, assignedTrack, deficitAnalysis, setPhase, currentSession, questions, hypotheses } = useAppStore();
 
   if (!diagnosticScores || !assignedDeficit || !assignedTrack) {
     navigate('/');
@@ -81,6 +81,73 @@ export function DeficitReport() {
           </Card>
         )}
 
+        {/* Multi-Deficit Display - Show all identified areas */}
+        {deficitAnalysis && deficitAnalysis.hasMultipleDeficits && (
+          <Card className="mb-6 border-2 border-amber-200">
+            <CardContent className="py-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Multiple Areas Identified
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    We identified {deficitAnalysis.allDeficits.length} areas that need attention. Your practice track will focus on the primary area, but improving it should help the others too.
+                  </p>
+
+                  <div className="space-y-3">
+                    {deficitAnalysis.allDeficits.map((deficit, index) => (
+                      <div
+                        key={deficit.type}
+                        className={`p-3 rounded-lg flex items-center gap-3 ${
+                          index === 0
+                            ? 'bg-blue-50 border-2 border-blue-200'
+                            : 'bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          index === 0 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
+                        }`}>
+                          {index === 0 ? '1' : index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-900">{deficit.displayName}</span>
+                            {index === 0 && (
+                              <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
+                                Primary Focus
+                              </span>
+                            )}
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              deficit.severity === 'critical' ? 'bg-red-100 text-red-700' :
+                              deficit.severity === 'moderate' ? 'bg-orange-100 text-orange-700' :
+                              'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {deficit.severity === 'critical' ? 'Needs significant work' :
+                               deficit.severity === 'moderate' ? 'Needs improvement' :
+                               'Needs some attention'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500">Score: {deficit.score}/100</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {deficitAnalysis.correlationNote && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-start gap-2">
+                      <Link className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-blue-800">{deficitAnalysis.correlationNote}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Primary Deficit Card */}
         <Card className="mb-6 border-2 border-blue-200">
           <CardContent className="py-6">
@@ -90,7 +157,9 @@ export function DeficitReport() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Your Primary Area for Improvement: {deficitName}
+                  {deficitAnalysis?.hasMultipleDeficits
+                    ? `Your Practice Track: ${deficitName}`
+                    : `Your Primary Area for Improvement: ${deficitName}`}
                 </h3>
 
                 <p className="text-gray-700 mb-4">

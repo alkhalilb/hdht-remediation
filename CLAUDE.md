@@ -196,6 +196,25 @@ The UI now displays transparent, literature-grounded metrics in an organized, ex
 
 ## Recent Changes (December 2025)
 
+### Virtual Patient Fidelity (December 2025)
+- Added strong guardrails to prevent the LLM from hallucinating clinical details
+- Virtual patient ONLY reports symptoms/history explicitly stated in the illness script
+- Symptoms in `negativeSymptoms` are explicitly denied
+- Default response for anything not in the script is denial
+- Prevents teaching wrong associations from invented symptoms
+
+### Multi-Deficit Model (December 2025)
+- Fixed the single-deficit limitation that forced students into one track
+- Now identifies ALL areas below threshold with severity levels (critical/moderate/mild)
+- DeficitReport.tsx shows all identified deficits with:
+  - Ranked list with primary focus highlighted
+  - Severity badges (needs significant work / needs improvement / needs some attention)
+  - Correlation notes explaining how deficits relate to each other
+- Practice track still focuses on primary deficit, but acknowledges others
+- New types: `DeficitInfo`, `MultiDeficitAnalysis` in `app/src/types/index.ts`
+- New function: `analyzeAllDeficits()` in `app/src/services/scoring.ts`
+- Store now persists `deficitAnalysis` with the full multi-deficit data
+
 ### Feedback Page UI Redesign (December 2025)
 - Redesigned MetricsDisplay component with expandable cards
 - Each metric category is now a collapsible card with:
@@ -266,6 +285,6 @@ The UI now displays transparent, literature-grounded metrics in an organized, ex
 ---
 
 ## Potential Future Work
-- Update `ExitFeedback.tsx` to use MetricsDisplay (currently not updated)
 - Persist phase/metrics in Zustand store for retrieval across pages
 - Add more cases for each remediation track
+- Add combined remediation tracks for students with multiple correlated deficits
