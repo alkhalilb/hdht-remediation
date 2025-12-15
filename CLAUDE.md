@@ -94,12 +94,16 @@ cd app && npm run build
 - `POST /api/analyze-question` - Analyze question quality and categorization
 - `POST /api/evaluate-hypotheses` - Evaluate student's differential diagnosis
 - `POST /api/assess-performance` - Full case assessment with scoring
+- `POST /api/tts` - Text-to-speech via ElevenLabs (with browser fallback)
+- `POST /api/bug-report` - Submit a bug report
+- `GET /api/bug-reports` - Retrieve all bug reports (stored in `server/bug-reports.json`)
 
 ## Environment Variables
 
 ### Server (.env)
 ```
 ANTHROPIC_API_KEY=your_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_key_here  # For natural TTS
 PORT=3001
 ```
 
@@ -172,17 +176,54 @@ Claude generates feedback but is constrained to reference computed metrics only.
 
 ## UI Components
 
-### MetricsDisplay (New)
+### MetricsDisplay (Updated December 2025)
 Located at `app/src/components/common/MetricsDisplay.tsx`:
 - **PhaseBadge**: Shows PCMC-1 phase prominently with color coding
-- **MetricsDisplay**: Shows all metrics grouped by category with progress bars, pass/warn/fail indicators, and target thresholds
+- **MetricsDisplay**: Shows all metrics in expandable cards with:
+  - Collapsible sections for each metric category (Information Gathering, Hypothesis-Driven Inquiry, Completeness, Question Summary)
+  - Summary badge on each card showing overall status (pass/warn/fail) with colored icon
+  - Progress bars with target markers for each metric
+  - Pass/warn/fail color coding based on thresholds
+  - Tooltips explaining what each metric means
+  - Focus area highlighting (auto-expands the relevant section)
 - **MetricsComparison**: For showing progress between assessments
+- **MetricRow**: Progress bar component with target markers and status colors
+- **MetricSection**: Expandable card component with summary badge
 
-The UI now displays transparent, literature-grounded metrics instead of opaque 0-100 scores.
+The UI now displays transparent, literature-grounded metrics in an organized, expandable card format.
 
 ---
 
 ## Recent Changes (December 2025)
+
+### Feedback Page UI Redesign (December 2025)
+- Redesigned MetricsDisplay component with expandable cards
+- Each metric category is now a collapsible card with:
+  - Summary badge showing overall status (pass/warn/fail icon + value)
+  - Click to expand/collapse detailed metrics
+  - Progress bars with visual target markers
+  - Color-coded status (green=pass, yellow=warn, red=fail)
+- Focus area auto-expands to show relevant metrics
+- Cleaner, more organized presentation of assessment data
+- Used on DeficitReport and TrackFeedback pages
+
+### Voice Features
+- **Text-to-Speech**: Patient responses can be read aloud using ElevenLabs API (Rachel voice)
+- **Voice Input**: Students can use microphone to ask questions (Web Speech API)
+- **Toggles**: Both features have checkbox toggles; settings persist in localStorage
+- **Fallback**: If ElevenLabs fails (credits, network), falls back to browser TTS
+
+### Debug Mode Improvements
+- Debug interview questions are now natural conversational sentences (not terse fragments)
+- Hypothesis confidence starts at 3 (neutral) pre-encounter, adjusts during interview at 25/50/75/100% milestones
+- TTS disabled by default in debug mode for faster testing
+- Debug markers show where scaffolding prompts would fire
+
+### Bug Reporting
+- "Report a Bug" link appears in footer on all pages
+- Opens modal where users describe the issue
+- Reports stored in `server/bug-reports.json` with timestamp, page, and browser info
+- Retrieve reports via `GET /api/bug-reports`
 
 ### Assessment Pipeline Refactor
 - Replaced single-prompt scoring with 3-stage literature-grounded pipeline
@@ -199,6 +240,8 @@ The UI now displays transparent, literature-grounded metrics instead of opaque 0
 ### Files to Know
 - `server/assessment/` - The entire assessment pipeline
 - `app/src/components/common/MetricsDisplay.tsx` - New metrics display components
+- `app/src/components/common/Layout.tsx` - Contains bug report modal and footer
+- `app/src/data/debugInterviews.ts` - Debug mode interview questions and data
 - `literature_grounded_assessment_spec.md` - Full specification for the assessment approach
 
 ### Build Fix (December 2025)
