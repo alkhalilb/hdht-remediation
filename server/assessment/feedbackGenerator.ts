@@ -104,12 +104,22 @@ HYPOTHESIS-DRIVEN INQUIRY METRICS (Daniel et al. 2019)
 ═══════════════════════════════════════════════════════════════════
 
 Hypothesis coverage: ${(hd.hypothesisCoverage * 100).toFixed(0)}% of must-consider diagnoses included (target: ≥70%)
-${hd.missedMustConsider && hd.missedMustConsider.length > 0 ? `Missed diagnoses: ${hd.missedMustConsider.join(', ')}` : 'All must-consider diagnoses included ✓'}
+
+STUDENT'S DIAGNOSES (these ARE in the differential - do NOT suggest these):
+${hd.hypothesisCoverageDetail.map(h => `  - ${h.hypothesisName}`).join('\n')}
+
+${hd.missedMustConsider && hd.missedMustConsider.length > 0
+  ? `MISSED DIAGNOSES (ONLY suggest these if recommending to expand differential):
+${hd.missedMustConsider.map(d => `  - ${d}`).join('\n')}`
+  : 'All must-consider diagnoses included ✓'}
+
+IMPORTANT: When giving feedback about hypothesis coverage, ONLY reference diagnoses from the MISSED list above. Do NOT tell the student to consider diagnoses they already listed.
+
 Question-hypothesis alignment: ${(hd.alignmentRatio * 100).toFixed(0)}% of questions tested hypotheses (target: ≥50%)
 Discriminating questions: ${(hd.discriminatingRatio * 100).toFixed(0)}% could differentiate diagnoses (target: ≥30%)
 Hypothesis clustering: ${(hd.hypothesisClusteringScore * 100).toFixed(0)}% (target: ≥60%)
 ${hd.hypothesisCoverageDetail.length > 0 ? `
-Per-hypothesis breakdown:
+Per-hypothesis question breakdown:
 ${hd.hypothesisCoverageDetail.map(h =>
   `  - ${h.hypothesisName}: ${h.questionCount} questions${h.hasDiscriminatingQuestion ? ' (has discriminating Q)' : ''}`
 ).join('\n')}` : ''}

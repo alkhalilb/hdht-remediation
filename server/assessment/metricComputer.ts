@@ -254,7 +254,7 @@ function hypothesesMatch(student: string, expert: string): boolean {
   // Exact match or substring
   if (s === e || s.includes(e) || e.includes(s)) return true;
 
-  // Common abbreviations
+  // Common abbreviations and synonyms
   const abbreviations: Record<string, string[]> = {
     'mi': ['myocardialinfarction', 'heartattack', 'stemi', 'nstemi'],
     'pe': ['pulmonaryembolism', 'pulmonaryembolus'],
@@ -265,6 +265,11 @@ function hypothesesMatch(student: string, expert: string): boolean {
     'dvt': ['deepveinthrombosis', 'deepvenousthrombosis'],
     'cad': ['coronaryarterydisease'],
     'msk': ['musculoskeletal'],
+    'tth': ['tensiontypeheadache', 'tensionheadache'],
+    'moh': ['medicationoveruseheadache', 'reboundheadache', 'analgesicoveruseheadache'],
+    'pud': ['pepticulcerdisease', 'pepticulcer', 'ulcer'],
+    'pad': ['peripheralarterydisease', 'peripheralvasculardisease', 'pvd', 'claudication'],
+    'hf': ['heartfailure', 'chf', 'congestiveheartfailure'],
   };
 
   for (const [abbrev, expansions] of Object.entries(abbreviations)) {
@@ -272,6 +277,23 @@ function hypothesesMatch(student: string, expert: string): boolean {
     const studentMatches = allTerms.some(term => s.includes(term));
     const expertMatches = allTerms.some(term => e.includes(term));
     if (studentMatches && expertMatches) return true;
+  }
+
+  // Check for key diagnostic terms that should match even with different phrasing
+  // e.g., "tension headache" should match "tension-type headache"
+  const keyTerms = [
+    ['tension', 'headache'],
+    ['migraine'],
+    ['ulcer'],
+    ['heart', 'failure'],
+    ['angina'],
+    ['claudication'],
+  ];
+
+  for (const terms of keyTerms) {
+    const studentHasAllTerms = terms.every(term => s.includes(term));
+    const expertHasAllTerms = terms.every(term => e.includes(term));
+    if (studentHasAllTerms && expertHasAllTerms) return true;
   }
 
   return false;
