@@ -950,11 +950,13 @@ export function Interview() {
                   <div
                     className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
                     style={{
-                      width: assessmentProgress.includes('Classifying') ? '20%' :
-                             assessmentProgress.includes('information') ? '40%' :
+                      width: assessmentProgress.includes('Analyzing') ? '10%' :
+                             assessmentProgress.includes('Classifying') ? '25%' :
+                             assessmentProgress.includes('information') ? '45%' :
                              assessmentProgress.includes('hypothesis') ? '60%' :
-                             assessmentProgress.includes('phase') ? '80%' :
-                             assessmentProgress.includes('Finalizing') ? '95%' : '90%'
+                             assessmentProgress.includes('phase') ? '75%' :
+                             assessmentProgress.includes('Generating') ? '85%' :
+                             assessmentProgress.includes('Finalizing') ? '95%' : '50%'
                     }}
                   ></div>
                 </div>

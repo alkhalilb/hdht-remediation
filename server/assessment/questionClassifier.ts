@@ -13,6 +13,14 @@ Your task is to classify a single question according to:
 
 Be precise and consistent. This classification will be used for algorithmic scoring.
 
+CRITICAL RULES FOR REDUNDANCY:
+- Questions about standard history categories (PMH, PSH, Medications, Allergies, FamilyHistory, SocialHistory) are NEVER redundant just for asking about them
+- These are REQUIRED parts of any complete medical history
+- Only mark isRedundant=true if the EXACT SAME specific information was already asked about
+- Example: "Any medical conditions?" is NOT redundant even if HPI covered some medical history
+- Example: "Do you smoke?" is NOT redundant even if prior questions explored symptoms
+- Redundant means truly duplicative: asking the same specific question twice
+
 IMPORTANT: Respond with valid JSON only. No other text.`;
 
 interface ClassificationContext {

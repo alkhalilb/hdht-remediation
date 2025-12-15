@@ -201,7 +201,6 @@ function MetricRow({
 
   const colors = statusColors[computedStatus];
   const percentage = Math.min((value / maxValue) * 100, 100);
-  const targetPercentage = (target / maxValue) * 100;
 
   return (
     <div className="py-3">
@@ -235,13 +234,6 @@ function MetricRow({
           className={`absolute left-0 top-0 h-full ${colors.bar} rounded-full transition-all duration-300`}
           style={{ width: `${percentage}%` }}
         />
-        {/* Target marker */}
-        {!inverse && (
-          <div
-            className="absolute top-0 h-full w-0.5 bg-gray-600"
-            style={{ left: `${targetPercentage}%` }}
-          />
-        )}
       </div>
     </div>
   );

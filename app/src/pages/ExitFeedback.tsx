@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
 import { getDeficitDisplayName, getCompetencyLevel } from '../services/scoring';
-import { CheckCircle, XCircle, ArrowRight, TrendingUp, Award, AlertTriangle, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowRight, TrendingUp, Award, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, ListOrdered } from 'lucide-react';
 import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
 
 export function ExitFeedback() {
   const [showConversation, setShowConversation] = useState(false);
+  const [showDifferential, setShowDifferential] = useState(false);
   const navigate = useNavigate();
   const {
     exitPassed,
@@ -18,6 +19,7 @@ export function ExitFeedback() {
     currentSession,
     setPhase,
     questions,
+    hypotheses,
   } = useAppStore();
 
   const assessment = currentSession?.assessment;
@@ -246,6 +248,53 @@ export function ExitFeedback() {
                 </p>
               </div>
             </CardContent>
+          </Card>
+        )}
+
+        {/* Differential Review */}
+        {hypotheses.length > 0 && (
+          <Card className="mb-6">
+            <button
+              onClick={() => setShowDifferential(!showDifferential)}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <ListOrdered className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Your Differential Diagnosis</h2>
+                <span className="text-sm text-gray-500">({hypotheses.length} diagnoses)</span>
+              </div>
+              {showDifferential ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+            {showDifferential && (
+              <CardContent className="border-t border-gray-200">
+                <div className="space-y-3">
+                  {[...hypotheses]
+                    .sort((a, b) => b.confidence - a.confidence)
+                    .map((h, i) => (
+                      <div key={h.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+                        <span className="text-sm font-bold text-gray-400 w-6">#{i + 1}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{h.name}</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <div
+                              key={star}
+                              className={`w-2 h-2 rounded-full ${
+                                star <= h.confidence ? 'bg-blue-500' : 'bg-gray-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            )}
           </Card>
         )}
 
