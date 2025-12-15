@@ -902,6 +902,17 @@ INSTRUCTIONS:
 `;
 ```
 
+**Patient Fidelity Guardrails (Added December 2025):**
+
+The virtual patient prompt now includes strong guardrails to prevent the LLM from hallucinating clinical details not in the illness script:
+
+- Patient ONLY reports symptoms/history explicitly stated in the illness script
+- Symptoms listed in `negativeSymptoms` are explicitly denied
+- Default response for anything not in the script is denial ("No, I don't have that")
+- Prevents teaching wrong clinical associations from invented symptoms
+
+This is critical for medical education—if the virtual patient "invents" symptoms, it could reinforce incorrect clinical reasoning patterns.
+
 **Question Analysis Prompt:**
 ```typescript
 const questionAnalysisPrompt = (question: string, hypotheses: string[], caseData: RemediationCase) => `
@@ -1005,11 +1016,18 @@ After remediation is validated, expand to general skills practice:
 
 ### 9.2 Multi-Deficit Tracks
 
-Some students may have multiple deficits. Future versions could:
+**Implemented (December 2025):** The app now identifies ALL deficits below threshold, not just the primary one:
 
-- Assign primary and secondary tracks
-- Sequential track completion
+- Shows all identified deficit areas with severity levels (critical/moderate/mild)
+- Displays correlation notes explaining how deficits relate to each other
+- Practice track still focuses on primary deficit but acknowledges secondary areas
+- UI shows ranked list of deficits with severity badges
+
+**Future enhancements:**
+
+- Sequential track completion for students with multiple severe deficits
 - Adaptive ordering based on progress
+- Combined scaffolding that addresses correlated deficits simultaneously
 
 ### 9.3 Enhanced Feedback
 
