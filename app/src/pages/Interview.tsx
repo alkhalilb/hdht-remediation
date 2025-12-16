@@ -397,6 +397,9 @@ export function Interview() {
         // New literature-grounded fields
         phase: assessment.phase,
         metrics: assessment.metrics,
+        // Rubric assessment
+        rubric: assessment.rubric,
+        rubricTrack: assessment.rubricTrack,
       });
 
       // Navigate based on phase
