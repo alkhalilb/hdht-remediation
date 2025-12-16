@@ -227,6 +227,22 @@ The rubric assessment appears alongside the deterministic metrics on DeficitRepo
 
 ## Recent Changes (December 2025)
 
+### Cognitive Error Detection (December 2025)
+- Added automatic detection of diagnostic reasoning errors for grading purposes
+- **NOT shown to students** - internal use only for instructor grading
+- Detects 6 cognitive error types based on Croskerry and Graber literature:
+  - **Anchoring**: Fixating on initial diagnosis despite contradictory data
+  - **Premature Closure**: Accepting diagnosis before adequate exploration
+  - **Confirmation Bias**: Only seeking confirming evidence
+  - **Search Satisficing**: Stopping search once one diagnosis found
+  - **Availability Bias**: Overweighting easily recalled diagnoses
+  - **Tunnel Vision**: Focusing too narrowly on one diagnostic path
+- Each error has severity (none/mild/moderate/severe) and confidence score
+- Returns `errorBurden` (0-100) and `gradingSummary` for quick grading
+- New file: `server/assessment/cognitiveErrorDetector.ts`
+- Integrated into assessment pipeline as Stage 4
+- Available via API in `cognitiveErrors` field (filtered out before student display)
+
 ### Rubric-Based Assessment (December 2025)
 - Added new 6-domain rubric assessment alongside existing metrics
 - Based on Calgary-Cambridge Guide and diagnostic reasoning literature
@@ -315,6 +331,7 @@ The rubric assessment appears alongside the deterministic metrics on DeficitRepo
 
 ### Files to Know
 - `server/assessment/` - The entire assessment pipeline
+- `server/assessment/cognitiveErrorDetector.ts` - Cognitive error detection (anchoring, premature closure, etc.)
 - `server/assessment/rubricScorer.ts` - 6-domain rubric scoring using LLM
 - `app/src/components/common/MetricsDisplay.tsx` - Metrics display components
 - `app/src/components/common/RubricDisplay.tsx` - Rubric display components

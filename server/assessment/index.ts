@@ -7,12 +7,14 @@ import { computeAllMetrics } from './metricComputer.js';
 import { determinePCMC1Phase, classifyDeficit, convertToLegacyScores } from './phaseAssessor.js';
 import { generateFeedback } from './feedbackGenerator.js';
 import { scoreWithRubric, mapRubricToTrack } from './rubricScorer.js';
+import { detectCognitiveErrors } from './cognitiveErrorDetector.js';
 import {
   LiteratureGroundedAssessment,
   ExpertContent,
   RemediationTrack,
   PCMC1Phase,
   RubricAssessment,
+  CognitiveErrorAnalysis,
 } from './types.js';
 
 // Re-export types
@@ -96,6 +98,26 @@ export async function assessPerformanceLiteratureBased(
     // Continue without rubric - it's optional
   }
 
+  // Stage 4: Detect cognitive errors (for grading purposes - NOT shown to students)
+  console.log('[Assessment] Stage 4: Detecting cognitive errors...');
+  let cognitiveErrors: CognitiveErrorAnalysis | undefined;
+
+  try {
+    cognitiveErrors = detectCognitiveErrors({
+      classifiedQuestions: questionClassifications,
+      studentHypotheses: hypotheses,
+      metrics,
+      expertContent,
+    });
+    console.log('[Assessment] Cognitive error detection complete. Error burden:', cognitiveErrors.errorBurden);
+    if (cognitiveErrors.detectedErrors.length > 0) {
+      console.log('[Assessment] Detected errors:', cognitiveErrors.gradingSummary);
+    }
+  } catch (error) {
+    console.error('[Assessment] Cognitive error detection failed:', error);
+    // Continue without cognitive errors - it's optional
+  }
+
   return {
     phase: phaseResult.phase,
     phaseRationale: phaseResult.rationale,
@@ -105,6 +127,7 @@ export async function assessPerformanceLiteratureBased(
     feedback,
     rubric: rubricAssessment,
     rubricTrack,
+    cognitiveErrors,
   };
 }
 
@@ -132,6 +155,8 @@ export async function assessPerformanceLegacyFormat(
   // Rubric assessment (6-domain, 1-4 scale)
   rubric?: RubricAssessment;
   rubricTrack?: RemediationTrack;
+  // Cognitive errors (for grading - NOT shown to students)
+  cognitiveErrors?: CognitiveErrorAnalysis;
 }> {
   const assessment = await assessPerformanceLiteratureBased(anthropic, input);
 
@@ -166,5 +191,7 @@ export async function assessPerformanceLegacyFormat(
     // Rubric assessment (6-domain, 1-4 scale)
     rubric: assessment.rubric,
     rubricTrack: assessment.rubricTrack,
+    // Cognitive errors (for grading - NOT shown to students)
+    cognitiveErrors: assessment.cognitiveErrors,
   };
 }

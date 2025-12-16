@@ -215,6 +215,83 @@ export const DOMAIN_METADATA: Record<RubricDomain, {
   },
 };
 
+// ============================================================================
+// COGNITIVE ERROR DETECTION TYPES
+// For grading purposes only - not shown to students
+// Based on diagnostic reasoning literature (Croskerry, Graber, et al.)
+// ============================================================================
+
+export type CognitiveErrorType =
+  | 'anchoring'           // Fixating on initial diagnosis despite contradictory data
+  | 'prematureClosure'    // Accepting diagnosis before adequate exploration
+  | 'confirmationBias'    // Only seeking confirming evidence, ignoring disconfirming
+  | 'searchSatisficing'   // Stopping search once one diagnosis found
+  | 'availabilityBias'    // Overweighting easily recalled diagnoses
+  | 'tunnelVision';       // Focusing too narrowly, missing alternatives
+
+export type CognitiveErrorSeverity = 'none' | 'mild' | 'moderate' | 'severe';
+
+export interface CognitiveErrorInstance {
+  errorType: CognitiveErrorType;
+  severity: CognitiveErrorSeverity;
+  confidence: number;  // 0-1, how confident we are this error occurred
+  evidence: string[];  // Behavioral evidence supporting this classification
+  questionIndices?: number[];  // Which questions demonstrate this error
+}
+
+export interface CognitiveErrorAnalysis {
+  // All detected errors with severity
+  detectedErrors: CognitiveErrorInstance[];
+
+  // Summary flags for quick grading
+  hasAnchoring: boolean;
+  hasPrematureClosure: boolean;
+  hasConfirmationBias: boolean;
+
+  // Overall cognitive error burden (0-100, higher = more errors)
+  errorBurden: number;
+
+  // Brief summary for grading notes (not shown to student)
+  gradingSummary: string;
+}
+
+export const COGNITIVE_ERROR_METADATA: Record<CognitiveErrorType, {
+  name: string;
+  description: string;
+  clinicalImpact: string;
+}> = {
+  anchoring: {
+    name: 'Anchoring',
+    description: 'Fixating on an initial diagnosis and failing to adjust despite new information',
+    clinicalImpact: 'May miss alternative diagnoses when initial impression is wrong',
+  },
+  prematureClosure: {
+    name: 'Premature Closure',
+    description: 'Accepting a diagnosis before gathering sufficient information',
+    clinicalImpact: 'Increases risk of diagnostic error from incomplete workup',
+  },
+  confirmationBias: {
+    name: 'Confirmation Bias',
+    description: 'Seeking only information that confirms the leading hypothesis',
+    clinicalImpact: 'Fails to rule out dangerous alternative diagnoses',
+  },
+  searchSatisficing: {
+    name: 'Search Satisficing',
+    description: 'Stopping the diagnostic search once one plausible diagnosis is found',
+    clinicalImpact: 'May miss co-existing conditions or the true diagnosis',
+  },
+  availabilityBias: {
+    name: 'Availability Bias',
+    description: 'Overweighting diagnoses that come to mind easily',
+    clinicalImpact: 'May miss rare but important diagnoses',
+  },
+  tunnelVision: {
+    name: 'Tunnel Vision',
+    description: 'Focusing too narrowly on one diagnostic path',
+    clinicalImpact: 'Fails to consider the full differential diagnosis',
+  },
+};
+
 // Final Assessment Output
 export interface LiteratureGroundedAssessment {
   // Phase result (replaces arbitrary 0-100 scores)
@@ -242,4 +319,7 @@ export interface LiteratureGroundedAssessment {
   // NEW: Rubric assessment (6-domain, 1-4 scale)
   rubric?: RubricAssessment;
   rubricTrack?: RemediationTrack;
+
+  // Cognitive error analysis (for grading purposes only - NOT shown to students)
+  cognitiveErrors?: CognitiveErrorAnalysis;
 }
