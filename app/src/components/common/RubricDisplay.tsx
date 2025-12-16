@@ -1,10 +1,10 @@
 // RubricDisplay.tsx
 // Displays the 6-domain rubric assessment (1-4 scale)
-// Based on Calgary-Cambridge Guide and diagnostic reasoning literature
+// Based on Calgary-Cambridge Guide and diagnostic reasoning frameworks
 
 import { useState } from 'react';
-import { CheckCircle2, AlertTriangle, XCircle, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
-import { RubricAssessment, RubricDomain, RubricLevel, DOMAIN_METADATA } from '../../types';
+import { CheckCircle2, AlertTriangle, XCircle, TrendingUp, ChevronDown, ChevronUp, Target } from 'lucide-react';
+import { RubricAssessment, RubricDomain, RubricLevel, DomainScore } from '../../types';
 
 const DOMAIN_DISPLAY_NAMES: Record<RubricDomain, string> = {
   problemFraming: 'Problem Framing & Hypothesis Generation',
@@ -15,171 +15,120 @@ const DOMAIN_DISPLAY_NAMES: Record<RubricDomain, string> = {
   dataSynthesis: 'Data Synthesis (Closure)',
 };
 
-const LEVEL_COLORS: Record<RubricLevel, { bg: string; text: string; icon: typeof XCircle }> = {
-  DEVELOPING: { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
-  APPROACHING: { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: AlertTriangle },
-  MEETING: { bg: 'bg-blue-100', text: 'text-blue-700', icon: CheckCircle2 },
-  EXCEEDING: { bg: 'bg-green-100', text: 'text-green-700', icon: TrendingUp },
+const LEVEL_CONFIG: Record<RubricLevel, {
+  bg: string;
+  text: string;
+  border: string;
+  Icon: typeof XCircle;
+  label: string;
+}> = {
+  DEVELOPING: { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-200', Icon: XCircle, label: 'Developing' },
+  APPROACHING: { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200', Icon: AlertTriangle, label: 'Approaching' },
+  MEETING: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200', Icon: CheckCircle2, label: 'Meeting' },
+  EXCEEDING: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-200', Icon: TrendingUp, label: 'Exceeding' },
 };
 
-const SCORE_COLORS = ['', 'bg-red-400', 'bg-yellow-400', 'bg-blue-400', 'bg-green-400'];
-
-interface RubricDisplayProps {
-  rubric: RubricAssessment;
-  highlightDomain?: RubricDomain;
-  compact?: boolean;
+// Global Rating Badge Component
+interface GlobalRatingBadgeProps {
+  rating: number;
+  rationale?: string;
 }
 
-export function RubricDisplay({ rubric, highlightDomain, compact = false }: RubricDisplayProps) {
-  const [expandedDomains, setExpandedDomains] = useState<Set<RubricDomain>>(
-    highlightDomain ? new Set([highlightDomain]) : new Set()
-  );
-
-  const toggleDomain = (domain: RubricDomain) => {
-    setExpandedDomains(prev => {
-      const next = new Set(prev);
-      if (next.has(domain)) {
-        next.delete(domain);
-      } else {
-        next.add(domain);
-      }
-      return next;
-    });
-  };
+export function GlobalRatingBadge({ rating, rationale }: GlobalRatingBadgeProps) {
+  const level: RubricLevel = rating <= 1 ? 'DEVELOPING' : rating <= 2 ? 'APPROACHING' : rating <= 3 ? 'MEETING' : 'EXCEEDING';
+  const config = LEVEL_CONFIG[level];
+  const Icon = config.Icon;
 
   return (
-    <div className="space-y-4">
-      {/* Global Rating */}
-      {rubric.globalRating && (
-        <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="text-3xl font-bold text-gray-900 mb-1">
-            {rubric.globalRating}/4
-          </div>
-          <div className="text-sm font-medium text-gray-600 mb-2">
-            Overall Clinical Reasoning
-          </div>
-          {rubric.globalRationale && (
-            <p className="text-sm text-gray-600">{rubric.globalRationale}</p>
-          )}
-        </div>
+    <div className="text-center p-6 bg-gradient-to-b from-gray-50 to-white rounded-xl border border-gray-200">
+      <div className="text-sm font-medium text-gray-500 mb-2">Overall Performance</div>
+      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${config.bg} mb-3`}>
+        <Icon className={`w-5 h-5 ${config.text}`} />
+        <span className={`text-2xl font-bold ${config.text}`}>{rating}/4</span>
+        <span className={`text-sm font-medium ${config.text}`}>{config.label}</span>
+      </div>
+      {rationale && (
+        <p className="text-sm text-gray-600 max-w-xl mx-auto">{rationale}</p>
       )}
+    </div>
+  );
+}
 
-      {/* Domain Scores */}
-      <div className="space-y-3">
-        {rubric.domainScores.map((domainScore) => {
-          const colors = LEVEL_COLORS[domainScore.level];
-          const Icon = colors.icon;
-          const isHighlighted = highlightDomain === domainScore.domain;
-          const isExpanded = expandedDomains.has(domainScore.domain);
+// Domain Score Card Component
+interface DomainScoreCardProps {
+  domain: DomainScore;
+  isHighlighted: boolean;
+  defaultExpanded?: boolean;
+}
 
-          return (
-            <div
-              key={domainScore.domain}
-              className={`rounded-lg border-2 transition-all ${
-                isHighlighted
-                  ? 'border-blue-400 bg-blue-50'
-                  : 'border-gray-200 bg-white'
-              }`}
-            >
-              <div
-                className="p-4 cursor-pointer"
-                onClick={() => toggleDomain(domainScore.domain)}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-gray-900">
-                      {DOMAIN_DISPLAY_NAMES[domainScore.domain]}
-                    </h3>
-                    {isHighlighted && (
-                      <span className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded-full">
-                        Focus Area
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${colors.bg}`}>
-                      <Icon className={`w-4 h-4 ${colors.text}`} />
-                      <span className={`font-bold ${colors.text}`}>
-                        {domainScore.score}/4
-                      </span>
-                    </div>
-                    {!compact && (
-                      isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
-                      )
-                    )}
-                  </div>
-                </div>
+function DomainScoreCard({ domain, isHighlighted, defaultExpanded = false }: DomainScoreCardProps) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const config = LEVEL_CONFIG[domain.level];
+  const Icon = config.Icon;
+  const displayName = DOMAIN_DISPLAY_NAMES[domain.domain];
 
-                {/* Score bar visualization */}
-                <div className="flex gap-1 mb-2">
-                  {[1, 2, 3, 4].map((n) => (
-                    <div
-                      key={n}
-                      className={`h-2 flex-1 rounded ${
-                        n <= domainScore.score
-                          ? SCORE_COLORS[n]
-                          : 'bg-gray-200'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                {/* Description from DOMAIN_METADATA */}
-                <p className="text-xs text-gray-500">
-                  {DOMAIN_METADATA[domainScore.domain]?.description}
-                </p>
-              </div>
-
-              {/* Expanded content */}
-              {!compact && isExpanded && (
-                <div className="px-4 pb-4 border-t border-gray-100">
-                  <div className="mt-3 space-y-2">
-                    <p className="text-sm text-gray-700">{domainScore.rationale}</p>
-                    {domainScore.behavioralEvidence.length > 0 && (
-                      <div className="text-xs text-gray-500">
-                        <span className="font-medium">Evidence: </span>
-                        <ul className="mt-1 list-disc list-inside space-y-1">
-                          {domainScore.behavioralEvidence.map((evidence, i) => (
-                            <li key={i}>{evidence}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
+  return (
+    <div className={`rounded-xl border-2 transition-all ${isHighlighted ? 'border-blue-400 bg-blue-50/50 shadow-md' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full p-4 flex items-center justify-between text-left"
+      >
+        <div className="flex items-center gap-3 flex-1">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-gray-900">{displayName}</h3>
+              {isHighlighted && (
+                <span className="text-xs px-2 py-0.5 bg-blue-600 text-white rounded-full">
+                  Primary Focus
+                </span>
               )}
             </div>
-          );
-        })}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${config.bg}`}>
+            <Icon className={`w-4 h-4 ${config.text}`} />
+            <span className={`font-bold ${config.text}`}>{domain.score}/4</span>
+          </div>
+          {expanded ? (
+            <ChevronUp className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          )}
+        </div>
+      </button>
+
+      {/* Score visualization bar */}
+      <div className="px-4 pb-2">
+        <div className="flex gap-1">
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              className={`h-1.5 flex-1 rounded-full transition-all ${
+                n <= domain.score
+                  ? n === 1 ? 'bg-red-400' :
+                    n === 2 ? 'bg-amber-400' :
+                    n === 3 ? 'bg-blue-400' : 'bg-green-400'
+                  : 'bg-gray-200'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Strengths & Improvements */}
-      {!compact && (rubric.strengths.length > 0 || rubric.improvements.length > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {rubric.strengths.length > 0 && (
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h4 className="font-medium text-green-800 mb-2">Strengths</h4>
-              <ul className="text-sm text-green-700 space-y-1">
-                {rubric.strengths.map((s, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {rubric.improvements.length > 0 && (
-            <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-              <h4 className="font-medium text-amber-800 mb-2">Areas for Improvement</h4>
-              <ul className="text-sm text-amber-700 space-y-1">
-                {rubric.improvements.map((s, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span>{s}</span>
+      {expanded && (
+        <div className="px-4 pb-4 pt-2 border-t border-gray-100 mt-2">
+          <p className="text-sm text-gray-700 mb-3">{domain.rationale}</p>
+
+          {domain.behavioralEvidence && domain.behavioralEvidence.length > 0 && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <div className="text-xs font-medium text-gray-500 mb-2">Behavioral Evidence</div>
+              <ul className="space-y-1">
+                {domain.behavioralEvidence.map((evidence, i) => (
+                  <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
+                    <span className="text-gray-400 mt-1">•</span>
+                    <span>{evidence}</span>
                   </li>
                 ))}
               </ul>
@@ -191,28 +140,97 @@ export function RubricDisplay({ rubric, highlightDomain, compact = false }: Rubr
   );
 }
 
-// Global rating badge component for compact display
-interface GlobalRatingBadgeProps {
-  rating: number;
-  size?: 'sm' | 'md' | 'lg';
+// Strengths and Improvements Section
+interface FeedbackSectionProps {
+  strengths: string[];
+  improvements: string[];
 }
 
-export function GlobalRatingBadge({ rating, size = 'md' }: GlobalRatingBadgeProps) {
-  const sizeClasses = {
-    sm: 'text-lg px-2 py-1',
-    md: 'text-2xl px-3 py-2',
-    lg: 'text-3xl px-4 py-3',
-  };
+export function FeedbackSection({ strengths, improvements }: FeedbackSectionProps) {
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      {strengths.length > 0 && (
+        <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+          <div className="flex items-center gap-2 mb-3">
+            <CheckCircle2 className="w-5 h-5 text-green-600" />
+            <h4 className="font-semibold text-green-800">Strengths</h4>
+          </div>
+          <ul className="space-y-2">
+            {strengths.map((s, i) => (
+              <li key={i} className="text-sm text-green-700 flex items-start gap-2">
+                <span className="text-green-400 mt-0.5">✓</span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-  const colorClass =
-    rating <= 1 ? 'bg-red-100 text-red-700' :
-    rating <= 2 ? 'bg-yellow-100 text-yellow-700' :
-    rating <= 3 ? 'bg-blue-100 text-blue-700' :
-    'bg-green-100 text-green-700';
+      {improvements.length > 0 && (
+        <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+          <div className="flex items-center gap-2 mb-3">
+            <Target className="w-5 h-5 text-amber-600" />
+            <h4 className="font-semibold text-amber-800">Areas for Improvement</h4>
+          </div>
+          <ul className="space-y-2">
+            {improvements.map((s, i) => (
+              <li key={i} className="text-sm text-amber-700 flex items-start gap-2">
+                <span className="text-amber-400 mt-0.5">→</span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Main RubricDisplay Component
+interface RubricDisplayProps {
+  rubric: RubricAssessment;
+  highlightDomain?: RubricDomain;
+  showGlobalRating?: boolean;
+  showFeedback?: boolean;
+}
+
+export function RubricDisplay({
+  rubric,
+  highlightDomain,
+  showGlobalRating = true,
+  showFeedback = true,
+}: RubricDisplayProps) {
+  const primaryDeficit = highlightDomain || rubric.primaryDeficitDomain;
 
   return (
-    <div className={`inline-flex items-center rounded-lg font-bold ${sizeClasses[size]} ${colorClass}`}>
-      {rating}/4
+    <div className="space-y-6">
+      {/* Global Rating */}
+      {showGlobalRating && rubric.globalRating && (
+        <GlobalRatingBadge
+          rating={rubric.globalRating}
+          rationale={rubric.globalRationale}
+        />
+      )}
+
+      {/* Domain Scores */}
+      <div className="space-y-3">
+        {rubric.domainScores.map((domain) => (
+          <DomainScoreCard
+            key={domain.domain}
+            domain={domain}
+            isHighlighted={domain.domain === primaryDeficit}
+            defaultExpanded={domain.domain === primaryDeficit}
+          />
+        ))}
+      </div>
+
+      {/* Strengths & Improvements */}
+      {showFeedback && (rubric.strengths.length > 0 || rubric.improvements.length > 0) && (
+        <FeedbackSection
+          strengths={rubric.strengths}
+          improvements={rubric.improvements}
+        />
+      )}
     </div>
   );
 }
