@@ -640,7 +640,7 @@ export function Interview() {
           )}
 
           {/* Chat window */}
-          <ChatWindow messages={messages} isLoading={isLoading} ttsEnabled={ttsEnabled} />
+          <ChatWindow messages={messages} isLoading={isLoading} ttsEnabled={ttsEnabled} patientSex={currentCase?.patient.sex} />
 
           {/* Question input */}
           <QuestionInput

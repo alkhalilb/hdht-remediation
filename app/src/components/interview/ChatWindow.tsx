@@ -8,9 +8,10 @@ interface ChatWindowProps {
   messages: Message[];
   isLoading?: boolean;
   ttsEnabled?: boolean;
+  patientSex?: 'male' | 'female';
 }
 
-export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps) {
+export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastSpokenMessageId = useRef<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -36,7 +37,7 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, patientSex }),
       });
 
       if (!response.ok) {
@@ -79,7 +80,7 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
     } finally {
       setLoadingTTS(null);
     }
-  }, []);
+  }, [patientSex]);
 
   // Fallback to browser TTS if ElevenLabs fails
   const fallbackBrowserTTS = useCallback((text: string) => {
@@ -92,18 +93,35 @@ export function ChatWindow({ messages, isLoading, ttsEnabled }: ChatWindowProps)
     utterance.volume = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v =>
-      v.name.includes('Samantha') ||
-      v.name.includes('Google') ||
-      v.name.includes('Microsoft') ||
-      v.lang.startsWith('en')
-    );
+    // Try to find a voice matching the patient's gender
+    let preferredVoice;
+    if (patientSex === 'male') {
+      // Look for male voices
+      preferredVoice = voices.find(v =>
+        v.name.includes('Daniel') ||
+        v.name.includes('Alex') ||
+        v.name.includes('Fred') ||
+        (v.name.includes('Google') && v.name.includes('Male'))
+      );
+    } else {
+      // Default to female voices
+      preferredVoice = voices.find(v =>
+        v.name.includes('Samantha') ||
+        v.name.includes('Victoria') ||
+        v.name.includes('Karen') ||
+        (v.name.includes('Google') && v.name.includes('Female'))
+      );
+    }
+    // Fallback to any English voice if gender-specific not found
+    if (!preferredVoice) {
+      preferredVoice = voices.find(v => v.lang.startsWith('en'));
+    }
     if (preferredVoice) {
       utterance.voice = preferredVoice;
     }
 
     window.speechSynthesis.speak(utterance);
-  }, []);
+  }, [patientSex]);
 
   // Manual play button handler
   const handlePlayMessage = useCallback((text: string, messageId: string) => {

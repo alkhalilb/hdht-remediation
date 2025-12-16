@@ -354,9 +354,10 @@ app.post('/api/assess-performance', async (req, res) => {
 // Text-to-Speech endpoint using ElevenLabs
 app.post('/api/tts', async (req, res) => {
   try {
-    const { text, voiceId } = req.body as {
+    const { text, voiceId, patientSex } = req.body as {
       text: string;
       voiceId?: string;
+      patientSex?: 'male' | 'female';
     };
 
     if (!text) {
@@ -369,9 +370,15 @@ app.post('/api/tts', async (req, res) => {
       return res.status(500).json({ error: 'TTS service not configured' });
     }
 
-    // Default to "Rachel" voice - natural conversational female voice
-    // Other good options: "Domi" (young female), "Bella" (warm female), "Antoni" (warm male)
-    const selectedVoiceId = voiceId || '21m00Tcm4TlvDq8ikWAM'; // Rachel
+    // Select voice based on patient gender
+    // Rachel (female): 21m00Tcm4TlvDq8ikWAM - warm, conversational female
+    // Adam (male): pNInz6obpgDQGcFmaJgB - natural, conversational male
+    let selectedVoiceId = voiceId;
+    if (!selectedVoiceId) {
+      selectedVoiceId = patientSex === 'male'
+        ? 'pNInz6obpgDQGcFmaJgB'  // Adam (male)
+        : '21m00Tcm4TlvDq8ikWAM'; // Rachel (female)
+    }
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}`,
