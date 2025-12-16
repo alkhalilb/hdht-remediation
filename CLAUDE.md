@@ -46,6 +46,7 @@ HBHx/
 │   │   ├── metricComputer.ts      # Stage 2: Deterministic metrics
 │   │   ├── phaseAssessor.ts       # Stage 3A: Phase determination
 │   │   ├── feedbackGenerator.ts   # Stage 3B: Grounded feedback
+│   │   ├── rubricScorer.ts        # Stage 3C: 6-domain rubric scoring
 │   │   └── index.ts        # Pipeline orchestration
 │   └── ...
 ├── hdht_remediation_app_spec.md  # Full specification document
@@ -166,11 +167,28 @@ EXEMPLARY   → Exceeding + complex case handling
 **3B: Grounded Feedback Generation:**
 Claude generates feedback but is constrained to reference computed metrics only.
 
-### Why This Approach?
-- **Reliability**: LLMs are good at classification but unreliable for direct scoring
-- **Transparency**: Scores come from deterministic algorithms, not LLM hallucination
-- **Reproducibility**: Same questions → same metrics every time
-- **Validity**: Grounded in educational research frameworks
+**3C: Rubric-Based Scoring (NEW - December 2025):**
+In parallel with deterministic metrics, we now use a 6-domain behaviorally-anchored rubric:
+
+| Domain | Description | Track Mapping |
+|--------|-------------|---------------|
+| Problem Framing | Generates plausible diagnoses early | HypothesisAlignment |
+| Discriminating Questioning | Questions differentiate competing diagnoses | HypothesisAlignment |
+| Sequencing & Strategy | Logical progression: broad → focused → confirmatory | Organization |
+| Responsiveness | Avoids cognitive fixation, adapts when data conflict | HypothesisAlignment |
+| Efficiency & Relevance | High-yield questions, avoids exhaustive ROS | Efficiency |
+| Data Synthesis | Coherent summary linking findings to hypotheses | Completeness |
+
+Each domain is scored 1-4:
+- 1 = DEVELOPING - Major gaps, disorganized, or harmful patterns
+- 2 = APPROACHING - Partially present but inconsistent
+- 3 = MEETING - Consistently demonstrates expected behavior
+- 4 = EXCEEDING - Expert-level, teaching-quality performance
+
+### Why Both Approaches?
+- **Deterministic Metrics**: Reproducible, transparent, traceable to specific behaviors
+- **Rubric Scoring**: Holistic judgment grounded in Calgary-Cambridge Guide
+- **Dual Display**: Students see both views for comprehensive feedback
 
 ---
 
@@ -192,9 +210,33 @@ Located at `app/src/components/common/MetricsDisplay.tsx`:
 
 The UI now displays transparent, literature-grounded metrics in an organized, expandable card format.
 
+### RubricDisplay (NEW - December 2025)
+Located at `app/src/components/common/RubricDisplay.tsx`:
+- **RubricDisplay**: Shows 6-domain clinical reasoning assessment with:
+  - Global rating (1-4) at the top
+  - Each domain displayed as an expandable card
+  - Color-coded score bars (red/yellow/blue/green for 1/2/3/4)
+  - Rationale and behavioral evidence for each domain
+  - Focus area highlighting for primary deficit domain
+  - Strengths and areas for improvement sections
+- **GlobalRatingBadge**: Compact badge showing overall rating
+
+The rubric assessment appears alongside the deterministic metrics on DeficitReport and TrackFeedback pages.
+
 ---
 
 ## Recent Changes (December 2025)
+
+### Rubric-Based Assessment (December 2025)
+- Added new 6-domain rubric assessment alongside existing metrics
+- Based on Calgary-Cambridge Guide and diagnostic reasoning literature
+- Each domain scored 1-4 (DEVELOPING/APPROACHING/MEETING/EXCEEDING)
+- New files:
+  - `server/assessment/rubricScorer.ts` - LLM-based rubric scoring
+  - `app/src/components/common/RubricDisplay.tsx` - Rubric visualization
+- DeficitReport and TrackFeedback now show both rubric and metrics
+- Rubric provides holistic clinical reasoning assessment
+- Metrics provide transparent, reproducible measurements
 
 ### Virtual Patient Fidelity (December 2025)
 - Added strong guardrails to prevent the LLM from hallucinating clinical details
@@ -273,10 +315,13 @@ The UI now displays transparent, literature-grounded metrics in an organized, ex
 
 ### Files to Know
 - `server/assessment/` - The entire assessment pipeline
-- `app/src/components/common/MetricsDisplay.tsx` - New metrics display components
+- `server/assessment/rubricScorer.ts` - 6-domain rubric scoring using LLM
+- `app/src/components/common/MetricsDisplay.tsx` - Metrics display components
+- `app/src/components/common/RubricDisplay.tsx` - Rubric display components
 - `app/src/components/common/Layout.tsx` - Contains bug report modal and footer
 - `app/src/data/debugInterviews.ts` - Debug mode interview questions and data
 - `literature_grounded_assessment_spec.md` - Full specification for the assessment approach
+- `RUBRIC_IMPLEMENTATION_GUIDE.md` - Rubric implementation specification
 
 ### Build Fix (December 2025)
 - Server uses `moduleResolution: "NodeNext"` which requires `.js` extensions on all relative imports

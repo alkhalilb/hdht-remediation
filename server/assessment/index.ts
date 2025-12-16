@@ -6,11 +6,13 @@ import { classifyAllQuestions } from './questionClassifier.js';
 import { computeAllMetrics } from './metricComputer.js';
 import { determinePCMC1Phase, classifyDeficit, convertToLegacyScores } from './phaseAssessor.js';
 import { generateFeedback } from './feedbackGenerator.js';
+import { scoreWithRubric, mapRubricToTrack } from './rubricScorer.js';
 import {
   LiteratureGroundedAssessment,
   ExpertContent,
   RemediationTrack,
   PCMC1Phase,
+  RubricAssessment,
 } from './types.js';
 
 // Re-export types
@@ -75,6 +77,25 @@ export async function assessPerformanceLiteratureBased(
     track || deficit.primaryDeficit
   );
 
+  // Stage 3C: Score with rubric (6-domain, 1-4 scale)
+  console.log('[Assessment] Stage 3C: Scoring with rubric...');
+  let rubricAssessment: RubricAssessment | undefined;
+  let rubricTrack: RemediationTrack | undefined;
+
+  try {
+    rubricAssessment = await scoreWithRubric(anthropic, {
+      classifiedQuestions: questionClassifications,
+      studentHypotheses,
+      expertContent,
+      chiefComplaint,
+    });
+    rubricTrack = mapRubricToTrack(rubricAssessment);
+    console.log('[Assessment] Rubric scoring complete. Global rating:', rubricAssessment.globalRating);
+  } catch (error) {
+    console.error('[Assessment] Rubric scoring failed:', error);
+    // Continue without rubric - it's optional
+  }
+
   return {
     phase: phaseResult.phase,
     phaseRationale: phaseResult.rationale,
@@ -82,6 +103,8 @@ export async function assessPerformanceLiteratureBased(
     metrics,
     questionClassifications,
     feedback,
+    rubric: rubricAssessment,
+    rubricTrack,
   };
 }
 
@@ -106,6 +129,9 @@ export async function assessPerformanceLegacyFormat(
   // New fields for transparency
   phase: PCMC1Phase;
   metrics: any;
+  // Rubric assessment (6-domain, 1-4 scale)
+  rubric?: RubricAssessment;
+  rubricTrack?: RemediationTrack;
 }> {
   const assessment = await assessPerformanceLiteratureBased(anthropic, input);
 
@@ -137,5 +163,8 @@ export async function assessPerformanceLegacyFormat(
     // New transparent fields
     phase: assessment.phase,
     metrics: assessment.metrics,
+    // Rubric assessment (6-domain, 1-4 scale)
+    rubric: assessment.rubric,
+    rubricTrack: assessment.rubricTrack,
   };
 }

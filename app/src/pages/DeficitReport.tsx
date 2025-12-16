@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay, RubricDisplay } from '../components/common';
 import { getDeficitDisplayName, getTrackDescription } from '../services/scoring';
-import { Target, ArrowRight, BookOpen, AlertCircle, MessageSquare, ChevronDown, ChevronUp, ListOrdered, AlertTriangle, Link } from 'lucide-react';
-import { PCMC1Phase, AllMetrics, RemediationTrackType, DeficitInfo } from '../types';
+import { Target, ArrowRight, BookOpen, AlertCircle, MessageSquare, ChevronDown, ChevronUp, ListOrdered, AlertTriangle, Link, Sparkles } from 'lucide-react';
+import { PCMC1Phase, AllMetrics, RemediationTrackType, DeficitInfo, RubricAssessment, RubricDomain } from '../types';
 
 export function DeficitReport() {
   const [showConversation, setShowConversation] = useState(false);
@@ -51,11 +51,35 @@ export function DeficitReport() {
           </p>
         </div>
 
+        {/* Rubric Assessment - Clinical Reasoning (6-domain, 1-4 scale) */}
+        {assessment?.rubric && (
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Clinical Reasoning Assessment</h2>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Based on Calgary-Cambridge Guide and diagnostic reasoning frameworks
+              </p>
+            </CardHeader>
+            <CardContent>
+              <RubricDisplay
+                rubric={assessment.rubric as RubricAssessment}
+                highlightDomain={assessment.rubric.primaryDeficitDomain as RubricDomain}
+              />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Metrics Display - Detailed Breakdown */}
         {metrics ? (
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-lg font-semibold text-gray-900">Detailed Metrics</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Computed from your question patterns (Hasnain & Daniel frameworks)
+              </p>
             </CardHeader>
             <CardContent>
               <MetricsDisplay

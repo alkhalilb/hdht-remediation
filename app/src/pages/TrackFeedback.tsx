@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay } from '../components/common';
+import { Layout, Button, Card, CardContent, CardHeader, MetricsDisplay, RubricDisplay } from '../components/common';
 import { getDeficitDisplayName } from '../services/scoring';
-import { CheckCircle, ArrowRight, TrendingUp, Target, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, RotateCcw, ListOrdered } from 'lucide-react';
-import { PCMC1Phase, AllMetrics, RemediationTrackType } from '../types';
+import { CheckCircle, ArrowRight, TrendingUp, Target, AlertTriangle, MessageSquare, ChevronDown, ChevronUp, RotateCcw, ListOrdered, Sparkles } from 'lucide-react';
+import { PCMC1Phase, AllMetrics, RemediationTrackType, RubricAssessment, RubricDomain } from '../types';
 
 export function TrackFeedback() {
   const [showConversation, setShowConversation] = useState(false);
@@ -148,6 +148,25 @@ export function TrackFeedback() {
             )}
           </CardContent>
         </Card>
+
+        {/* Rubric Assessment - Clinical Reasoning (6-domain, 1-4 scale) */}
+        {assessment?.rubric && (
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Clinical Reasoning Assessment</h2>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <RubricDisplay
+                rubric={assessment.rubric as RubricAssessment}
+                highlightDomain={assessment.rubric.primaryDeficitDomain as RubricDomain}
+                compact={true}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Detailed Metrics */}
         {metrics && (

@@ -257,6 +257,78 @@ export interface MultiDeficitAnalysis {
   correlationNote?: string; // Explains relationship between deficits
 }
 
+// ============================================================================
+// RUBRIC-BASED ASSESSMENT TYPES (Literature-Grounded)
+// Based on Calgary-Cambridge Guide and diagnostic reasoning literature
+// ============================================================================
+
+export type RubricDomain =
+  | 'problemFraming'
+  | 'discriminatingQuestioning'
+  | 'sequencingStrategy'
+  | 'responsiveness'
+  | 'efficiencyRelevance'
+  | 'dataSynthesis';
+
+export type RubricScore = 1 | 2 | 3 | 4;
+
+export type RubricLevel = 'DEVELOPING' | 'APPROACHING' | 'MEETING' | 'EXCEEDING';
+
+export interface DomainScore {
+  domain: RubricDomain;
+  score: RubricScore;
+  level: RubricLevel;
+  rationale: string;
+  behavioralEvidence: string[];
+}
+
+export interface RubricAssessment {
+  domainScores: DomainScore[];
+  globalRating?: RubricScore;
+  globalRationale?: string;
+  strengths: string[];
+  improvements: string[];
+  primaryDeficitDomain?: RubricDomain;
+}
+
+// Domain display metadata with track mapping
+export const DOMAIN_METADATA: Record<RubricDomain, {
+  name: string;
+  description: string;
+  trackMapping: RemediationTrackType;
+}> = {
+  problemFraming: {
+    name: 'Problem Framing & Hypothesis Generation',
+    description: 'Generates plausible diagnoses early based on chief complaint',
+    trackMapping: 'HypothesisAlignment',
+  },
+  discriminatingQuestioning: {
+    name: 'Discriminating Questioning',
+    description: 'Questions differentiate competing diagnoses',
+    trackMapping: 'HypothesisAlignment',
+  },
+  sequencingStrategy: {
+    name: 'Sequencing & Strategy',
+    description: 'Logical progression from broad to focused to confirmatory',
+    trackMapping: 'Organization',
+  },
+  responsiveness: {
+    name: 'Responsiveness to New Information',
+    description: 'Avoids cognitive fixation, adapts when data conflict',
+    trackMapping: 'HypothesisAlignment',
+  },
+  efficiencyRelevance: {
+    name: 'Efficiency & Relevance',
+    description: 'High-yield questions, avoids exhaustive ROS',
+    trackMapping: 'Completeness', // Note: mapping to Completeness as 'Efficiency' is not in RemediationTrackType
+  },
+  dataSynthesis: {
+    name: 'Data Synthesis (Closure)',
+    description: 'Coherent summary linking findings to hypotheses',
+    trackMapping: 'Completeness',
+  },
+};
+
 export interface CaseAssessment {
   // Legacy scores (for backward compatibility - prefer phase/metrics)
   scores: DimensionScores;
@@ -271,6 +343,9 @@ export interface CaseAssessment {
   phaseRationale?: string[];
   metrics?: AllMetrics;
   deficit?: DeficitClassificationResult;
+  // Rubric assessment (6-domain, 1-4 scale)
+  rubric?: RubricAssessment;
+  rubricTrack?: RemediationTrackType;
 }
 
 export interface RemediationSession {

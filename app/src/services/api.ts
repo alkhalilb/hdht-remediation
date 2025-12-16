@@ -1,4 +1,4 @@
-import { RemediationCase, QuestionAnalysis, DimensionScores, HypothesisEntry, PCMC1Phase, AllMetrics } from '../types';
+import { RemediationCase, QuestionAnalysis, DimensionScores, HypothesisEntry, PCMC1Phase, AllMetrics, RubricAssessment, RemediationTrackType } from '../types';
 
 const API_URL = '/api';
 
@@ -47,6 +47,9 @@ interface AssessmentResponse {
   // New literature-grounded fields
   phase: PCMC1Phase;
   metrics: AllMetrics;
+  // Rubric assessment (6-domain, 1-4 scale)
+  rubric?: RubricAssessment;
+  rubricTrack?: RemediationTrackType;
 }
 
 export async function getPatientResponse(request: VirtualPatientRequest): Promise<string> {
