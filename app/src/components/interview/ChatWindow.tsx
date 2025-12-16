@@ -202,7 +202,7 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
                   ? 'bg-white text-gray-900 border border-gray-200 group'
                   : 'bg-yellow-50 text-yellow-900 border border-yellow-200'
               }`}
-              style={{ padding: '16px 24px' }}
+              style={{ padding: '10px 16px' }}
             >
               <div className="flex items-start gap-2">
                 <p className="text-base whitespace-pre-wrap leading-relaxed break-words flex-1">{message.content}</p>
@@ -256,11 +256,11 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
           <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-300 text-gray-700">
             <Bot className="w-5 h-5" />
           </div>
-          <div className="bg-white text-gray-900 border border-gray-200 rounded-2xl" style={{ padding: '16px 24px' }}>
+          <div className="bg-white text-gray-900 border border-gray-200 rounded-2xl" style={{ padding: '10px 16px' }}>
             <div className="flex gap-1.5">
-              <span className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         </div>
