@@ -438,7 +438,7 @@ export function getDebugInterview(caseId: string, quality: DebugQuality): DebugI
 
 // Check if we're in debug mode (only in development)
 export function isDebugMode(): boolean {
-  return import.meta.env.DEV || localStorage.getItem('hdht-debug-mode') === 'true';
+  return import.meta.env.DEV && localStorage.getItem('hdht-debug-mode') === 'true';
 }
 
 // Toggle debug mode

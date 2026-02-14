@@ -20,24 +20,24 @@ import {
 const orientationSlides = [
   {
     title: 'What is Hypothesis-Driven History Taking?',
-    subtitle: 'The expert approach to patient interviews',
+    subtitle: 'The 6 domains of clinical reasoning',
     icon: Lightbulb,
     iconBg: 'bg-amber-100',
     iconColor: 'text-amber-600',
     content: (
       <>
         <p className="text-lg text-gray-600 mb-6">
-          Expert clinicians don't just gather information randomly. They follow a systematic approach:
+          Expert clinicians use a systematic approach. You'll be assessed on 6 key domains:
         </p>
 
-        <div className="grid gap-4 mb-6">
+        <div className="grid gap-3 mb-6">
           <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-blue-600 font-bold text-sm">1</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Generate hypotheses early</p>
-              <p className="text-sm text-gray-500">Based on the chief complaint and patient demographics</p>
+              <p className="font-semibold text-gray-900">Problem Framing</p>
+              <p className="text-sm text-gray-500">Generate plausible diagnoses early from the chief complaint</p>
             </div>
           </div>
 
@@ -46,8 +46,8 @@ const orientationSlides = [
               <span className="text-blue-600 font-bold text-sm">2</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Ask discriminating questions</p>
-              <p className="text-sm text-gray-500">Questions that help confirm or refute each hypothesis</p>
+              <p className="font-semibold text-gray-900">Discriminating Questioning</p>
+              <p className="text-sm text-gray-500">Ask questions that help distinguish between competing diagnoses</p>
             </div>
           </div>
 
@@ -56,8 +56,8 @@ const orientationSlides = [
               <span className="text-blue-600 font-bold text-sm">3</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Revise your differential</p>
-              <p className="text-sm text-gray-500">Update as new information emerges</p>
+              <p className="font-semibold text-gray-900">Sequencing & Strategy</p>
+              <p className="text-sm text-gray-500">Progress logically from broad to focused to confirmatory questions</p>
             </div>
           </div>
 
@@ -66,23 +66,37 @@ const orientationSlides = [
               <span className="text-blue-600 font-bold text-sm">4</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Stay organized</p>
-              <p className="text-sm text-gray-500">Gather complete information efficiently</p>
+              <p className="font-semibold text-gray-900">Responsiveness</p>
+              <p className="text-sm text-gray-500">Adapt your thinking when new information conflicts with hypotheses</p>
             </div>
           </div>
-        </div>
 
-        <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-          <p className="text-sm text-blue-800">
-            <strong>Example:</strong> For chest pain, an expert immediately considers ACS, PE, pneumothorax, and GERD — then asks specific questions to distinguish between them.
-          </p>
+          <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-blue-600 font-bold text-sm">5</span>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">Efficiency & Relevance</p>
+              <p className="text-sm text-gray-500">Ask high-yield questions without exhaustive review of systems</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-blue-600 font-bold text-sm">6</span>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">Data Synthesis</p>
+              <p className="text-sm text-gray-500">Gather complete information and link findings to your hypotheses</p>
+            </div>
+          </div>
         </div>
       </>
     ),
   },
   {
     title: 'Common Pitfalls to Avoid',
-    subtitle: 'Recognize these patterns in your own practice',
+    subtitle: 'Patterns that indicate specific domain weaknesses',
     icon: AlertCircle,
     iconBg: 'bg-rose-100',
     iconColor: 'text-rose-600',
@@ -95,9 +109,10 @@ const orientationSlides = [
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 mb-1">The "Shotgun" Approach</h4>
-              <p className="text-sm text-gray-600">
-                Asking every possible question without a clear purpose. This wastes time and doesn't demonstrate clinical reasoning.
+              <p className="text-sm text-gray-600 mb-1">
+                Asking every possible question without a clear purpose.
               </p>
+              <p className="text-xs text-rose-600">Affects: Efficiency & Relevance, Discriminating Questioning</p>
             </div>
           </div>
         </div>
@@ -109,9 +124,10 @@ const orientationSlides = [
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 mb-1">Disorganized Questioning</h4>
-              <p className="text-sm text-gray-600">
-                Jumping randomly between topics (HPI → family history → back to HPI → meds). This makes the interview feel unstructured.
+              <p className="text-sm text-gray-600 mb-1">
+                Jumping randomly between topics (HPI → family history → back to HPI).
               </p>
+              <p className="text-xs text-amber-600">Affects: Sequencing & Strategy</p>
             </div>
           </div>
         </div>
@@ -122,10 +138,11 @@ const orientationSlides = [
               <AlertTriangle className="w-5 h-5 text-orange-500" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-1">Missing Key Topics</h4>
-              <p className="text-sm text-gray-600">
-                Forgetting medications, family history, or relevant systems review leads to incomplete assessments.
+              <h4 className="font-semibold text-gray-900 mb-1">Anchoring / Tunnel Vision</h4>
+              <p className="text-sm text-gray-600 mb-1">
+                Fixating on one diagnosis and ignoring information that contradicts it.
               </p>
+              <p className="text-xs text-orange-600">Affects: Responsiveness to New Information</p>
             </div>
           </div>
         </div>
@@ -136,10 +153,11 @@ const orientationSlides = [
               <Target className="w-5 h-5 text-slate-500" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-1">Not Connecting to Hypotheses</h4>
-              <p className="text-sm text-gray-600">
-                Asking good questions but not understanding why they matter to your differential diagnosis.
+              <h4 className="font-semibold text-gray-900 mb-1">Not Linking Questions to Hypotheses</h4>
+              <p className="text-sm text-gray-600 mb-1">
+                Asking good questions but not understanding why they matter to your differential.
               </p>
+              <p className="text-xs text-slate-600">Affects: Problem Framing, Discriminating Questioning</p>
             </div>
           </div>
         </div>
@@ -148,7 +166,7 @@ const orientationSlides = [
   },
   {
     title: 'What Good Looks Like',
-    subtitle: 'Characteristics of expert interviewers',
+    subtitle: 'Expert behaviors across the 6 domains',
     icon: CheckCircle,
     iconBg: 'bg-emerald-100',
     iconColor: 'text-emerald-600',
@@ -158,9 +176,9 @@ const orientationSlides = [
           <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
             <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-gray-900">Early hypothesis generation</p>
+              <p className="font-semibold text-gray-900">Forms a differential early</p>
               <p className="text-sm text-gray-500">
-                Forming a differential within the first few questions based on age, presentation, and chief complaint
+                Generates 3-5 plausible diagnoses within the first few questions based on age, presentation, and chief complaint
               </p>
             </div>
           </div>
@@ -168,9 +186,9 @@ const orientationSlides = [
           <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
             <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-gray-900">Questions in close proximity</p>
+              <p className="font-semibold text-gray-900">Asks questions that discriminate</p>
               <p className="text-sm text-gray-500">
-                Following a "line of reasoning" rather than jumping between unrelated topics
+                Each question helps narrow the differential by supporting or refuting specific diagnoses
               </p>
             </div>
           </div>
@@ -178,9 +196,9 @@ const orientationSlides = [
           <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
             <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-gray-900">Discriminating questions</p>
+              <p className="font-semibold text-gray-900">Follows a logical sequence</p>
               <p className="text-sm text-gray-500">
-                Asking questions that help distinguish between diagnoses, not just gather information
+                Starts broad (HPI), then focused testing of hypotheses, then confirms with targeted questions
               </p>
             </div>
           </div>
@@ -188,9 +206,19 @@ const orientationSlides = [
           <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
             <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-gray-900">Complete but efficient</p>
+              <p className="font-semibold text-gray-900">Adapts when data conflicts</p>
               <p className="text-sm text-gray-500">
-                Covering necessary topics without excessive redundancy or tangential questions
+                Updates the differential and explores alternatives when answers don't fit expectations
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-gray-900">Complete yet efficient</p>
+              <p className="text-sm text-gray-500">
+                Covers all necessary topics in 15-25 focused questions without redundancy
               </p>
             </div>
           </div>
@@ -198,7 +226,7 @@ const orientationSlides = [
 
         <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
           <p className="text-sm text-emerald-800">
-            <strong>Target:</strong> 15-25 focused questions that systematically explore your differential while gathering a complete history.
+            <strong>Goal:</strong> Score 3 or higher ("Meeting") on all 6 domains to demonstrate competent hypothesis-driven history taking.
           </p>
         </div>
       </>
@@ -246,32 +274,35 @@ const orientationSlides = [
           <div className="p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
             <h4 className="font-semibold text-gray-900 mb-3">Scaffolding (Practice Cases)</h4>
             <p className="text-sm text-gray-600 mb-3">
-              During practice, you'll see helpful aids that gradually fade:
+              During practice, you'll see helpful aids targeting specific domains:
             </p>
             <ul className="space-y-2">
               <li className="flex gap-2 text-sm text-gray-600">
                 <span className="text-emerald-500">•</span>
-                Checklists of topics to cover
+                <strong>Sequencing:</strong> Category labels and sequence suggestions
               </li>
               <li className="flex gap-2 text-sm text-gray-600">
                 <span className="text-emerald-500">•</span>
-                Prompts to connect questions to hypotheses
+                <strong>Discriminating:</strong> "Which hypothesis does this test?" prompts
               </li>
               <li className="flex gap-2 text-sm text-gray-600">
                 <span className="text-emerald-500">•</span>
-                Alerts if you're jumping between topics
+                <strong>Efficiency:</strong> Question counter and redundancy alerts
               </li>
               <li className="flex gap-2 text-sm text-gray-600">
                 <span className="text-emerald-500">•</span>
-                Real-time feedback on question quality
+                <strong>Completeness:</strong> Topic checklists and missing topic alerts
               </li>
             </ul>
+            <p className="text-xs text-gray-500 mt-3">
+              These aids gradually fade over 3 practice cases as you build independence.
+            </p>
           </div>
 
           <div className="p-5 bg-white rounded-xl border border-gray-100 shadow-sm">
             <h4 className="font-semibold text-gray-900 mb-2">After Each Case</h4>
             <p className="text-sm text-gray-600">
-              You'll receive detailed feedback on hypothesis generation, question alignment, organization, completeness, and efficiency.
+              You'll receive a detailed rubric assessment showing your score (1-4) on each of the 6 domains, with specific feedback on your strengths and areas for improvement.
             </p>
           </div>
         </div>
@@ -293,7 +324,7 @@ export function Orientation() {
   const Icon = slide.icon;
 
   const handleDebugLogin = () => {
-    if (debugPassword === 'debugFeinberg') {
+    if (import.meta.env.DEV) {
       setDebugMode(true);
       setDebugEnabled(true);
       setShowDebugError(false);
@@ -390,7 +421,8 @@ export function Orientation() {
           </div>
         </div>
 
-        {/* Debug Mode Section */}
+        {/* Debug Mode Section — only visible in development */}
+        {import.meta.env.DEV && (
         <div className="mt-12 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-center">
             {debugEnabled ? (
@@ -430,6 +462,7 @@ export function Orientation() {
             )}
           </div>
         </div>
+        )}
       </div>
     </Layout>
   );

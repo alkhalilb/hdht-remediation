@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 import { assessPerformanceLegacyFormat } from './assessment/index.js';
@@ -20,6 +21,16 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
+// Rate limiting — protect paid API endpoints
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' },
+});
+app.use('/api/', apiLimiter);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -27,8 +38,8 @@ app.use(cors({
     if (allowedOrigins.some(allowed => origin.startsWith(allowed as string))) {
       return callback(null, true);
     }
-    // In production, be more permissive for Vercel preview URLs
-    if (origin.includes('vercel.app')) {
+    // Allow Vercel preview URLs for this project only
+    if (origin.includes('hdht-remediation') && origin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));
