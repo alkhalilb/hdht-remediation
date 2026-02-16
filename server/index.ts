@@ -179,7 +179,7 @@ Respond as the patient would, in first person.`;
   } catch (error: any) {
     console.error('Virtual patient error:', error?.message || error);
     console.error('Full error:', JSON.stringify(error, null, 2));
-    res.status(500).json({ error: 'Failed to generate response', details: error?.message });
+    res.status(500).json({ error: 'An internal error occurred' });
   }
 });
 
@@ -465,6 +465,15 @@ app.post('/api/bug-report', async (req, res) => {
       return res.status(400).json({ error: 'Description is required' });
     }
 
+    if (description.length > 5000) {
+      return res.status(400).json({ error: 'Description must be 5000 characters or fewer' });
+    }
+
+    const sessionStateStr = sessionState != null ? JSON.stringify(sessionState) : '';
+    if (sessionStateStr.length > 10000) {
+      return res.status(400).json({ error: 'Session state must be 10000 characters or fewer' });
+    }
+
     const report: BugReport = {
       id: `bug-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
@@ -492,6 +501,16 @@ app.post('/api/bug-report', async (req, res) => {
 // Get all bug reports (for admin review)
 app.get('/api/bug-reports', async (req, res) => {
   try {
+    // Simple bearer token auth for admin endpoints
+    // If ADMIN_TOKEN is not set, allow access (dev mode)
+    const adminToken = process.env.ADMIN_TOKEN;
+    if (adminToken) {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || authHeader !== `Bearer ${adminToken}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+    }
+
     const reports = JSON.parse(fs.readFileSync(BUG_REPORTS_FILE, 'utf-8'));
     res.json(reports);
   } catch (error: any) {
