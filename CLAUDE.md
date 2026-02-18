@@ -83,6 +83,28 @@ cd app && npm run dev
 cd app && npm run build
 ```
 
+### Deploying to Vercel
+
+The frontend deploys to Vercel. The Vercel project `hdht-remediation` has:
+- **Root directory**: `app`
+- **Framework**: Vite (auto-detected)
+- **GitHub integration**: Auto-deploys on push to `main` — **but only works if the repo is public or Vercel has access to the private repo** (re-authorize at https://vercel.com/bilal-al-khalils-projects/hdht-remediation/settings/git)
+
+**If GitHub auto-deploy stops working** (e.g., repo made private), deploy manually:
+```bash
+# Copy app source to a temp dir (avoids git author error from Vercel CLI)
+mkdir -p /tmp/hbhx-deploy/app
+cp -r app/package.json app/package-lock.json app/tsconfig*.json app/vite.config.ts app/index.html app/vercel.json app/src /tmp/hbhx-deploy/app/
+cp -r app/public /tmp/hbhx-deploy/app/ 2>/dev/null
+
+# Link and deploy
+cd /tmp/hbhx-deploy
+npx vercel link --project hdht-remediation --yes
+npx vercel deploy --prod --yes
+```
+
+**Do NOT** create new Vercel projects — always deploy to the existing `hdht-remediation` project.
+
 ## Key Features
 
 1. **Diagnostic Case**: Identifies student's deficit pattern using 6-domain rubric
