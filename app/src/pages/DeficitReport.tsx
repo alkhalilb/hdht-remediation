@@ -43,17 +43,9 @@ export function DeficitReport() {
   return (
     <Layout>
       <div className="max-w-3xl mx-auto">
-        {/* Page Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Target className="w-8 h-8 text-blue-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Your Clinical Reasoning Assessment
-          </h1>
-          <p className="text-gray-600">
-            Based on Calgary-Cambridge Guide and diagnostic reasoning frameworks
-          </p>
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">Your Assessment</h1>
+          <p className="text-sm text-gray-500">Based on your diagnostic case performance</p>
         </div>
 
         {/* Rubric Assessment - Main Display */}
@@ -79,30 +71,19 @@ export function DeficitReport() {
           </Card>
         )}
 
-        {/* Practice Track Assignment */}
-        <Card className="mb-6 border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-white">
-          <CardContent className="py-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Your Practice Track: {primaryDeficitDisplayName}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {trackDescription}
-                </p>
-                <div className="p-4 bg-blue-100 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">What You'll Practice:</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    {getTrackPracticePoints(assignedDeficit).map((point, i) => (
-                      <li key={i}>• {point}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
+        <Card className="mb-6">
+          <CardContent className="py-5">
+            <h3 className="font-semibold text-gray-900 mb-1">
+              Practice Track: {primaryDeficitDisplayName}
+            </h3>
+            <p className="text-sm text-gray-600 mb-3">
+              {trackDescription}
+            </p>
+            <ul className="text-sm text-gray-700 space-y-1">
+              {getTrackPracticePoints(assignedDeficit).map((point, i) => (
+                <li key={i}>• {point}</li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
 
@@ -208,47 +189,10 @@ export function DeficitReport() {
           </Card>
         )}
 
-        {/* What's Next - Learning Path */}
-        <Card className="mb-8">
-          <CardContent className="py-4">
-            <h3 className="font-semibold text-gray-900 mb-4">Your Learning Path</h3>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="font-bold">1</span>
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">Practice Case 1</p>
-                  <p className="text-xs text-gray-500">High scaffolding</p>
-                  <p className="text-xs text-blue-600">Guided prompts</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="font-bold">2</span>
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">Practice Case 2</p>
-                  <p className="text-xs text-gray-500">Medium scaffolding</p>
-                  <p className="text-xs text-gray-400">Hints available</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-10 h-10 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="font-bold">3</span>
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">Practice Case 3</p>
-                  <p className="text-xs text-gray-500">Low scaffolding</p>
-                  <p className="text-xs text-gray-400">Independent</p>
-                </div>
-              </div>
-              <div className="text-center px-4 border-l border-gray-200">
-                <div className="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <p className="text-sm font-medium text-gray-900">Exit Case</p>
-                <p className="text-xs text-gray-500">Demonstrate mastery</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-gray-50 rounded-lg p-4 mb-8 text-sm text-gray-600">
+          <p className="font-medium text-gray-900 mb-1">What's next</p>
+          <p>3 practice cases with decreasing scaffolding (guided → hints → independent), then an unscaffolded exit case.</p>
+        </div>
 
         {/* CTA Button */}
         <div className="text-center">

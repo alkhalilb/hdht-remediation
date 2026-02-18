@@ -67,12 +67,11 @@ export function Interview() {
   const [debugFilling, setDebugFilling] = useState(false);
   const [debugComplete, setDebugComplete] = useState<DebugQuality | null>(null);
 
-  // Voice settings - persist in localStorage (but disable TTS in debug mode)
+  // Voice settings - persist in localStorage
   const [voiceInputEnabled, setVoiceInputEnabled] = useState(() => {
     return localStorage.getItem('hdht-voice-input') === 'true';
   });
   const [ttsEnabled, setTtsEnabled] = useState(() => {
-    // Default to off in debug mode to avoid reading all responses during auto-fill
     if (isDebugMode()) return false;
     return localStorage.getItem('hdht-tts') === 'true';
   });
@@ -342,23 +341,6 @@ export function Interview() {
     setAssessmentProgress('Analyzing your questions...');
 
     try {
-      // Simulate progress updates
-      const progressSteps = [
-        'Classifying question types...',
-        'Computing information gathering metrics...',
-        'Evaluating hypothesis alignment...',
-        'Determining performance phase...',
-        'Generating feedback...',
-      ];
-
-      let stepIndex = 0;
-      const progressInterval = setInterval(() => {
-        if (stepIndex < progressSteps.length) {
-          setAssessmentProgress(progressSteps[stepIndex]);
-          stepIndex++;
-        }
-      }, 1500);
-
       // Get full assessment
       const assessment = await assessPerformance({
         questions: questions.map(q => ({
@@ -377,8 +359,7 @@ export function Interview() {
         assignedTrack: assignedTrack || undefined,
       });
 
-      clearInterval(progressInterval);
-      setAssessmentProgress('Finalizing results...');
+      setAssessmentProgress('Finalizing...');
 
       // Determine mastery based on track
       const masteryThreshold = 60;
@@ -790,14 +771,10 @@ export function Interview() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="max-w-lg mx-4 w-full">
             <CardContent className="py-6">
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <ListChecks className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 text-lg mb-2">Rank Your Differential Diagnosis</h3>
-                <p className="text-sm text-gray-600">
-                  Before ending, order your differential from most likely (#1) to least likely.
-                  Drag to reorder or use the arrows.
+              <div className="mb-4">
+                <h3 className="font-semibold text-gray-900 mb-1">Rank Your Differential</h3>
+                <p className="text-sm text-gray-500">
+                  Order from most likely (#1) to least likely. Drag or use arrows.
                 </p>
               </div>
 
@@ -933,39 +910,11 @@ export function Interview() {
 
       {/* Assessment loading overlay */}
       {assessmentProgress && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <Card className="max-w-md mx-4 w-full">
-            <CardContent className="py-8 px-6">
-              <div className="flex flex-col items-center text-center">
-                {/* Animated spinner */}
-                <div className="w-16 h-16 mb-6 relative">
-                  <div className="absolute inset-0 rounded-full border-4 border-blue-100"></div>
-                  <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
-                </div>
-
-                <h3 className="font-semibold text-gray-900 text-lg mb-2">Analyzing Your Performance</h3>
-                <p className="text-sm text-gray-600 mb-6">
-                  {assessmentProgress}
-                </p>
-
-                {/* Progress bar */}
-                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
-                    style={{
-                      width: assessmentProgress.includes('Analyzing') ? '10%' :
-                             assessmentProgress.includes('Classifying') ? '25%' :
-                             assessmentProgress.includes('information') ? '45%' :
-                             assessmentProgress.includes('hypothesis') ? '60%' :
-                             assessmentProgress.includes('phase') ? '75%' :
-                             assessmentProgress.includes('Generating') ? '85%' :
-                             assessmentProgress.includes('Finalizing') ? '95%' : '50%'
-                    }}
-                  ></div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-xs mx-4 text-center">
+            <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-sm text-gray-700">Analyzing your interview...</p>
+          </div>
         </div>
       )}
     </Layout>

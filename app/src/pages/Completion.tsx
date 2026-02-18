@@ -71,30 +71,19 @@ export function Completion() {
   return (
     <Layout showProgress={false}>
       <div>
-        <div className="text-center mb-8">
-          <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
-            exitPassed ? 'bg-green-100' : isFlaggedForReview ? 'bg-yellow-100' : 'bg-blue-100'
-          }`}>
-            {exitPassed ? (
-              <Award className="w-10 h-10 text-green-600" />
-            ) : isFlaggedForReview ? (
-              <AlertTriangle className="w-10 h-10 text-yellow-600" />
-            ) : (
-              <CheckCircle className="w-10 h-10 text-blue-600" />
-            )}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">
             {exitPassed
-              ? 'Remediation Complete!'
+              ? 'Remediation Complete'
               : isFlaggedForReview
               ? 'Referred for Faculty Review'
               : 'Program Complete'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm text-gray-500">
             {exitPassed
-              ? 'You\'ve successfully demonstrated improved hypothesis-driven history taking.'
+              ? 'You\'ve met mastery criteria for hypothesis-driven history taking.'
               : isFlaggedForReview
-              ? 'You\'ll receive additional support from a faculty member.'
+              ? 'A faculty member will provide additional one-on-one support.'
               : 'Thank you for completing the program.'}
           </p>
         </div>
@@ -223,10 +212,8 @@ export function Completion() {
             Start Over
           </Button>
 
-          <p className="text-sm text-gray-500 text-center mt-4">
-            Thank you for using the History Taking Skills Remediation program.
-            <br />
-            Your data has been saved for evaluation purposes.
+          <p className="text-xs text-gray-400 text-center mt-4">
+            Your data has been saved.
           </p>
         </div>
       </div>

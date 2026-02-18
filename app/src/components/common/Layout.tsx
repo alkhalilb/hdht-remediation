@@ -71,7 +71,7 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {showHeader && (
         <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -110,15 +110,13 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
         )}
       </main>
 
-      {/* Bug Report Footer */}
-      <footer className="bg-white border-t border-gray-200 py-3">
+      <footer className="py-4">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
           <button
             onClick={() => setShowBugModal(true)}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <Bug className="w-4 h-4" />
-            Report a Bug
+            Report a bug
           </button>
         </div>
       </footer>

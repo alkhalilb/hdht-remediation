@@ -42,42 +42,9 @@ export function TrackIntro() {
   return (
     <Layout>
       <div>
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-8 h-8 text-blue-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {trackName} Track
-          </h1>
-          <p className="text-gray-600">
-            Practice Case {currentTrackCaseIndex + 1} of 3
-          </p>
-        </div>
-
-        {/* Progress indicator */}
-        <div className="flex justify-center gap-4 mb-8">
-          {[0, 1, 2].map((index) => (
-            <div key={index} className="flex items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                  index < currentTrackCaseIndex
-                    ? 'bg-green-600 text-white'
-                    : index === currentTrackCaseIndex
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                }`}
-              >
-                {index < currentTrackCaseIndex ? '✓' : index + 1}
-              </div>
-              {index < 2 && (
-                <div
-                  className={`w-12 h-1 mx-2 rounded ${
-                    index < currentTrackCaseIndex ? 'bg-green-600' : 'bg-gray-200'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">{trackName} Track</h1>
+          <p className="text-sm text-gray-500">Practice case {currentTrackCaseIndex + 1} of 3</p>
         </div>
 
         <Card className="mb-6">
@@ -114,17 +81,12 @@ export function TrackIntro() {
 
         <Card className="mb-8">
           <CardContent className="py-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Remember Your Focus: {trackName}</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
+            <h3 className="font-semibold text-gray-900 mb-3">Remember: {trackName}</h3>
+            <ol className="space-y-1.5 text-sm text-gray-700 list-decimal list-inside">
               {getTrackReminders(assignedTrack).map((reminder, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-medium text-blue-600">
-                    {index + 1}
-                  </span>
-                  {reminder}
-                </li>
+                <li key={index}>{reminder}</li>
               ))}
-            </ul>
+            </ol>
           </CardContent>
         </Card>
 

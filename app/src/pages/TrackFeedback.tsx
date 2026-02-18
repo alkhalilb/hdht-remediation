@@ -54,22 +54,12 @@ export function TrackFeedback() {
   return (
     <Layout>
       <div className="max-w-3xl mx-auto">
-        {/* Page Header */}
-        <div className="text-center mb-8">
-          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
-            passedMastery ? 'bg-green-100' : 'bg-blue-100'
-          }`}>
-            {passedMastery ? (
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            ) : (
-              <Target className="w-8 h-8 text-blue-600" />
-            )}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Practice Case {currentTrackCaseIndex + 1} Complete
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">
+            Practice Case {currentTrackCaseIndex + 1} — Feedback
           </h1>
-          <p className="text-gray-600">
-            {trackName} Track - {getScaffoldingLevel(currentTrackCaseIndex)} scaffolding
+          <p className="text-sm text-gray-500">
+            {trackName} track, {getScaffoldingLevel(currentTrackCaseIndex).toLowerCase()} scaffolding
           </p>
         </div>
 
@@ -225,47 +215,12 @@ export function TrackFeedback() {
           </Card>
         )}
 
-        {/* Progress Indicator */}
-        <Card className="mb-8">
-          <CardContent className="py-4">
-            <h3 className="font-semibold text-gray-900 mb-4">Your Progress</h3>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 grid grid-cols-3 gap-4">
-                {[1, 2, 3].map((caseNum) => {
-                  const isCompleted = caseNum <= currentTrackCaseIndex + 1;
-                  const isCurrent = caseNum === currentTrackCaseIndex + 1;
-                  return (
-                    <div key={caseNum} className="text-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${
-                        isCompleted ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-                      }`}>
-                        {isCompleted ? (
-                          <CheckCircle2 className="w-5 h-5" />
-                        ) : (
-                          <span className="font-bold">{caseNum}</span>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium text-gray-900">Case {caseNum}</p>
-                      <p className="text-xs text-gray-500">{getScaffoldingLevel(caseNum - 1)}</p>
-                      {isCurrent && (
-                        <p className="text-xs text-blue-600 font-medium">Completed</p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="text-center px-4 border-l border-gray-200">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${
-                  isLastTrackCase ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
-                }`}>
-                  <Target className="w-5 h-5" />
-                </div>
-                <p className="text-sm font-medium text-gray-900">Exit Case</p>
-                <p className="text-xs text-gray-500">{isLastTrackCase ? 'Up next' : 'After practice'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-gray-50 rounded-lg p-4 mb-8 text-sm text-gray-600">
+          <p>
+            <strong className="text-gray-900">Progress:</strong> {currentTrackCaseIndex + 1} of 3 practice cases complete.
+            {isLastTrackCase ? ' Exit case is next.' : ` ${3 - currentTrackCaseIndex - 1} remaining before exit case.`}
+          </p>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

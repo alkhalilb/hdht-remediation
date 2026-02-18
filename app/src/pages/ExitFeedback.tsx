@@ -56,25 +56,16 @@ export function ExitFeedback() {
   return (
     <Layout>
       <div>
-        <div className="text-center mb-8">
-          <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
-            exitPassed ? 'bg-green-100' : 'bg-red-100'
-          }`}>
-            {exitPassed ? (
-              <Award className="w-10 h-10 text-green-600" />
-            ) : (
-              <XCircle className="w-10 h-10 text-red-600" />
-            )}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {exitPassed ? 'Congratulations!' : 'Not Quite There Yet'}
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">
+            {exitPassed ? 'Exit Case — Passed' : 'Exit Case — Not Yet Passing'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm text-gray-500">
             {exitPassed
-              ? 'You\'ve demonstrated mastery of the skills!'
+              ? 'You\'ve met mastery criteria.'
               : exitAttempts >= 2
-              ? 'You\'ll be referred for additional support'
-              : 'Review the feedback and try again'}
+              ? 'You\'ll be referred for additional support.'
+              : 'Review the feedback below and try again.'}
           </p>
         </div>
 

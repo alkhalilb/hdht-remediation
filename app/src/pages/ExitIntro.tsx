@@ -6,13 +6,17 @@ import { ClipboardCheck, ArrowRight, AlertTriangle, Info } from 'lucide-react';
 
 export function ExitIntro() {
   const navigate = useNavigate();
-  const { exitAttempts, setPhase } = useAppStore();
+  const { exitAttempts, setPhase, clearMessages, setHypotheses, setPlannedQuestions } = useAppStore();
 
   const exitCase = getExitCase(exitAttempts);
 
   const handleStart = () => {
+    // Clear previous case state before starting exit case
+    clearMessages();
+    setHypotheses([]);
+    setPlannedQuestions([]);
     setPhase('exit_case');
-    navigate('/interview');
+    navigate('/hypothesis-generation');
   };
 
   const isRetry = exitAttempts > 0;
@@ -20,24 +24,13 @@ export function ExitIntro() {
   return (
     <Layout>
       <div>
-        <div className="text-center mb-8">
-          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
-            isRetry ? 'bg-yellow-100' : 'bg-purple-100'
-          }`}>
-            {isRetry ? (
-              <AlertTriangle className="w-8 h-8 text-yellow-600" />
-            ) : (
-              <ClipboardCheck className="w-8 h-8 text-purple-600" />
-            )}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {isRetry ? 'Exit Case - Retry' : 'Exit Assessment'}
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">
+            {isRetry ? 'Exit Case — Retry' : 'Exit Assessment'}
           </h1>
-          <p className="text-gray-600">
-            {isRetry
-              ? 'Let\'s try again with a different case'
-              : 'Demonstrate your improvement'}
-          </p>
+          {isRetry && (
+            <p className="text-sm text-gray-500">Try again with a different case</p>
+          )}
         </div>
 
         {isRetry && (
@@ -91,40 +84,17 @@ export function ExitIntro() {
 
         <Card className="mb-8">
           <CardContent className="py-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Passing Criteria</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xs">✓</span>
-                Score ≥60 on your focus dimension (Meeting standard)
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xs">✓</span>
-                Overall score ≥50 (Approaching standard)
-              </li>
+            <h3 className="font-semibold text-gray-900 mb-2">Passing Criteria</h3>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li>Score ≥60 on your focus dimension (Meeting standard)</li>
+              <li>Overall score ≥50 (Approaching standard)</li>
             </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardContent className="py-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Quick Reminders</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2" />
-                Generate your differential early based on the chief complaint
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2" />
-                Ask discriminating questions that test your hypotheses
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2" />
-                Stay organized - complete topics before moving on
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2" />
-                Be thorough but efficient - aim for 15-25 focused questions
-              </li>
+            <h3 className="font-semibold text-gray-900 mt-4 mb-2">Reminders</h3>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li>Generate your differential early based on the chief complaint</li>
+              <li>Ask discriminating questions that test your hypotheses</li>
+              <li>Stay organized — complete topics before moving on</li>
+              <li>Aim for 15–25 focused questions</li>
             </ul>
           </CardContent>
         </Card>
@@ -134,9 +104,6 @@ export function ExitIntro() {
             Begin Exit Case
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-          <p className="text-sm text-gray-500 mt-3">
-            Take your time. When you're ready, proceed.
-          </p>
         </div>
       </div>
     </Layout>
