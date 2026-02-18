@@ -21,6 +21,7 @@ This is a web-based virtual patient application designed to remediate medical st
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4, Zustand
 - **Backend**: Node.js, Express, Claude API (Anthropic)
 - **AI**: Uses claude-opus-4-5 for virtual patient responses, question analysis, and hypothesis evaluation; claude-sonnet-4-20250514 for rubric scoring, question classification, and feedback generation
+- **UI Brand**: Northwestern/Feinberg identity — purple `#4E2A84`, Poppins font, flat design, Rich Black neutrals. Colors defined via Tailwind v4 `@theme` in `app/src/index.css`
 
 ## Project Structure
 
@@ -57,6 +58,18 @@ HBHx/
 
 ## How to Run
 
+### Start of Session
+The repo is kept **private** when not actively developing. Make it public before working:
+```bash
+gh repo edit alkhalilb/hdht-remediation --visibility public --accept-visibility-change-consequences
+```
+
+### End of Session
+Make it private again after pushing final changes:
+```bash
+gh repo edit alkhalilb/hdht-remediation --visibility private --accept-visibility-change-consequences
+```
+
 ### Development
 
 ```bash
@@ -88,7 +101,8 @@ cd app && npm run build
 The frontend deploys to Vercel. The Vercel project `hdht-remediation` has:
 - **Root directory**: `app`
 - **Framework**: Vite (auto-detected)
-- **GitHub integration**: Auto-deploys on push to `main` — **but only works if the repo is public or Vercel has access to the private repo** (re-authorize at https://vercel.com/bilal-al-khalils-projects/hdht-remediation/settings/git)
+- **GitHub integration**: Auto-deploys on push to `main` — repo must be **public** for Vercel to clone it
+- **Repo visibility workflow**: Make public at start of session (`gh repo edit alkhalilb/hdht-remediation --visibility public --accept-visibility-change-consequences`), make private when done (`--visibility private`)
 
 **If GitHub auto-deploy stops working** (e.g., repo made private), deploy manually:
 ```bash
@@ -112,6 +126,11 @@ npx vercel deploy --prod --yes
 3. **Scaffolded Practice**: Decreasing scaffolding over 3 practice cases aligned to rubric domains
 4. **Exit Assessment**: Demonstrates mastery
 5. **Virtual Patients**: AI-powered patient responses via Claude API
+
+### Removed Features
+- **Voice input** (speech-to-text via browser SpeechRecognition) — removed Feb 2026
+- **Read-aloud** (TTS via ElevenLabs API) — removed Feb 2026
+- **Bug report** (frontend modal + server endpoints) — removed Feb 2026
 
 ## API Endpoints
 
