@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent } from '../components/common';
+import { Layout, Button } from '../components/common';
 import { setDebugMode, isDebugMode } from '../data/debugInterviews';
 import { ChevronRight, ChevronLeft, Bug } from 'lucide-react';
 
@@ -83,7 +83,7 @@ const orientationSlides = [
           <li><strong>Adapts when data conflicts</strong> — updates the differential when answers don't fit expectations</li>
           <li><strong>Complete yet efficient</strong> — covers necessary topics in 15–25 focused questions</li>
         </ul>
-        <div className="mt-5 p-3 bg-gray-50 rounded-lg">
+        <div className="mt-5 p-3 bg-gray-50">
           <p className="text-sm text-gray-600">
             <strong>Goal:</strong> Score 3+ ("Meeting") on all 6 domains.
           </p>
@@ -188,17 +188,15 @@ export function Orientation() {
           ))}
         </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="mb-5">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">{slide.title}</h2>
-              <p className="text-sm text-gray-500">{slide.subtitle}</p>
-            </div>
-            <div className="text-gray-700">
-              {slide.content}
-            </div>
-          </CardContent>
-        </Card>
+        <div>
+          <div className="mb-5">
+            <h2 className="text-xl font-bold text-gray-900 mb-1">{slide.title}</h2>
+            <p className="text-sm text-gray-500">{slide.subtitle}</p>
+          </div>
+          <div className="text-gray-700">
+            {slide.content}
+          </div>
+        </div>
 
         {/* Navigation */}
         <div className="flex items-center justify-between mt-8">
@@ -226,7 +224,7 @@ export function Orientation() {
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-center">
             {debugEnabled ? (
-              <div className="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-200">
                 <Bug className="w-4 h-4 text-orange-600" />
                 <span className="text-sm text-orange-800">Debug mode enabled</span>
                 <button
@@ -248,13 +246,13 @@ export function Orientation() {
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handleDebugLogin()}
                   placeholder="Debug password"
-                  className={`px-3 py-1.5 text-sm border rounded-lg w-40 ${
+                  className={`px-3 py-1.5 text-sm border w-40 ${
                     showDebugError ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 />
                 <button
                   onClick={handleDebugLogin}
-                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
+                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100"
                 >
                   Enable
                 </button>

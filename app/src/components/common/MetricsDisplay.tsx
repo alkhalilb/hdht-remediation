@@ -210,7 +210,7 @@ function MetricRow({
           {tooltip && (
             <div className="group relative">
               <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 max-w-xs">
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 max-w-xs">
                 {tooltip}
               </div>
             </div>
@@ -261,7 +261,7 @@ function SimpleMetricRow({ label, value, status, tooltip }: SimpleMetricRowProps
         {tooltip && (
           <div className="group relative">
             <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 max-w-xs">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 max-w-xs">
               {tooltip}
             </div>
           </div>
@@ -310,7 +310,7 @@ function MetricSection({
   const colors = summaryStatus ? statusColors[summaryStatus] : null;
 
   return (
-    <div className={`rounded-lg mb-4 overflow-hidden border-2 transition-all duration-200 ${
+    <div className={`mb-4 overflow-hidden border-2 transition-all duration-200 ${
       highlight
         ? 'border-blue-300 bg-blue-50/50'
         : 'border-gray-200 bg-white hover:border-gray-300'
@@ -510,7 +510,7 @@ export function MetricsDisplay({
           </>
         )}
         {ig.prematureROSDetected && (
-          <div className="flex items-center gap-3 mt-4 p-4 bg-red-50 rounded-lg text-sm text-red-700">
+          <div className="flex items-center gap-3 mt-4 p-4 bg-red-50 text-sm text-red-700">
             <XCircle className="w-4 h-4 flex-shrink-0" />
             <span>Premature ROS detected - jumped to systems review before adequately exploring chief complaint</span>
           </div>
@@ -556,7 +556,7 @@ export function MetricsDisplay({
           />
         )}
         {!hd.includesMustNotMiss && (
-          <div className="flex items-center gap-3 mt-4 p-4 bg-red-50 rounded-lg text-sm text-red-700">
+          <div className="flex items-center gap-3 mt-4 p-4 bg-red-50 text-sm text-red-700">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>Missing critical "can't miss" diagnosis in your differential</span>
           </div>
@@ -579,7 +579,7 @@ export function MetricsDisplay({
           tooltip="Percentage of required history topics addressed"
         />
         {completeness.requiredTopicsMissed.length > 0 && (
-          <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+          <div className="mt-4 p-4 bg-yellow-50">
             <p className="text-sm font-medium text-yellow-800 mb-2">Topics Missed:</p>
             <ul className="text-sm text-yellow-700 space-y-2">
               {completeness.requiredTopicsMissed.slice(0, 5).map((topic, i) => (
@@ -663,7 +663,7 @@ export function MetricsComparison({
   return (
     <div className="space-y-4">
       {/* Phase Progression */}
-      <div className="flex items-center justify-center gap-4 p-5 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-center gap-4 p-5 bg-gray-50">
         <PhaseBadge phase={previousPhase} size="sm" />
         <span className="text-2xl text-gray-400">→</span>
         <PhaseBadge phase={currentPhase} size="sm" />
@@ -671,7 +671,7 @@ export function MetricsComparison({
 
       {/* Key Metrics Comparison */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50">
           <p className="text-xs text-gray-500 mb-1">Early HPI Focus</p>
           <p className="text-lg font-bold">
             {(curr.ig.earlyHPIFocus * 100).toFixed(0)}%
@@ -679,7 +679,7 @@ export function MetricsComparison({
             {formatChange(prev.ig.earlyHPIFocus, curr.ig.earlyHPIFocus, true)}
           </p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50">
           <p className="text-xs text-gray-500 mb-1">Line of Reasoning</p>
           <p className="text-lg font-bold">
             {curr.ig.lineOfReasoningScore.toFixed(1)}
@@ -687,7 +687,7 @@ export function MetricsComparison({
             {formatChange(prev.ig.lineOfReasoningScore, curr.ig.lineOfReasoningScore)}
           </p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50">
           <p className="text-xs text-gray-500 mb-1">Question Alignment</p>
           <p className="text-lg font-bold">
             {(curr.hd.alignmentRatio * 100).toFixed(0)}%
@@ -695,7 +695,7 @@ export function MetricsComparison({
             {formatChange(prev.hd.alignmentRatio, curr.hd.alignmentRatio, true)}
           </p>
         </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
+        <div className="p-4 bg-gray-50">
           <p className="text-xs text-gray-500 mb-1">Completeness</p>
           <p className="text-lg font-bold">
             {(curr.completeness.completenessRatio * 100).toFixed(0)}%

@@ -1,5 +1,5 @@
 import { useState, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
-import { Send, HelpCircle, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Send, HelpCircle, Mic, MicOff, Volume2 } from 'lucide-react';
 import { Button } from '../common';
 
 interface QuestionInputProps {
@@ -154,14 +154,14 @@ export const QuestionInput = forwardRef<QuestionInputRef, QuestionInputProps>(
         </div>
 
         {showHint && (
-          <div className="flex items-start gap-2 mb-3 bg-blue-50 border border-blue-200 rounded-lg" style={{ padding: '12px' }}>
+          <div className="flex items-start gap-2 mb-3 bg-blue-50 border border-blue-200" style={{ padding: '12px' }}>
             <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-blue-800">{showHint}</p>
           </div>
         )}
 
         {speechError && (
-          <div className="flex items-start gap-2 mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-start gap-2 mb-3 p-3 bg-red-50 border border-red-200">
             <MicOff className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-800">{speechError}</p>
           </div>
@@ -182,7 +182,7 @@ export const QuestionInput = forwardRef<QuestionInputRef, QuestionInputProps>(
                     : (placeholder || 'Type your question...')
               }
               rows={2}
-              className={`w-full px-4 py-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-4 py-3 border resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 isListening ? 'border-red-400 bg-red-50' : 'border-gray-300'
               }`}
             />

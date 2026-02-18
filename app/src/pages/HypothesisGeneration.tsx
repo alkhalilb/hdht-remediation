@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
-import { Layout, Button, Card, CardContent } from '../components/common';
+import { Layout, Button } from '../components/common';
 import { HypothesisPanel } from '../components/interview';
 import { RemediationCase } from '../types';
 import { isDebugMode, getDebugInterview, DebugQuality } from '../data/debugInterviews';
@@ -80,9 +80,8 @@ export function HypothesisGeneration() {
           <p className="text-sm text-gray-500">Review the case, then enter your initial differential before interviewing.</p>
         </div>
 
-        {/* Patient Card */}
-        <Card className="mb-6">
-          <CardContent className="py-6">
+        {/* Patient Info */}
+        <div className="mb-6">
             <div>
                 <h2 className="font-semibold text-gray-900 text-lg mb-1">
                   {currentCase.patient.name}
@@ -92,7 +91,7 @@ export function HypothesisGeneration() {
                   {currentCase.patient.occupation}
                 </p>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg" style={{ padding: '16px' }}>
+                <div className="bg-yellow-50 border border-yellow-200" style={{ padding: '16px' }}>
                   <p className="font-medium text-yellow-800 mb-1">Chief Complaint:</p>
                   <p className="text-yellow-900 text-lg">"{currentCase.chiefComplaint}"</p>
                 </div>
@@ -120,13 +119,11 @@ export function HypothesisGeneration() {
                   </div>
                 </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
 
-        {/* Tips Card */}
+        {/* Tips */}
         {showTips && (
-          <Card className="mb-6 bg-blue-50 border-blue-200">
-            <CardContent className="py-4">
+          <div className="mb-6 bg-blue-50 border border-blue-200 p-4">
               <div className="flex items-start gap-3">
                 <ClipboardList className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
@@ -145,13 +142,11 @@ export function HypothesisGeneration() {
                   Dismiss
                 </button>
               </div>
-            </CardContent>
-          </Card>
+          </div>
         )}
 
         {/* Hypothesis Entry */}
-        <Card className="mb-6">
-          <CardContent className="py-6">
+        <div className="mb-6">
             <h3 className="font-semibold text-gray-900 mb-4">
               Your Differential Diagnosis
             </h3>
@@ -168,14 +163,13 @@ export function HypothesisGeneration() {
             />
 
             {hypotheses.length === 0 && (
-              <div className="mt-4 text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+              <div className="mt-4 text-center py-8 bg-gray-50 border-2 border-dashed border-gray-200">
                 <p className="text-gray-500">
                   Add at least one diagnosis to continue
                 </p>
               </div>
             )}
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Action Button */}
         <div className="flex justify-end">
@@ -192,8 +186,7 @@ export function HypothesisGeneration() {
 
         {/* Debug Panel */}
         {isDebugMode() && (
-          <Card className="mt-6 border-orange-300 bg-orange-50">
-            <CardContent className="py-4">
+          <div className="mt-6 border border-orange-300 bg-orange-50 p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Bug className="w-4 h-4 text-orange-600" />
                 <h3 className="font-medium text-orange-900 text-sm">Debug Mode - Auto-fill Hypotheses</h3>
@@ -201,7 +194,7 @@ export function HypothesisGeneration() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleDebugFillHypotheses('poor')}
-                  className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  className={`flex-1 px-3 py-2 text-sm transition-colors flex items-center justify-center gap-2 ${
                     debugFilled === 'poor'
                       ? 'bg-red-600 text-white'
                       : 'bg-red-100 hover:bg-red-200 text-red-800'
@@ -212,7 +205,7 @@ export function HypothesisGeneration() {
                 </button>
                 <button
                   onClick={() => handleDebugFillHypotheses('medium')}
-                  className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  className={`flex-1 px-3 py-2 text-sm transition-colors flex items-center justify-center gap-2 ${
                     debugFilled === 'medium'
                       ? 'bg-yellow-600 text-white'
                       : 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
@@ -223,7 +216,7 @@ export function HypothesisGeneration() {
                 </button>
                 <button
                   onClick={() => handleDebugFillHypotheses('good')}
-                  className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                  className={`flex-1 px-3 py-2 text-sm transition-colors flex items-center justify-center gap-2 ${
                     debugFilled === 'good'
                       ? 'bg-green-600 text-white'
                       : 'bg-green-100 hover:bg-green-200 text-green-800'
@@ -238,8 +231,7 @@ export function HypothesisGeneration() {
                   Filled with {debugFilled} quality hypotheses
                 </p>
               )}
-            </CardContent>
-          </Card>
+          </div>
         )}
       </div>
     </Layout>

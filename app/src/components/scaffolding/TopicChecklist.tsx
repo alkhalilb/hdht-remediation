@@ -1,3 +1,16 @@
+/**
+ * TopicChecklist Component
+ *
+ * RUBRIC DOMAIN: Data Synthesis / Closure (Domain 6)
+ *
+ * This scaffolding component helps students ensure they gather complete information
+ * by tracking required topics. It supports the "Data Synthesis" rubric domain which
+ * assesses whether students form a coherent summary linking findings to hypotheses.
+ * Complete topic coverage is a prerequisite for effective data synthesis.
+ *
+ * Also supports: Completeness remediation track
+ */
+
 import { Check, Circle } from 'lucide-react';
 
 interface TopicChecklistProps {
@@ -64,7 +77,7 @@ export function TopicChecklist({ requiredTopics, coveredTopics, showWarning }: T
   const percentComplete = Math.round((coveredCount / requiredTopics.length) * 100);
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="bg-white border border-gray-200 overflow-hidden">
       <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-gray-900">Required Topics</span>

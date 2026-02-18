@@ -1,7 +1,22 @@
+/**
+ * HypothesisMappingPrompt Component
+ *
+ * RUBRIC DOMAIN: Discriminating Questioning (Domain 2)
+ *
+ * This scaffolding component prompts students to connect each question to their
+ * stated hypotheses. It supports the "Discriminating Questioning" rubric domain
+ * which assesses whether questions help differentiate between competing diagnoses.
+ *
+ * By prompting "Which hypothesis does this question test?", students develop
+ * the habit of purposeful, hypothesis-driven questioning.
+ *
+ * Also supports: HypothesisAlignment remediation track
+ */
+
 import { useState } from 'react';
 import { HypothesisEntry } from '../../types';
 import { Button } from '../common';
-import { Check, X, HelpCircle } from 'lucide-react';
+import { Check, HelpCircle } from 'lucide-react';
 
 interface HypothesisMappingPromptProps {
   question: string;
@@ -53,7 +68,7 @@ export function HypothesisMappingPrompt({
     );
 
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+      <div className="bg-blue-50 border border-blue-200 p-4 mb-4">
         <div className="flex items-start gap-3">
           <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
             analysisResult.isDiscriminating ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'
@@ -99,7 +114,7 @@ export function HypothesisMappingPrompt({
   }
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+    <div className="bg-blue-50 border border-blue-200 p-4 mb-4">
       <p className="font-medium text-gray-900 mb-2">
         Which hypothesis does this question test?
       </p>

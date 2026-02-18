@@ -121,7 +121,7 @@ export function HypothesisPanel({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-visible">
+    <div className="bg-white border border-gray-200 overflow-visible">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -141,7 +141,7 @@ export function HypothesisPanel({
               {hypotheses.map((hypothesis) => (
                 <div
                   key={hypothesis.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50"
                 >
                   <span className="text-sm font-medium text-gray-900">{hypothesis.name}</span>
                   <div className="flex items-center gap-2">
@@ -199,12 +199,12 @@ export function HypothesisPanel({
                   onKeyDown={handleKeyDown}
                   onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                   placeholder="Add diagnosis..."
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 text-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {showSuggestions && suggestions.length > 0 && (
                   <div
                     ref={suggestionsRef}
-                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 shadow-lg max-h-60 overflow-y-auto"
                   >
                     {suggestions.map((suggestion, index) => (
                       <button
@@ -212,8 +212,8 @@ export function HypothesisPanel({
                         onClick={() => selectSuggestion(suggestion)}
                         className={`w-full px-3 py-2 text-left text-sm hover:bg-blue-50 ${
                           index === selectedIndex ? 'bg-blue-100' : ''
-                        } ${index === 0 ? 'rounded-t-lg' : ''} ${
-                          index === suggestions.length - 1 ? 'rounded-b-lg' : ''
+                        } ${index === 0 ? 'rounded-t' : ''} ${
+                          index === suggestions.length - 1 ? 'rounded-b' : ''
                         }`}
                       >
                         {suggestion}

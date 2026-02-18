@@ -4,7 +4,7 @@ import { useAppStore } from '../store';
 import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
 import { getPatientResponse, analyzeQuestion, assessPerformance } from '../services/api';
 import { classifyDeficit, analyzeAllDeficits } from '../services/scoring';
-import { Layout, PatientInfoBar, Button, Card, CardContent } from '../components/common';
+import { Layout, PatientInfoBar, Button } from '../components/common';
 import { HypothesisPanel, ChatWindow, QuestionInput, QuestionInputRef } from '../components/interview';
 import {
   TopicChecklist,
@@ -672,8 +672,8 @@ export function Interview() {
 
           {/* Planned questions */}
           {plannedQuestions.length > 0 && (
-            <Card>
-              <CardContent className="py-4">
+            <div className="border border-gray-200">
+              <div className="py-4">
                 <div className="flex items-center gap-2 mb-3">
                   <ListChecks className="w-4 h-4 text-blue-600" />
                   <h3 className="font-medium text-gray-900 text-sm">Planned Questions</h3>
@@ -700,14 +700,14 @@ export function Interview() {
                     </li>
                   ))}
                 </ul>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
 
           {/* Debug Panel - only visible in debug mode */}
           {isDebugMode() && (
-            <Card className="border-orange-300 bg-orange-50">
-              <CardContent className="py-4">
+            <div className="bg-white border border-gray-200border-orange-300 bg-orange-50">
+              <div className="py-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Bug className="w-4 h-4 text-orange-600" />
                   <h3 className="font-medium text-orange-900 text-sm">Debug Mode</h3>
@@ -739,29 +739,29 @@ export function Interview() {
                       <button
                         onClick={() => handleDebugFill('poor')}
                         disabled={debugFilling || isLoading}
-                        className="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-800 rounded-lg disabled:opacity-50 transition-colors"
+                        className="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-800 disabled:opacity-50 transition-colors"
                       >
                         {debugFilling ? 'Filling...' : 'Poor Interview'}
                       </button>
                       <button
                         onClick={() => handleDebugFill('medium')}
                         disabled={debugFilling || isLoading}
-                        className="w-full px-3 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg disabled:opacity-50 transition-colors"
+                        className="w-full px-3 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 disabled:opacity-50 transition-colors"
                       >
                         {debugFilling ? 'Filling...' : 'Medium Interview'}
                       </button>
                       <button
                         onClick={() => handleDebugFill('good')}
                         disabled={debugFilling || isLoading}
-                        className="w-full px-3 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-800 rounded-lg disabled:opacity-50 transition-colors"
+                        className="w-full px-3 py-2 text-sm bg-green-100 hover:bg-green-200 text-green-800 disabled:opacity-50 transition-colors"
                       >
                         {debugFilling ? 'Filling...' : 'Good Interview'}
                       </button>
                     </div>
                   </>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -769,8 +769,8 @@ export function Interview() {
       {/* Differential Ranking Modal */}
       {showRankingModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="max-w-lg mx-4 w-full">
-            <CardContent className="py-6">
+          <div className="bg-white border border-gray-200max-w-lg mx-4 w-full">
+            <div className="py-6">
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-900 mb-1">Rank Your Differential</h3>
                 <p className="text-sm text-gray-500">
@@ -791,7 +791,7 @@ export function Interview() {
                       onDragStart={() => handleDragStart(index)}
                       onDragOver={(e) => handleDragOver(e, index)}
                       onDragEnd={handleDragEnd}
-                      className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-grab active:cursor-grabbing ${
+                      className={`flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 cursor-grab active:cursor-grabbing ${
                         draggedIndex === index ? 'opacity-50 border-blue-400' : ''
                       }`}
                     >
@@ -829,16 +829,16 @@ export function Interview() {
                   Confirm Ranking
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
       {/* End confirmation modal */}
       {showEndConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="max-w-md mx-4">
-            <CardContent className="py-6">
+          <div className="bg-white border border-gray-200max-w-md mx-4">
+            <div className="py-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
@@ -849,7 +849,7 @@ export function Interview() {
                     You've asked {liveMetrics.questionCount} questions and covered{' '}
                     {liveMetrics.topicsCovered.length} topics.
                   </p>
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <div className="bg-gray-50 p-3 mb-4">
                     <p className="text-xs text-gray-500 mb-2">Your final differential (ranked):</p>
                     <ol className="text-sm space-y-1">
                       {rankedDifferential.map((h, i) => (
@@ -873,16 +873,16 @@ export function Interview() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Back confirmation modal */}
       {showBackConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="max-w-md mx-4">
-            <CardContent className="py-6">
+          <div className="bg-white border border-gray-200max-w-md mx-4">
+            <div className="py-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
@@ -903,15 +903,15 @@ export function Interview() {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Assessment loading overlay */}
       {assessmentProgress && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-xs mx-4 text-center">
+          <div className="bg-white p-6 max-w-xs mx-4 text-center">
             <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
             <p className="text-sm text-gray-700">Analyzing your interview...</p>
           </div>

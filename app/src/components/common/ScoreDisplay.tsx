@@ -31,7 +31,7 @@ export function ScoreDisplay({
   };
 
   return (
-    <div className={`${highlight ? 'bg-blue-50 p-3 rounded-lg border-2 border-blue-200' : ''}`}>
+    <div className={`${highlight ? 'bg-blue-50 p-3 border-2 border-blue-200' : ''}`}>
       <div className="flex items-center justify-between mb-1">
         <span className={`${sizeClasses[size].text} text-gray-700 ${highlight ? 'font-semibold' : ''}`}>
           {label}

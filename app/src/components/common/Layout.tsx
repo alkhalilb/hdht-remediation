@@ -71,13 +71,13 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {showHeader && (
         <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
                   <Stethoscope className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -124,7 +124,7 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
       {/* Bug Report Modal */}
       {showBugModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+          <div className="bg-white shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Bug className="w-5 h-5 text-gray-600" />
@@ -154,7 +154,7 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
                     value={bugDescription}
                     onChange={(e) => setBugDescription(e.target.value)}
                     placeholder="Describe the bug..."
-                    className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full h-32 px-3 py-2 border border-gray-300 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-400 mt-2">
                     Page: {location.pathname}
@@ -174,7 +174,7 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
                 <button
                   onClick={handleSubmitBugReport}
                   disabled={!bugDescription.trim() || isSubmitting}
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   {isSubmitting ? 'Submitting...' : 'Submit Report'}

@@ -50,7 +50,7 @@ export function TrackIntro() {
           {currentCase.title}
         </h2>
 
-        <div className="p-4 bg-gray-50 rounded-lg mb-4">
+        <div className="p-4 bg-gray-50 mb-4">
           <p className="text-gray-700">
             {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
           </p>

@@ -40,7 +40,7 @@ export function GlobalRatingBadge({ rating, rationale }: GlobalRatingBadgeProps)
   const Icon = config.Icon;
 
   return (
-    <div className="text-center p-6 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-gray-200">
+    <div className="text-center p-6 bg-gradient-to-b from-gray-50 to-white border border-gray-200">
       <div className="text-sm font-medium text-gray-500 mb-2">Overall Performance</div>
       <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${config.bg} mb-3`}>
         <Icon className={`w-5 h-5 ${config.text}`} />
@@ -68,7 +68,7 @@ function DomainScoreCard({ domain, isHighlighted, defaultExpanded = false }: Dom
   const displayName = DOMAIN_DISPLAY_NAMES[domain.domain];
 
   return (
-    <div className={`rounded-lg border-2 transition-all ${isHighlighted ? 'border-blue-400 bg-blue-50/50 shadow-md' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+    <div className={`border-2 transition-all ${isHighlighted ? 'border-blue-400 bg-blue-50/50 shadow-md' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full p-4 flex items-center justify-between text-left"
@@ -122,7 +122,7 @@ function DomainScoreCard({ domain, isHighlighted, defaultExpanded = false }: Dom
           <p className="text-sm text-gray-700 mb-3">{domain.rationale}</p>
 
           {domain.behavioralEvidence && domain.behavioralEvidence.length > 0 && (
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-gray-50 p-3">
               <div className="text-xs font-medium text-gray-500 mb-2">Behavioral Evidence</div>
               <ul className="space-y-1">
                 {domain.behavioralEvidence.map((evidence, i) => (
@@ -150,7 +150,7 @@ export function FeedbackSection({ strengths, improvements }: FeedbackSectionProp
   return (
     <div className="grid md:grid-cols-2 gap-4">
       {strengths.length > 0 && (
-        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+        <div className="p-4 bg-green-50 border border-green-200">
           <div className="flex items-center gap-2 mb-3">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
             <h4 className="font-semibold text-green-800">Strengths</h4>
@@ -167,7 +167,7 @@ export function FeedbackSection({ strengths, improvements }: FeedbackSectionProp
       )}
 
       {improvements.length > 0 && (
-        <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+        <div className="p-4 bg-amber-50 border border-amber-200">
           <div className="flex items-center gap-2 mb-3">
             <Target className="w-5 h-5 text-amber-600" />
             <h4 className="font-semibold text-amber-800">Areas for Improvement</h4>

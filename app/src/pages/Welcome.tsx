@@ -24,7 +24,7 @@ export function Welcome() {
           The program finds where you're getting stuck and gives you focused reps on that skill.
         </p>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6">
+        <div className="bg-white border border-gray-200 p-5 mb-6">
           <h2 className="font-semibold text-gray-900 mb-3">How it works</h2>
           <ol className="space-y-2 text-sm text-gray-700 list-decimal list-inside">
             <li><strong>Diagnostic case</strong> (15–20 min) — identifies your specific area for improvement</li>

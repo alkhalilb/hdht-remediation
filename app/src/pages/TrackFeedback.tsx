@@ -76,7 +76,7 @@ export function TrackFeedback() {
         ) : assessment?.feedback ? (
           <div className="mb-8">
             {assessment.feedback.strengths.length > 0 && (
-              <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="mb-4 p-4 bg-green-50 border border-green-200">
                 <h3 className="font-medium text-green-800 mb-2 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
                   Strengths
@@ -92,7 +92,7 @@ export function TrackFeedback() {
               </div>
             )}
             {assessment.feedback.improvements.length > 0 && (
-              <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="p-4 bg-amber-50 border border-amber-200">
                 <h3 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
                   <Target className="w-5 h-5" />
                   Areas for Improvement

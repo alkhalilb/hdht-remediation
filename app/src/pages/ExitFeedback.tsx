@@ -69,7 +69,7 @@ export function ExitFeedback() {
         </div>
 
         {/* Result */}
-        <div className={`mb-8 p-5 rounded-lg border-2 ${exitPassed ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
+        <div className={`mb-8 p-5 border-2 ${exitPassed ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
           <div className="flex items-center justify-center gap-6 mb-4">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Overall Score</p>
@@ -190,7 +190,7 @@ export function ExitFeedback() {
               </div>
             )}
 
-            <div className={`p-3 rounded-lg text-sm ${exitPassed ? 'bg-green-50 text-green-800' : 'bg-blue-50 text-blue-800'}`}>
+            <div className={`p-3 text-sm ${exitPassed ? 'bg-green-50 text-green-800' : 'bg-blue-50 text-blue-800'}`}>
               <span className="font-medium">{trackName}:</span> {assessment.feedback.deficitSpecific}
             </div>
           </div>

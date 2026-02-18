@@ -68,7 +68,7 @@ export function CategoryLabels({ currentCategory, suggestedSequence }: CategoryL
   const currentGroup = getCurrentGroup();
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-white border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="font-semibold text-gray-900">Question Categories</span>
         {currentGroup && (

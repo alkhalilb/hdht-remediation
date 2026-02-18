@@ -1,3 +1,22 @@
+/**
+ * AlertBanner Component
+ *
+ * RUBRIC DOMAINS: Multiple
+ * - Sequencing & Strategy (Domain 3): CategoryJumpAlert
+ * - Efficiency & Relevance (Domain 5): RedundancyAlert, EfficiencyAlert
+ * - Data Synthesis (Domain 6): MissingTopicAlert
+ *
+ * This scaffolding component provides real-time feedback on various aspects
+ * of the student's interview technique, supporting multiple rubric domains
+ * depending on the alert type triggered.
+ *
+ * Alert types map to remediation tracks:
+ * - CategoryJumpAlert → Organization track
+ * - RedundancyAlert → Efficiency track
+ * - EfficiencyAlert → Efficiency track
+ * - MissingTopicAlert → Completeness track
+ */
+
 import { AlertTriangle, Info, CheckCircle, X } from 'lucide-react';
 
 interface AlertBannerProps {
@@ -47,7 +66,7 @@ export function AlertBanner({ type, title, message, onDismiss }: AlertBannerProp
   const Icon = style.icon;
 
   return (
-    <div className={`${style.bg} ${style.border} border rounded-lg mb-4`} style={{ padding: '16px' }}>
+    <div className={`${style.bg} ${style.border} border mb-4`} style={{ padding: '16px' }}>
       <div className="flex items-start gap-3">
         <Icon className={`w-5 h-5 ${style.iconColor} flex-shrink-0 mt-0.5`} />
         <div className="flex-1">
