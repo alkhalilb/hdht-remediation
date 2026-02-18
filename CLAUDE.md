@@ -97,9 +97,6 @@ cd app && npm run build
 - `POST /api/analyze-question` - Analyze question quality and categorization
 - `POST /api/evaluate-hypotheses` - Evaluate student's differential diagnosis
 - `POST /api/assess-performance` - Full case assessment with rubric scoring
-- `POST /api/tts` - Text-to-speech via ElevenLabs (with browser fallback)
-- `POST /api/bug-report` - Submit a bug report
-- `GET /api/bug-reports` - Retrieve all bug reports
 - `GET /api/health` - Health check endpoint
 
 ## Security
@@ -107,8 +104,6 @@ cd app && npm run build
 - Debug mode restricted to `import.meta.env.DEV` (Vite strips from production builds)
 - Rate limiting: 100 requests/15min on all `/api/` routes
 - CORS: restricted to localhost + `FRONTEND_URL` + `hdht-remediation*.vercel.app`
-- **Input validation**: Max length on bug report inputs (description: 5000 chars, session state: 10000 chars)
-- **Admin auth**: Bearer token auth (`ADMIN_TOKEN`) required on GET /api/bug-reports endpoint
 - **Generic error messages**: Internal error details are not leaked to clients
 - Security audit completed February 2026
 
@@ -117,8 +112,6 @@ cd app && npm run build
 ### Server (.env)
 ```
 ANTHROPIC_API_KEY=your_key_here
-ELEVENLABS_API_KEY=your_elevenlabs_key_here  # For natural TTS
-ADMIN_TOKEN=your_admin_token_here            # Required for GET /api/bug-reports
 FRONTEND_URL=https://hdht-remediation.vercel.app
 PORT=3001
 ```
