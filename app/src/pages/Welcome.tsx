@@ -20,8 +20,8 @@ export function Welcome() {
           History Taking Skills
         </h1>
         <p className="text-gray-600 mb-6">
-          This program identifies gaps in your hypothesis-driven history-taking
-          and gives you targeted practice with virtual patients.
+          Practice hypothesis-driven history-taking with virtual patients.
+          The program finds where you're getting stuck and gives you focused reps on that skill.
         </p>
 
         <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6">

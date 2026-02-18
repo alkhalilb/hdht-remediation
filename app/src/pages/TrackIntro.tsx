@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { getTrackCases } from '../data/cases';
-import { Layout, Button, Card, CardContent } from '../components/common';
+import { Layout, Button } from '../components/common';
 import { getDeficitDisplayName, getScaffoldingExplanation } from '../services/scoring';
-import { BookOpen, ArrowRight, Info } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export function TrackIntro() {
   const navigate = useNavigate();
@@ -25,7 +25,6 @@ export function TrackIntro() {
   }
 
   const handleStart = () => {
-    // Clear previous case state before starting new case
     clearMessages();
     setHypotheses([]);
     setPlannedQuestions([]);
@@ -41,61 +40,43 @@ export function TrackIntro() {
 
   return (
     <Layout>
-      <div>
+      <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-xl font-bold text-gray-900">{trackName} Track</h1>
           <p className="text-sm text-gray-500">Practice case {currentTrackCaseIndex + 1} of 3</p>
         </div>
 
-        <Card className="mb-6">
-          <CardContent className="py-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              {currentCase.title}
-            </h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          {currentCase.title}
+        </h2>
 
-            <div className="p-4 bg-gray-50 rounded-lg mb-4">
-              <h3 className="font-medium text-gray-900 mb-2">Patient Preview</h3>
-              <p className="text-gray-700">
-                {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
-              </p>
-              <p className="text-gray-700">
-                Chief Complaint: "{currentCase.chiefComplaint}"
-              </p>
-            </div>
-
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-medium text-blue-900 mb-1">
-                    Scaffolding Level: {currentCase.scaffoldingLevel?.charAt(0).toUpperCase()}{currentCase.scaffoldingLevel?.slice(1)}
-                  </h3>
-                  <p className="text-sm text-blue-800">
-                    {scaffoldingExplanation}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardContent className="py-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Remember: {trackName}</h3>
-            <ol className="space-y-1.5 text-sm text-gray-700 list-decimal list-inside">
-              {getTrackReminders(assignedTrack).map((reminder, index) => (
-                <li key={index}>{reminder}</li>
-              ))}
-            </ol>
-          </CardContent>
-        </Card>
-
-        <div className="text-center">
-          <Button size="lg" onClick={handleStart}>
-            Start Practice Case
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
+        <div className="p-4 bg-gray-50 rounded-lg mb-4">
+          <p className="text-gray-700">
+            {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
+          </p>
+          <p className="text-gray-700">
+            Chief Complaint: "{currentCase.chiefComplaint}"
+          </p>
         </div>
+
+        <p className="text-sm text-gray-600 mb-6">
+          <strong className="text-gray-900">Scaffolding ({currentCase.scaffoldingLevel}):</strong>{' '}
+          {scaffoldingExplanation}
+        </p>
+
+        <div className="mb-8">
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">Keep in mind</h3>
+          <ol className="space-y-1.5 text-sm text-gray-700 list-decimal list-inside">
+            {getTrackReminders(assignedTrack).map((reminder, index) => (
+              <li key={index}>{reminder}</li>
+            ))}
+          </ol>
+        </div>
+
+        <Button size="lg" onClick={handleStart}>
+          Start Practice Case
+          <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
       </div>
     </Layout>
   );
@@ -105,7 +86,7 @@ function getTrackReminders(track: string): string[] {
   switch (track) {
     case 'organization':
       return [
-        'Start with the HPI - explore the chief complaint thoroughly',
+        'Start with the HPI — explore the chief complaint thoroughly',
         'Complete one topic before moving to the next',
         'Follow the sequence: HPI → PMH → Meds → Family → Social → ROS',
         'Avoid jumping back to topics you\'ve already covered',
@@ -113,7 +94,7 @@ function getTrackReminders(track: string): string[] {
 
     case 'completeness':
       return [
-        'Cover all required domains - don\'t skip any major categories',
+        'Cover all required domains — don\'t skip any major categories',
         'Ask sufficient depth within each topic',
         'Watch the checklist to track your coverage',
         'Don\'t end the interview with important topics missing',
@@ -131,7 +112,7 @@ function getTrackReminders(track: string): string[] {
       return [
         'Avoid asking the same question in different ways',
         'Focus on discriminating questions, not "nice to know" info',
-        'Aim to complete the history in 15-25 questions',
+        'Aim to complete the history in 15–25 questions',
         'Each question should have a clear purpose',
       ];
 

@@ -26,18 +26,18 @@
   --color-danger-500: #ef4444;
   --color-danger-600: #dc2626;
 
-  /* Remap blue palette to teal */
-  --color-blue-50: #f0fdfa;
-  --color-blue-100: #ccfbf1;
-  --color-blue-200: #99f6e4;
-  --color-blue-300: #5eead4;
-  --color-blue-400: #2dd4bf;
-  --color-blue-500: #14b8a6;
-  --color-blue-600: #0d9488;
-  --color-blue-700: #0f766e;
-  --color-blue-800: #115e59;
-  --color-blue-900: #134e4a;
-  --color-blue-950: #042f2e;
+  /* Remap blue palette to Northwestern purple */
+  --color-blue-50: #f8f5fc;
+  --color-blue-100: #efe8f7;
+  --color-blue-200: #dccbee;
+  --color-blue-300: #c3a7e0;
+  --color-blue-400: #a47ccf;
+  --color-blue-500: #7a3fad;
+  --color-blue-600: #4E2A84;
+  --color-blue-700: #40216e;
+  --color-blue-800: #351b5a;
+  --color-blue-900: #291546;
+  --color-blue-950: #190c2d;
 }
 
 * {

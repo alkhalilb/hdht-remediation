@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, Card, CardContent, RubricDisplay } from '../components/common';
+import { Layout, Button, RubricDisplay } from '../components/common';
 import { getDeficitDisplayName } from '../services/scoring';
-import { CheckCircle, ArrowRight, Target, MessageSquare, ChevronDown, ChevronUp, RotateCcw, ListOrdered, CheckCircle2 } from 'lucide-react';
+import { CheckCircle, ArrowRight, Target, MessageSquare, ChevronDown, ChevronUp, RotateCcw, ListOrdered } from 'lucide-react';
 import { RubricAssessment, RubricDomain } from '../types';
 
 export function TrackFeedback() {
@@ -65,7 +65,7 @@ export function TrackFeedback() {
 
         {/* Rubric Assessment - Main Display */}
         {rubric ? (
-          <div className="mb-6">
+          <div className="mb-8">
             <RubricDisplay
               rubric={rubric}
               highlightDomain={primaryDeficitDomain as RubricDomain}
@@ -74,155 +74,143 @@ export function TrackFeedback() {
             />
           </div>
         ) : assessment?.feedback ? (
-          // Fallback to legacy feedback if no rubric
-          <Card className="mb-6">
-            <CardContent className="py-4">
-              {assessment.feedback.strengths.length > 0 && (
-                <div className="mb-4 p-4 bg-green-50 rounded-xl border border-green-200">
-                  <h3 className="font-medium text-green-800 mb-2 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    Strengths
-                  </h3>
-                  <ul className="space-y-1">
-                    {assessment.feedback.strengths.map((s, i) => (
-                      <li key={i} className="text-sm text-green-700 flex items-start gap-2">
-                        <span className="text-green-400 mt-0.5">✓</span>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {assessment.feedback.improvements.length > 0 && (
-                <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
-                  <h3 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Areas for Improvement
-                  </h3>
-                  <ul className="space-y-1">
-                    {assessment.feedback.improvements.map((s, i) => (
-                      <li key={i} className="text-sm text-amber-700 flex items-start gap-2">
-                        <span className="text-amber-400 mt-0.5">→</span>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="mb-8">
+            {assessment.feedback.strengths.length > 0 && (
+              <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                <h3 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Strengths
+                </h3>
+                <ul className="space-y-1">
+                  {assessment.feedback.strengths.map((s, i) => (
+                    <li key={i} className="text-sm text-green-700 flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">✓</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {assessment.feedback.improvements.length > 0 && (
+              <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <h3 className="font-medium text-amber-800 mb-2 flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Areas for Improvement
+                </h3>
+                <ul className="space-y-1">
+                  {assessment.feedback.improvements.map((s, i) => (
+                    <li key={i} className="text-sm text-amber-700 flex items-start gap-2">
+                      <span className="text-amber-400 mt-0.5">→</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         ) : null}
 
-        {/* Differential Review */}
         {hypotheses.length > 0 && (
-          <Card className="mb-6">
+          <div className="border-t border-gray-200 py-3">
             <button
               onClick={() => setShowDifferential(!showDifferential)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
-                <ListOrdered className="w-5 h-5 text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Your Differential Diagnosis</h2>
-                <span className="text-sm text-gray-500">({hypotheses.length} diagnoses)</span>
+                <ListOrdered className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Your Differential Diagnosis</span>
+                <span className="text-xs text-gray-400">({hypotheses.length})</span>
               </div>
               {showDifferential ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-gray-400" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               )}
             </button>
             {showDifferential && (
-              <CardContent className="border-t border-gray-100">
-                <div className="space-y-3">
-                  {[...hypotheses]
-                    .sort((a, b) => b.confidence - a.confidence)
-                    .map((h, i) => (
-                      <div key={h.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
-                        <span className="text-sm font-bold text-gray-400 w-6">#{i + 1}</span>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{h.name}</p>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <div
-                              key={star}
-                              className={`w-2 h-2 rounded-full ${
-                                star <= h.confidence ? 'bg-blue-500' : 'bg-gray-200'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        )}
-
-        {/* Conversation Review */}
-        {questions.length > 0 && (
-          <Card className="mb-6">
-            <button
-              onClick={() => setShowConversation(!showConversation)}
-              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Review Your Interview</h2>
-                <span className="text-sm text-gray-500">({questions.length} questions)</span>
-              </div>
-              {showConversation ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
-              )}
-            </button>
-            {showConversation && (
-              <CardContent className="border-t border-gray-100">
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {questions.map((q, i) => (
-                    <div key={q.id} className="border-b border-gray-100 pb-4 last:border-0">
-                      <div className="flex items-start gap-3">
-                        <span className="text-xs font-medium text-gray-400 mt-1">Q{i + 1}</span>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-blue-800 mb-1">{q.text}</p>
-                          <p className="text-sm text-gray-600">{q.response}</p>
-                          {q.analysis && (
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
-                                {q.analysis.category}
-                              </span>
-                              {q.analysis.isDiscriminating && (
-                                <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
-                                  Discriminating
-                                </span>
-                              )}
-                              {q.analysis.isRedundant && (
-                                <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">
-                                  Redundant
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
+              <div className="mt-3 space-y-2">
+                {[...hypotheses]
+                  .sort((a, b) => b.confidence - a.confidence)
+                  .map((h, i) => (
+                    <div key={h.id} className="flex items-center gap-3 py-1.5">
+                      <span className="text-sm font-bold text-gray-400 w-6">#{i + 1}</span>
+                      <p className="text-sm text-gray-900 flex-1">{h.name}</p>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <div
+                            key={star}
+                            className={`w-2 h-2 rounded-full ${
+                              star <= h.confidence ? 'bg-blue-500' : 'bg-gray-200'
+                            }`}
+                          />
+                        ))}
                       </div>
                     </div>
                   ))}
-                </div>
-              </CardContent>
+              </div>
             )}
-          </Card>
+          </div>
         )}
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-8 text-sm text-gray-600">
+        {questions.length > 0 && (
+          <div className="border-t border-gray-200 py-3">
+            <button
+              onClick={() => setShowConversation(!showConversation)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Review Your Interview</span>
+                <span className="text-xs text-gray-400">({questions.length} questions)</span>
+              </div>
+              {showConversation ? (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+            {showConversation && (
+              <div className="mt-3 space-y-4 max-h-96 overflow-y-auto">
+                {questions.map((q, i) => (
+                  <div key={q.id} className="border-b border-gray-100 pb-3 last:border-0">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xs font-medium text-gray-400 mt-1">Q{i + 1}</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-blue-800 mb-1">{q.text}</p>
+                        <p className="text-sm text-gray-600">{q.response}</p>
+                        {q.analysis && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                              {q.analysis.category}
+                            </span>
+                            {q.analysis.isDiscriminating && (
+                              <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                                Discriminating
+                              </span>
+                            )}
+                            {q.analysis.isRedundant && (
+                              <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded">
+                                Redundant
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="border-t border-gray-200 pt-4 mb-8 text-sm text-gray-600">
           <p>
             <strong className="text-gray-900">Progress:</strong> {currentTrackCaseIndex + 1} of 3 practice cases complete.
             {isLastTrackCase ? ' Exit case is next.' : ` ${3 - currentTrackCaseIndex - 1} remaining before exit case.`}
           </p>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button variant="outline" onClick={handleRetry}>
             <RotateCcw className="w-5 h-5 mr-2" />
@@ -234,7 +222,6 @@ export function TrackFeedback() {
           </Button>
         </div>
 
-        {/* Footer Note */}
         <div className="mt-8 text-center text-xs text-gray-400">
           Assessment framework derived from Calgary-Cambridge Guide (Silverman et al., 2013),
           SEGUE Framework (Makoul, 2001), and diagnostic reasoning literature (Bowen, 2006; Kassirer, 2010)

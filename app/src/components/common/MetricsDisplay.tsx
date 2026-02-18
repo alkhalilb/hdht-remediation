@@ -310,7 +310,7 @@ function MetricSection({
   const colors = summaryStatus ? statusColors[summaryStatus] : null;
 
   return (
-    <div className={`rounded-xl mb-4 overflow-hidden border-2 transition-all duration-200 ${
+    <div className={`rounded-lg mb-4 overflow-hidden border-2 transition-all duration-200 ${
       highlight
         ? 'border-blue-300 bg-blue-50/50'
         : 'border-gray-200 bg-white hover:border-gray-300'

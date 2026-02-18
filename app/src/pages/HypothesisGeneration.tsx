@@ -75,25 +75,15 @@ export function HypothesisGeneration() {
   return (
     <Layout showProgress={true}>
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-            <Brain className="w-8 h-8 text-blue-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Hypothesis Generation</h1>
-          <p className="text-gray-600">
-            Before interviewing the patient, generate your initial differential diagnosis.
-          </p>
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-gray-900">Hypothesis Generation</h1>
+          <p className="text-sm text-gray-500">Review the case, then enter your initial differential before interviewing.</p>
         </div>
 
         {/* Patient Card */}
         <Card className="mb-6">
           <CardContent className="py-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Stethoscope className="w-6 h-6 text-gray-600" />
-              </div>
-              <div className="flex-1">
+            <div>
                 <h2 className="font-semibold text-gray-900 text-lg mb-1">
                   {currentCase.patient.name}
                 </h2>
@@ -129,7 +119,6 @@ export function HypothesisGeneration() {
                     <span className="ml-1 font-medium">{currentCase.vitalSigns.spo2}%</span>
                   </div>
                 </div>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -199,14 +188,6 @@ export function HypothesisGeneration() {
             Start Patient Interview
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
-        </div>
-
-        {/* Educational Note */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>
-            Your hypotheses will guide your questioning strategy.
-            Each question you ask should help confirm or rule out one of your diagnoses.
-          </p>
         </div>
 
         {/* Debug Panel */}
