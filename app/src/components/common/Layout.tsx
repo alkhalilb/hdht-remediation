@@ -1,10 +1,8 @@
-import { ReactNode, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useProgress, useAppStore } from '../../store';
 import { ProgressBar } from './ProgressBar';
-import { Stethoscope, BookOpen, CheckCircle, Bug, X, Loader2 } from 'lucide-react';
-
-const API_URL = '/api';
+import { Stethoscope, CheckCircle } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,12 +14,6 @@ interface LayoutProps {
 export function Layout({ children, showProgress = true, showHeader = true, fullWidth = false }: LayoutProps) {
   const { percentComplete, currentStep, totalSteps } = useProgress();
   const { phase } = useAppStore();
-  const location = useLocation();
-
-  const [showBugModal, setShowBugModal] = useState(false);
-  const [bugDescription, setBugDescription] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const getPhaseLabel = () => {
     switch (phase) {
@@ -37,36 +29,6 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
       case 'exit_feedback': return 'Results';
       case 'completion': return 'Complete!';
       default: return '';
-    }
-  };
-
-  const handleSubmitBugReport = async () => {
-    if (!bugDescription.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const response = await fetch(`${API_URL}/bug-report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: bugDescription,
-          page: location.pathname,
-          userAgent: navigator.userAgent,
-        }),
-      });
-
-      if (response.ok) {
-        setSubmitSuccess(true);
-        setBugDescription('');
-        setTimeout(() => {
-          setShowBugModal(false);
-          setSubmitSuccess(false);
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('Failed to submit bug report:', error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -109,81 +71,6 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
           </div>
         )}
       </main>
-
-      <footer className="py-4">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
-          <button
-            onClick={() => setShowBugModal(true)}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            Report a bug
-          </button>
-        </div>
-      </footer>
-
-      {/* Bug Report Modal */}
-      {showBugModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Bug className="w-5 h-5 text-gray-600" />
-                Report a Bug
-              </h2>
-              <button
-                onClick={() => setShowBugModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-4">
-              {submitSuccess ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                  <p className="text-gray-900 font-medium">Thank you!</p>
-                  <p className="text-gray-600 text-sm">Your bug report has been submitted.</p>
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Describe the issue you encountered. Include what you were doing and what you expected to happen.
-                  </p>
-                  <textarea
-                    value={bugDescription}
-                    onChange={(e) => setBugDescription(e.target.value)}
-                    placeholder="Describe the bug..."
-                    className="w-full h-32 px-3 py-2 border border-gray-300 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-400 mt-2">
-                    Page: {location.pathname}
-                  </p>
-                </>
-              )}
-            </div>
-
-            {!submitSuccess && (
-              <div className="flex justify-end gap-2 p-4 border-t">
-                <button
-                  onClick={() => setShowBugModal(false)}
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmitBugReport}
-                  disabled={!bugDescription.trim() || isSubmitting}
-                  className="px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {isSubmitting ? 'Submitting...' : 'Submit Report'}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

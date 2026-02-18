@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button, ScoreGrid } from '../components/common';
+import { Layout, Button, Card, CardContent, ScoreGrid } from '../components/common';
 import { getDeficitDisplayName } from '../services/scoring';
-import { Award, CheckCircle, AlertTriangle, RotateCcw, Download } from 'lucide-react';
+import { CheckCircle, AlertTriangle, RotateCcw, Download } from 'lucide-react';
 
 export function Completion() {
   const navigate = useNavigate();
@@ -121,71 +121,75 @@ export function Completion() {
         )}
 
         {/* Summary */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
+        <Card className="mb-6">
+          <CardContent>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="p-4 bg-gray-50 text-center">
-              <p className="text-sm text-gray-600 mb-1">Total Time</p>
-              <p className="text-xl font-bold text-gray-900">
-                {Math.round(student?.totalTimeMinutes || 0)} min
-              </p>
-            </div>
-            <div className="p-4 bg-gray-50 text-center">
-              <p className="text-sm text-gray-600 mb-1">Total Questions</p>
-              <p className="text-xl font-bold text-gray-900">
-                {student?.totalQuestions || 0}
-              </p>
-            </div>
-            <div className="p-4 bg-gray-50 text-center">
-              <p className="text-sm text-gray-600 mb-1">Focus Area</p>
-              <p className="text-xl font-bold text-gray-900">{trackName}</p>
-            </div>
-            <div className="p-4 bg-gray-50 text-center">
-              <p className="text-sm text-gray-600 mb-1">Cases Completed</p>
-              <p className="text-xl font-bold text-gray-900">
-                {1 + trackScores.length + exitAttempts}
-              </p>
-            </div>
-          </div>
-
-          <h3 className="font-medium text-gray-900 mb-3">{trackName} Score Progression</h3>
-          <div className="flex items-center justify-between text-sm mb-4">
-            <div className="text-center">
-              <p className="text-gray-500">Diagnostic</p>
-              <p className={`text-lg font-bold ${
-                diagnosticFocusScore >= 60 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {diagnosticFocusScore}
-              </p>
-            </div>
-            {trackScores.map((score, index) => (
-              <div key={index} className="text-center">
-                <p className="text-gray-500">Case {index + 1}</p>
-                <p className={`text-lg font-bold ${
-                  (score[focusKey as keyof typeof score] as number) >= 60 ? 'text-green-600' : 'text-yellow-600'
-                }`}>
-                  {score[focusKey as keyof typeof score] as number}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="p-4 bg-gray-50 text-center">
+                <p className="text-sm text-gray-600 mb-1">Total Time</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {Math.round(student?.totalTimeMinutes || 0)} min
                 </p>
               </div>
-            ))}
-            <div className="text-center">
-              <p className="text-gray-500">Exit</p>
-              <p className={`text-lg font-bold ${
-                exitFocusScore >= 60 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {exitFocusScore}
-              </p>
+              <div className="p-4 bg-gray-50 text-center">
+                <p className="text-sm text-gray-600 mb-1">Total Questions</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {student?.totalQuestions || 0}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 text-center">
+                <p className="text-sm text-gray-600 mb-1">Focus Area</p>
+                <p className="text-xl font-bold text-gray-900">{trackName}</p>
+              </div>
+              <div className="p-4 bg-gray-50 text-center">
+                <p className="text-sm text-gray-600 mb-1">Cases Completed</p>
+                <p className="text-xl font-bold text-gray-900">
+                  {1 + trackScores.length + exitAttempts}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+
+            <h3 className="font-medium text-gray-900 mb-3">{trackName} Score Progression</h3>
+            <div className="flex items-center justify-between text-sm">
+              <div className="text-center">
+                <p className="text-gray-500">Diagnostic</p>
+                <p className={`text-lg font-bold ${
+                  diagnosticFocusScore >= 60 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {diagnosticFocusScore}
+                </p>
+              </div>
+              {trackScores.map((score, index) => (
+                <div key={index} className="text-center">
+                  <p className="text-gray-500">Case {index + 1}</p>
+                  <p className={`text-lg font-bold ${
+                    (score[focusKey as keyof typeof score] as number) >= 60 ? 'text-green-600' : 'text-yellow-600'
+                  }`}>
+                    {score[focusKey as keyof typeof score] as number}
+                  </p>
+                </div>
+              ))}
+              <div className="text-center">
+                <p className="text-gray-500">Exit</p>
+                <p className={`text-lg font-bold ${
+                  exitFocusScore >= 60 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {exitFocusScore}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Exit scores */}
         {exitScores && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Final Exit Case Scores</h2>
-            <ScoreGrid scores={exitScores} highlightDimension={assignedTrack || undefined} />
-          </div>
+          <Card className="mb-8">
+            <CardContent>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Final Exit Case Scores</h2>
+              <ScoreGrid scores={exitScores} highlightDimension={assignedTrack || undefined} />
+            </CardContent>
+          </Card>
         )}
 
         {/* Actions */}

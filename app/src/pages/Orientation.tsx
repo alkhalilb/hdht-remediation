@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
-import { Layout, Button } from '../components/common';
+import { Layout, Button, Card, CardContent } from '../components/common';
 import { setDebugMode, isDebugMode } from '../data/debugInterviews';
 import { ChevronRight, ChevronLeft, Bug } from 'lucide-react';
 
@@ -188,15 +188,17 @@ export function Orientation() {
           ))}
         </div>
 
-        <div>
-          <div className="mb-5">
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{slide.title}</h2>
-            <p className="text-sm text-gray-500">{slide.subtitle}</p>
-          </div>
-          <div className="text-gray-700">
-            {slide.content}
-          </div>
-        </div>
+        <Card>
+          <CardContent>
+            <div className="mb-5">
+              <h2 className="text-xl font-bold text-gray-900 mb-1">{slide.title}</h2>
+              <p className="text-sm text-gray-500">{slide.subtitle}</p>
+            </div>
+            <div className="text-gray-700">
+              {slide.content}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Navigation */}
         <div className="flex items-center justify-between mt-8">

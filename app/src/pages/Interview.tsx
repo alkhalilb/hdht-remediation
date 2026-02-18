@@ -4,7 +4,7 @@ import { useAppStore } from '../store';
 import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
 import { getPatientResponse, analyzeQuestion, assessPerformance } from '../services/api';
 import { classifyDeficit, analyzeAllDeficits } from '../services/scoring';
-import { Layout, PatientInfoBar, Button } from '../components/common';
+import { Layout, PatientInfoBar, Button, Card, CardContent } from '../components/common';
 import { HypothesisPanel, ChatWindow, QuestionInput, QuestionInputRef } from '../components/interview';
 import {
   TopicChecklist,
@@ -66,26 +66,6 @@ export function Interview() {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [debugFilling, setDebugFilling] = useState(false);
   const [debugComplete, setDebugComplete] = useState<DebugQuality | null>(null);
-
-  // Voice settings - persist in localStorage
-  const [voiceInputEnabled, setVoiceInputEnabled] = useState(() => {
-    return localStorage.getItem('hdht-voice-input') === 'true';
-  });
-  const [ttsEnabled, setTtsEnabled] = useState(() => {
-    if (isDebugMode()) return false;
-    return localStorage.getItem('hdht-tts') === 'true';
-  });
-
-  // Persist voice settings
-  const handleToggleVoiceInput = (enabled: boolean) => {
-    setVoiceInputEnabled(enabled);
-    localStorage.setItem('hdht-voice-input', enabled ? 'true' : 'false');
-  };
-
-  const handleToggleTTS = (enabled: boolean) => {
-    setTtsEnabled(enabled);
-    localStorage.setItem('hdht-tts', enabled ? 'true' : 'false');
-  };
 
   // Get planned questions from store
   const plannedQuestions = useAppStore((state) => state.plannedQuestions);
@@ -624,7 +604,7 @@ export function Interview() {
           )}
 
           {/* Chat window */}
-          <ChatWindow messages={messages} isLoading={isLoading} ttsEnabled={ttsEnabled} patientSex={currentCase?.patient.sex} />
+          <ChatWindow messages={messages} isLoading={isLoading} />
 
           {/* Question input */}
           <QuestionInput
@@ -635,10 +615,6 @@ export function Interview() {
             showHint={scaffolding.promptHypothesisMapping !== 'none' && hypotheses.length > 0
               ? "Consider: which of your hypotheses will this question help test?"
               : undefined}
-            voiceInputEnabled={voiceInputEnabled}
-            ttsEnabled={ttsEnabled}
-            onToggleVoiceInput={handleToggleVoiceInput}
-            onToggleTTS={handleToggleTTS}
           />
         </div>
 
@@ -672,8 +648,8 @@ export function Interview() {
 
           {/* Planned questions */}
           {plannedQuestions.length > 0 && (
-            <div className="border border-gray-200">
-              <div className="py-4">
+            <Card>
+              <CardContent>
                 <div className="flex items-center gap-2 mb-3">
                   <ListChecks className="w-4 h-4 text-blue-600" />
                   <h3 className="font-medium text-gray-900 text-sm">Planned Questions</h3>
@@ -683,7 +659,7 @@ export function Interview() {
                   {plannedQuestions.map((q, index) => (
                     <li
                       key={index}
-                      className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm group"
+                      className="flex items-center justify-between bg-gray-50 px-3 py-2 text-sm group"
                     >
                       <span className="text-gray-700 flex-1 truncate">{q}</span>
                       <button
@@ -700,13 +676,13 @@ export function Interview() {
                     </li>
                   ))}
                 </ul>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Debug Panel - only visible in debug mode */}
           {isDebugMode() && (
-            <div className="bg-white border border-gray-200border-orange-300 bg-orange-50">
+            <div className="bg-white border border-orange-300 bg-orange-50">
               <div className="py-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Bug className="w-4 h-4 text-orange-600" />
@@ -769,7 +745,7 @@ export function Interview() {
       {/* Differential Ranking Modal */}
       {showRankingModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white border border-gray-200max-w-lg mx-4 w-full">
+          <div className="bg-white border border-gray-200 max-w-lg mx-4 w-full">
             <div className="py-6">
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-900 mb-1">Rank Your Differential</h3>
@@ -837,7 +813,7 @@ export function Interview() {
       {/* End confirmation modal */}
       {showEndConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white border border-gray-200max-w-md mx-4">
+          <div className="bg-white border border-gray-200 max-w-md mx-4">
             <div className="py-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -881,7 +857,7 @@ export function Interview() {
       {/* Back confirmation modal */}
       {showBackConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white border border-gray-200max-w-md mx-4">
+          <div className="bg-white border border-gray-200 max-w-md mx-4">
             <div className="py-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">

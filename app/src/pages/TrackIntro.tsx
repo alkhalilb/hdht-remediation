@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { getTrackCases } from '../data/cases';
-import { Layout, Button } from '../components/common';
+import { Layout, Button, Card, CardContent } from '../components/common';
 import { getDeficitDisplayName, getScaffoldingExplanation } from '../services/scoring';
 import { ArrowRight } from 'lucide-react';
 
@@ -46,32 +46,36 @@ export function TrackIntro() {
           <p className="text-sm text-gray-500">Practice case {currentTrackCaseIndex + 1} of 3</p>
         </div>
 
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {currentCase.title}
-        </h2>
+        <Card className="mb-6">
+          <CardContent>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              {currentCase.title}
+            </h2>
+            <div className="p-4 bg-gray-50 mb-3">
+              <p className="text-gray-700">
+                {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
+              </p>
+              <p className="text-gray-700">
+                Chief Complaint: "{currentCase.chiefComplaint}"
+              </p>
+            </div>
+            <p className="text-sm text-gray-600">
+              <strong className="text-gray-900">Scaffolding ({currentCase.scaffoldingLevel}):</strong>{' '}
+              {scaffoldingExplanation}
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="p-4 bg-gray-50 mb-4">
-          <p className="text-gray-700">
-            {currentCase.patient.name}, {currentCase.patient.age}-year-old {currentCase.patient.sex}
-          </p>
-          <p className="text-gray-700">
-            Chief Complaint: "{currentCase.chiefComplaint}"
-          </p>
-        </div>
-
-        <p className="text-sm text-gray-600 mb-6">
-          <strong className="text-gray-900">Scaffolding ({currentCase.scaffoldingLevel}):</strong>{' '}
-          {scaffoldingExplanation}
-        </p>
-
-        <div className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Keep in mind</h3>
-          <ol className="space-y-1.5 text-sm text-gray-700 list-decimal list-inside">
-            {getTrackReminders(assignedTrack).map((reminder, index) => (
-              <li key={index}>{reminder}</li>
-            ))}
-          </ol>
-        </div>
+        <Card className="mb-8">
+          <CardContent>
+            <h3 className="text-sm font-semibold text-gray-900 mb-2">Keep in mind</h3>
+            <ol className="space-y-1.5 text-sm text-gray-700 list-decimal list-inside">
+              {getTrackReminders(assignedTrack).map((reminder, index) => (
+                <li key={index}>{reminder}</li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
 
         <Button size="lg" onClick={handleStart}>
           Start Practice Case

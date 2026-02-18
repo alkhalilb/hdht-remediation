@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { diagnosticCase, getTrackCases, getExitCase } from '../data/cases';
-import { Layout, Button } from '../components/common';
+import { Layout, Button, Card, CardContent } from '../components/common';
 import { HypothesisPanel } from '../components/interview';
 import { RemediationCase } from '../types';
 import { isDebugMode, getDebugInterview, DebugQuality } from '../data/debugInterviews';
@@ -81,45 +81,45 @@ export function HypothesisGeneration() {
         </div>
 
         {/* Patient Info */}
-        <div className="mb-6">
-            <div>
-                <h2 className="font-semibold text-gray-900 text-lg mb-1">
-                  {currentCase.patient.name}
-                </h2>
-                <p className="text-gray-600 mb-3">
-                  {currentCase.patient.age}-year-old {currentCase.patient.sex},{' '}
-                  {currentCase.patient.occupation}
-                </p>
+        <Card className="mb-6">
+          <CardContent>
+            <h2 className="font-semibold text-gray-900 text-lg mb-1">
+              {currentCase.patient.name}
+            </h2>
+            <p className="text-gray-600 mb-3">
+              {currentCase.patient.age}-year-old {currentCase.patient.sex},{' '}
+              {currentCase.patient.occupation}
+            </p>
 
-                <div className="bg-yellow-50 border border-yellow-200" style={{ padding: '16px' }}>
-                  <p className="font-medium text-yellow-800 mb-1">Chief Complaint:</p>
-                  <p className="text-yellow-900 text-lg">"{currentCase.chiefComplaint}"</p>
-                </div>
-
-                <div className="mt-4 grid grid-cols-5 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-500">BP:</span>
-                    <span className="ml-1 font-medium">{currentCase.vitalSigns.bp}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">HR:</span>
-                    <span className="ml-1 font-medium">{currentCase.vitalSigns.hr}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">RR:</span>
-                    <span className="ml-1 font-medium">{currentCase.vitalSigns.rr}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Temp:</span>
-                    <span className="ml-1 font-medium">{currentCase.vitalSigns.temp}°F</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">SpO2:</span>
-                    <span className="ml-1 font-medium">{currentCase.vitalSigns.spo2}%</span>
-                  </div>
-                </div>
+            <div className="bg-yellow-50 border border-yellow-200" style={{ padding: '16px' }}>
+              <p className="font-medium text-yellow-800 mb-1">Chief Complaint:</p>
+              <p className="text-yellow-900 text-lg">"{currentCase.chiefComplaint}"</p>
             </div>
-        </div>
+
+            <div className="mt-4 grid grid-cols-5 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">BP:</span>
+                <span className="ml-1 font-medium">{currentCase.vitalSigns.bp}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">HR:</span>
+                <span className="ml-1 font-medium">{currentCase.vitalSigns.hr}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">RR:</span>
+                <span className="ml-1 font-medium">{currentCase.vitalSigns.rr}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">Temp:</span>
+                <span className="ml-1 font-medium">{currentCase.vitalSigns.temp}°F</span>
+              </div>
+              <div>
+                <span className="text-gray-500">SpO2:</span>
+                <span className="ml-1 font-medium">{currentCase.vitalSigns.spo2}%</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Tips */}
         {showTips && (
@@ -146,7 +146,8 @@ export function HypothesisGeneration() {
         )}
 
         {/* Hypothesis Entry */}
-        <div className="mb-6">
+        <Card className="mb-6">
+          <CardContent>
             <h3 className="font-semibold text-gray-900 mb-4">
               Your Differential Diagnosis
             </h3>
@@ -169,7 +170,8 @@ export function HypothesisGeneration() {
                 </p>
               </div>
             )}
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Action Button */}
         <div className="flex justify-end">

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { getExitCase } from '../data/cases';
-import { Layout, Button } from '../components/common';
+import { Layout, Button, Card, CardContent } from '../components/common';
 import { ArrowRight, AlertTriangle } from 'lucide-react';
 
 export function ExitIntro() {
@@ -42,40 +42,45 @@ export function ExitIntro() {
           </div>
         )}
 
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {exitCase.title}
-        </h2>
+        <Card className="mb-6">
+          <CardContent>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              {exitCase.title}
+            </h2>
+            <div className="p-4 bg-gray-50 mb-3">
+              <p className="text-gray-700">
+                {exitCase.patient.name}, {exitCase.patient.age}-year-old {exitCase.patient.sex}
+              </p>
+              <p className="text-gray-700">
+                Chief Complaint: "{exitCase.chiefComplaint}"
+              </p>
+            </div>
+            <p className="text-sm text-gray-600">
+              No scaffolding on this case. You're on your own.
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="p-4 bg-gray-50 mb-4">
-          <p className="text-gray-700">
-            {exitCase.patient.name}, {exitCase.patient.age}-year-old {exitCase.patient.sex}
-          </p>
-          <p className="text-gray-700">
-            Chief Complaint: "{exitCase.chiefComplaint}"
-          </p>
-        </div>
-
-        <p className="text-sm text-gray-600 mb-6">
-          No scaffolding on this case. You're on your own.
-        </p>
-
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Passing criteria</h3>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• Focus dimension score ≥60</li>
-            <li>• Overall score ≥50</li>
-          </ul>
-        </div>
-
-        <div className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Reminders</h3>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• Generate your differential early from the chief complaint</li>
-            <li>• Ask discriminating questions that test your hypotheses</li>
-            <li>• Stay organized — complete topics before moving on</li>
-            <li>• Aim for 15–25 focused questions</li>
-          </ul>
-        </div>
+        <Card className="mb-8">
+          <CardContent>
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Passing criteria</h3>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• Focus dimension score ≥60</li>
+                <li>• Overall score ≥50</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Reminders</h3>
+              <ul className="text-sm text-gray-700 space-y-1">
+                <li>• Generate your differential early from the chief complaint</li>
+                <li>• Ask discriminating questions that test your hypotheses</li>
+                <li>• Stay organized — complete topics before moving on</li>
+                <li>• Aim for 15–25 focused questions</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
 
         <Button size="lg" onClick={handleStart}>
           Begin Exit Case
