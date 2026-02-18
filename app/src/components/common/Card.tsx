@@ -9,9 +9,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const baseStyles = 'bg-white';
 
     const variantStyles = {
-      default: 'border border-gray-300 shadow-sm',
-      bordered: 'border border-gray-300',
-      elevated: 'border border-gray-300 shadow-md',
+      default: 'border border-solid border-gray-300',
+      bordered: 'border border-solid border-gray-300',
+      elevated: 'border border-solid border-gray-300 shadow-sm',
     };
 
     return (
