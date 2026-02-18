@@ -9,7 +9,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     const baseStyles = 'bg-white rounded-xl';
 
     const variantStyles = {
-      default: 'shadow-sm',
+      default: 'shadow-sm border border-gray-100',
       bordered: 'border border-gray-200',
       elevated: 'shadow-lg',
     };

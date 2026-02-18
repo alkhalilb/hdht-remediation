@@ -1,3 +1,14 @@
+/**
+ * CategoryLabels Component
+ *
+ * RUBRIC DOMAIN: Sequencing & Strategy (Domain 3)
+ *
+ * This scaffolding component helps students develop logical interview sequencing
+ * by showing the current question category and (optionally) the suggested sequence.
+ * It supports the "Sequencing & Strategy" rubric domain which assesses whether
+ * students progress logically from broad to focused to confirmatory questioning.
+ */
+
 import { QuestionCategory } from '../../types';
 
 interface CategoryLabelsProps {
@@ -10,7 +21,7 @@ const categoryGroups = [
     name: 'HPI',
     categories: ['hpi_onset', 'hpi_location', 'hpi_character', 'hpi_severity', 'hpi_duration',
                  'hpi_aggravating', 'hpi_relieving', 'hpi_timing', 'hpi_associated'],
-    color: 'blue',
+    color: 'indigo',
   },
   {
     name: 'PMH/PSH',
@@ -40,7 +51,7 @@ const categoryGroups = [
 ];
 
 const colorClasses: Record<string, { bg: string; border: string; text: string; activeBg: string }> = {
-  blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', activeBg: 'bg-blue-100' },
+  indigo: { bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-700', activeBg: 'bg-indigo-100' },
   purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', activeBg: 'bg-purple-100' },
   green: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', activeBg: 'bg-green-100' },
   orange: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', activeBg: 'bg-orange-100' },

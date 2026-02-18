@@ -1,8 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { Message } from '../../types';
-import { User, Bot, MessageSquareWarning, Volume2, Loader2 } from 'lucide-react';
-
-const API_URL = '/api';
+import { User, Bot, MessageSquareWarning, Volume2 } from 'lucide-react';
 
 interface ChatWindowProps {
   messages: Message[];
@@ -14,76 +12,10 @@ interface ChatWindowProps {
 export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastSpokenMessageId = useRef<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
-  const [loadingTTS, setLoadingTTS] = useState<string | null>(null);
 
-  // Speak text using ElevenLabs API
-  const speakText = useCallback(async (text: string, messageId?: string) => {
-    // Stop any currently playing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setPlayingMessageId(null);
-
-    if (messageId) {
-      setLoadingTTS(messageId);
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/tts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text, patientSex }),
-      });
-
-      if (!response.ok) {
-        console.error('TTS request failed:', response.status);
-        // Fall back to browser TTS
-        fallbackBrowserTTS(text);
-        return;
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-
-      if (messageId) {
-        setPlayingMessageId(messageId);
-      }
-
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-        setPlayingMessageId(null);
-        audioRef.current = null;
-      };
-
-      audio.onerror = () => {
-        console.error('Audio playback error');
-        URL.revokeObjectURL(audioUrl);
-        setPlayingMessageId(null);
-        audioRef.current = null;
-        // Fall back to browser TTS
-        fallbackBrowserTTS(text);
-      };
-
-      await audio.play();
-    } catch (error) {
-      console.error('TTS error:', error);
-      // Fall back to browser TTS
-      fallbackBrowserTTS(text);
-    } finally {
-      setLoadingTTS(null);
-    }
-  }, [patientSex]);
-
-  // Fallback to browser TTS if ElevenLabs fails
-  const fallbackBrowserTTS = useCallback((text: string) => {
+  // Speak text using browser Speech Synthesis
+  const speakText = useCallback((text: string, messageId?: string) => {
     if (!('speechSynthesis' in window)) return;
 
     window.speechSynthesis.cancel();
@@ -93,10 +25,8 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
     utterance.volume = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    // Try to find a voice matching the patient's gender
     let preferredVoice;
     if (patientSex === 'male') {
-      // Look for male voices
       preferredVoice = voices.find(v =>
         v.name.includes('Daniel') ||
         v.name.includes('Alex') ||
@@ -104,7 +34,6 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
         (v.name.includes('Google') && v.name.includes('Male'))
       );
     } else {
-      // Default to female voices
       preferredVoice = voices.find(v =>
         v.name.includes('Samantha') ||
         v.name.includes('Victoria') ||
@@ -112,13 +41,24 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
         (v.name.includes('Google') && v.name.includes('Female'))
       );
     }
-    // Fallback to any English voice if gender-specific not found
     if (!preferredVoice) {
       preferredVoice = voices.find(v => v.lang.startsWith('en'));
     }
     if (preferredVoice) {
       utterance.voice = preferredVoice;
     }
+
+    if (messageId) {
+      setPlayingMessageId(messageId);
+    }
+
+    utterance.onend = () => {
+      setPlayingMessageId(null);
+    };
+
+    utterance.onerror = () => {
+      setPlayingMessageId(null);
+    };
 
     window.speechSynthesis.speak(utterance);
   }, [patientSex]);
@@ -130,10 +70,6 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
 
   // Stop playback
   const handleStopPlayback = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
     window.speechSynthesis?.cancel();
     setPlayingMessageId(null);
   }, []);
@@ -157,9 +93,6 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
       window.speechSynthesis?.cancel();
     };
   }, []);
@@ -182,7 +115,7 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                 message.role === 'student'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-sm'
                   : message.role === 'patient'
                   ? 'bg-gray-300 text-gray-700'
                   : 'bg-yellow-100 text-yellow-700'
@@ -197,9 +130,9 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
             <div
               className={`max-w-[80%] rounded-2xl ${
                 message.role === 'student'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-sm'
                   : message.role === 'patient'
-                  ? 'bg-white text-gray-900 border border-gray-200 group'
+                  ? 'bg-white text-gray-900 border border-gray-100 shadow-sm group'
                   : 'bg-yellow-50 text-yellow-900 border border-yellow-200'
               }`}
               style={{ padding: '10px 16px' }}
@@ -213,23 +146,14 @@ export function ChatWindow({ messages, isLoading, ttsEnabled, patientSex }: Chat
                         ? handleStopPlayback()
                         : handlePlayMessage(message.content, message.id)
                     }
-                    disabled={loadingTTS === message.id}
                     className={`flex-shrink-0 p-1.5 rounded-full transition-all ${
                       playingMessageId === message.id
                         ? 'bg-blue-100 text-blue-600'
-                        : loadingTTS === message.id
-                        ? 'bg-gray-100 text-gray-400'
                         : 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100'
                     }`}
                     title={playingMessageId === message.id ? 'Stop' : 'Read aloud'}
                   >
-                    {loadingTTS === message.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : playingMessageId === message.id ? (
-                      <Volume2 className="w-4 h-4 animate-pulse" />
-                    ) : (
-                      <Volume2 className="w-4 h-4" />
-                    )}
+                    <Volume2 className={`w-4 h-4 ${playingMessageId === message.id ? 'animate-pulse' : ''}`} />
                   </button>
                 )}
               </div>

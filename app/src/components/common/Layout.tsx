@@ -73,16 +73,16 @@ export function Layout({ children, showProgress = true, showHeader = true, fullW
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
       {showHeader && (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
                   <Stethoscope className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-semibold text-gray-900">History Taking Skills</h1>
-                  <p className="text-xs text-gray-500">Remediation Program</p>
+                  <h1 className="text-lg font-bold text-gray-900">HBHx</h1>
+                  <p className="text-xs text-gray-500">History Taking Skills</p>
                 </div>
               </Link>
               {showProgress && (
